@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth2/Keycloak Debug Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #4CAF50;
+            margin-top: 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            background: #f0f0f0;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+        .warning {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #666;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .status.ok { background: #4CAF50; color: white; }
+        .status.error { background: #f44336; color: white; }
+        .status.warning { background: #ff9800; color: white; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #4CAF50;
+            color: white;
+        }
+        tr:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 OAuth2/Keycloak Debug Tool</h1>
+    
+    <div class="section">
+        <h2>1. Keycloak Discovery</h2>
+        <p>Check what endpoints and capabilities Keycloak advertises</p>
+        <button onclick="checkDiscovery()">Check Discovery Endpoint</button>
+        <div id="discovery-result"></div>
+    </div>
+
+    <div class="section">
+        <h2>2. Service Status</h2>
+        <p>Check if OAuth2 proxy services are responding</p>
+        <button onclick="checkService('mongodb')">Check Mongo Express</button>
+        <button onclick="checkService('redis')">Check Redis Commander</button>
+        <button onclick="checkService('dashy')">Check Dashy</button>
+        <div id="service-result"></div>
+    </div>
+
+    <div class="section">
+        <h2>3. OAuth2 Flow Tester</h2>
+        <p>Test the OAuth2 authorization URL construction</p>
+        <label>Client ID:</label>
+        <input type="text" id="client-id" value="mongodb">
+        <label>Redirect URI:</label>
+        <input type="text" id="redirect-uri" value="https://mongodb.ai-servicers.com/oauth2/callback">
+        <label>Scopes:</label>
+        <input type="text" id="scopes" value="openid email profile groups">
+        <button onclick="testOAuthFlow()">Generate Auth URL</button>
+        <div id="oauth-result"></div>
+    </div>
+
+    <div class="section">
+        <h2>4. Token Introspection</h2>
+        <p>If you have an access token, check what it contains</p>
+        <label>Access Token (paste from session info):</label>
+        <input type="text" id="access-token" placeholder="Paste your access token here">
+        <button onclick="decodeToken()">Decode Token (Client-Side)</button>
+        <div id="token-result"></div>
+    </div>
+
+    <div class="section">
+        <h2>5. Session Check</h2>
+        <p>Check your current session with each service</p>
+        <button onclick="checkSession('mongodb')">Mongo Express Session</button>
+        <button onclick="checkSession('redis')">Redis Commander Session</button>
+        <button onclick="checkSession('dashy')">Dashy Session</button>
+        <div id="session-result"></div>
+    </div>
+
+    <div class="section">
+        <h2>6. Keycloak Realm Info</h2>
+        <p>Get public information about the Keycloak realm</p>
+        <button onclick="getRealmInfo()">Get Realm Info</button>
+        <div id="realm-result"></div>
+    </div>
+
+    <script>
+        const KEYCLOAK_BASE = 'https://keycloak.ai-servicers.com';
+        const REALM = 'master';
+
+        async function checkDiscovery() {
+            const resultDiv = document.getElementById('discovery-result');
+            resultDiv.innerHTML = 'Loading...';
+            
+            try {
+                const response = await fetch(`${KEYCLOAK_BASE}/realms/${REALM}/.well-known/openid-configuration`);
+                const data = await response.json();
+                
+                let html = '<div class="result">';
+                html += '<h3>✅ Discovery Endpoint Working</h3>';
+                html += '<table>';
+                html += '<tr><th>Endpoint</th><th>URL</th></tr>';
+                html += `<tr><td>Authorization</td><td>${data.authorization_endpoint}</td></tr>`;
+                html += `<tr><td>Token</td><td>${data.token_endpoint}</td></tr>`;
+                html += `<tr><td>UserInfo</td><td>${data.userinfo_endpoint}</td></tr>`;
+                html += `<tr><td>JWKS</td><td>${data.jwks_uri}</td></tr>`;
+                html += '</table>';
+                html += '<h4>Supported Scopes:</h4>';
+                html += data.scopes_supported ? data.scopes_supported.join(', ') : 'Not specified';
+                html += '<h4>Supported Response Types:</h4>';
+                html += data.response_types_supported ? data.response_types_supported.join(', ') : 'Not specified';
+                html += '</div>';
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function checkService(service) {
+            const resultDiv = document.getElementById('service-result');
+            resultDiv.innerHTML = 'Checking...';
+            
+            const services = {
+                'mongodb': 'https://mongodb.ai-servicers.com/oauth2/ping',
+                'redis': 'https://redis.ai-servicers.com/oauth2/ping',
+                'dashy': 'https://dashy.ai-servicers.com/oauth2/ping'
+            };
+            
+            try {
+                const response = await fetch(services[service], {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+                
+                // With no-cors, we can't read the response but we know it connected
+                resultDiv.innerHTML = `<div class="result">
+                    <span class="status ok">Connected</span> ${service} OAuth2 proxy is responding
+                    <br><br>To check your session, visit:
+                    <br><a href="${services[service].replace('/ping', '/userinfo')}" target="_blank">${services[service].replace('/ping', '/userinfo')}</a>
+                </div>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">
+                    <span class="status error">Error</span> Cannot reach ${service} OAuth2 proxy
+                    <br>Error: ${error.message}
+                </div>`;
+            }
+        }
+
+        function testOAuthFlow() {
+            const clientId = document.getElementById('client-id').value;
+            const redirectUri = document.getElementById('redirect-uri').value;
+            const scopes = document.getElementById('scopes').value;
+            const resultDiv = document.getElementById('oauth-result');
+            
+            const authUrl = new URL(`${KEYCLOAK_BASE}/realms/${REALM}/protocol/openid-connect/auth`);
+            authUrl.searchParams.append('client_id', clientId);
+            authUrl.searchParams.append('redirect_uri', redirectUri);
+            authUrl.searchParams.append('response_type', 'code');
+            authUrl.searchParams.append('scope', scopes);
+            authUrl.searchParams.append('state', 'test-state-' + Date.now());
+            
+            resultDiv.innerHTML = `<div class="result">
+                <h4>Generated Authorization URL:</h4>
+                <a href="${authUrl.toString()}" target="_blank">${authUrl.toString()}</a>
+                <br><br>
+                <h4>Parameters:</h4>
+                <table>
+                    <tr><td><strong>Client ID:</strong></td><td>${clientId}</td></tr>
+                    <tr><td><strong>Redirect URI:</strong></td><td>${redirectUri}</td></tr>
+                    <tr><td><strong>Scopes:</strong></td><td>${scopes}</td></tr>
+                    <tr><td><strong>Response Type:</strong></td><td>code</td></tr>
+                </table>
+                <br>
+                <button onclick="window.open('${authUrl.toString()}', '_blank')">Test This URL</button>
+                <br><br>
+                <em>If you get "invalid_scope" error, the scopes "${scopes}" are not all available in Keycloak.</em>
+            </div>`;
+        }
+
+        function decodeToken() {
+            const token = document.getElementById('access-token').value;
+            const resultDiv = document.getElementById('token-result');
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="result error">Please enter a token</div>';
+                return;
+            }
+            
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) {
+                    throw new Error('Invalid JWT format');
+                }
+                
+                const header = JSON.parse(atob(parts[0]));
+                const payload = JSON.parse(atob(parts[1]));
+                
+                resultDiv.innerHTML = `<div class="result">
+                    <h4>Token Header:</h4>
+                    ${JSON.stringify(header, null, 2)}
+                    <br><br>
+                    <h4>Token Payload:</h4>
+                    ${JSON.stringify(payload, null, 2)}
+                    <br><br>
+                    <h4>Key Information:</h4>
+                    <table>
+                        <tr><td><strong>Subject:</strong></td><td>${payload.sub || 'N/A'}</td></tr>
+                        <tr><td><strong>Username:</strong></td><td>${payload.preferred_username || 'N/A'}</td></tr>
+                        <tr><td><strong>Email:</strong></td><td>${payload.email || 'N/A'}</td></tr>
+                        <tr><td><strong>Groups:</strong></td><td>${payload.groups ? payload.groups.join(', ') : 'N/A'}</td></tr>
+                        <tr><td><strong>Expires:</strong></td><td>${payload.exp ? new Date(payload.exp * 1000).toLocaleString() : 'N/A'}</td></tr>
+                    </table>
+                </div>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">Error decoding token: ${error.message}</div>`;
+            }
+        }
+
+        async function checkSession(service) {
+            const resultDiv = document.getElementById('session-result');
+            resultDiv.innerHTML = 'Checking session...';
+            
+            const services = {
+                'mongodb': 'https://mongodb.ai-servicers.com/oauth2/userinfo',
+                'redis': 'https://redis.ai-servicers.com/oauth2/userinfo',
+                'dashy': 'https://dashy.ai-servicers.com/oauth2/userinfo'
+            };
+            
+            try {
+                const response = await fetch(services[service], {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<div class="result">
+                        <span class="status ok">Authenticated</span> ${service}
+                        <br><br>
+                        <strong>Session Data:</strong>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="result warning">
+                        <span class="status warning">Not Authenticated</span> ${service}
+                        <br>Status: ${response.status} ${response.statusText}
+                        <br><br>You need to login first at: 
+                        <a href="${services[service].replace('/oauth2/userinfo', '')}" target="_blank">${services[service].replace('/oauth2/userinfo', '')}</a>
+                    </div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">Error checking session: ${error.message}</div>`;
+            }
+        }
+
+        async function getRealmInfo() {
+            const resultDiv = document.getElementById('realm-result');
+            resultDiv.innerHTML = 'Loading...';
+            
+            try {
+                const response = await fetch(`${KEYCLOAK_BASE}/realms/${REALM}`);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `<div class="result">
+                    <h4>Realm Information:</h4>
+                    <table>
+                        <tr><td><strong>Realm:</strong></td><td>${data.realm}</td></tr>
+                        <tr><td><strong>Display Name:</strong></td><td>${data.displayName || 'Not set'}</td></tr>
+                        <tr><td><strong>Login Theme:</strong></td><td>${data.loginTheme || 'default'}</td></tr>
+                        <tr><td><strong>Account URL:</strong></td><td>${data.accountUrl || 'Not set'}</td></tr>
+                    </table>
+                </div>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-check discovery on load
+        window.onload = () => {
+            checkDiscovery();
+        };
+    </script>
+</body>
+</html>
