@@ -92,9 +92,10 @@ server {
 EOF
 fi
 
-# Generate index page for sites directory
-echo "Generating sites index page..."
-cat > "/home/administrator/projects/nginx/sites/index.html" <<'EOF'
+# Generate index page for sites directory if it doesn't exist
+if [ ! -f "/home/administrator/projects/nginx/sites/index.html" ]; then
+    echo "Generating sites index page..."
+    cat > "/home/administrator/projects/nginx/sites/index.html" <<'EOF'
 <!DOCTYPE html>
 <html>
 <head>

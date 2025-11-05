@@ -11,6 +11,10 @@ NGINX serves as the main reverse proxy and static site host:
 - SSL termination and certificate management via Traefik
 
 ### Static Sites Hosted
+- **nginx-portal** - https://nginx.ai-servicers.com
+  - Main portal/landing page for nginx-hosted services
+  - Links to diagrams and other nginx services
+  - Created: 2025-11-04
 - **langchain-portal** - https://langchain-portal.ai-servicers.com
   - LangChain API directory and quick links
   - Beautiful portal page with all LangServe endpoints
@@ -18,6 +22,15 @@ NGINX serves as the main reverse proxy and static site host:
 
 ## Recent Work & Changes
 _This section is updated by Claude during each session_
+
+### Session: 2025-11-04
+- **Infrastructure Consolidation**: Eliminated main-nginx container
+  - Moved nginx.ai-servicers.com portal from separate main-nginx container to general nginx container
+  - Created nginx-portal site under nginx/sites/nginx-portal/
+  - Added nginx-portal.conf configuration
+  - Moved data from data/nginx-main/ to data/nginx/nginx-portal/
+  - Now serving nginx.ai-servicers.com through main nginx container
+  - Reduced container count from 3 nginx containers to 2
 
 ### Session: 2025-09-30
 - **Static Sites Standard Established**: Created new pattern for hosting static pages
