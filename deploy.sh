@@ -267,10 +267,6 @@ else
         --label "traefik.http.routers.nginx.entrypoints=websecure" \
         --label "traefik.http.routers.nginx.tls=true" \
         --label "traefik.http.routers.nginx.tls.certresolver=letsencrypt" \
-        --label "traefik.http.routers.langchain-portal.rule=Host(\`langchain-portal.ai-servicers.com\`)" \
-        --label "traefik.http.routers.langchain-portal.entrypoints=websecure" \
-        --label "traefik.http.routers.langchain-portal.tls=true" \
-        --label "traefik.http.routers.langchain-portal.tls.certresolver=letsencrypt" \
         --label "traefik.http.services.nginx.loadbalancer.server.port=80" \
         "$NGINX_IMAGE"
     

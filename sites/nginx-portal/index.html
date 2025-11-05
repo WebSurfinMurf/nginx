@@ -10,7 +10,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -20,131 +20,117 @@
             align-items: center;
             padding: 20px;
         }
-        
+
         .container {
             background: white;
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
         }
-        
+
         h1 {
             color: #333;
             text-align: center;
             margin-bottom: 10px;
             font-size: 2.5em;
         }
-        
+
         .subtitle {
             text-align: center;
             color: #666;
             margin-bottom: 40px;
             font-size: 1.1em;
         }
-        
+
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
-        
+
         .service-card {
             background: #f8f9fa;
             border-radius: 10px;
-            padding: 20px;
+            padding: 25px;
             text-decoration: none;
             color: #333;
             transition: all 0.3s;
             border: 2px solid transparent;
+            display: block;
         }
-        
+
         .service-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             border-color: #667eea;
         }
-        
+
+        .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
         .service-card h3 {
             color: #667eea;
             margin-bottom: 10px;
-            font-size: 1.3em;
+            font-size: 1.4em;
         }
-        
+
         .service-card p {
             color: #666;
             line-height: 1.6;
+            font-size: 0.95em;
         }
-        
-        .status {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            margin-left: 10px;
-        }
-        
-        .status.active {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .status.coming-soon {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
+
         .footer {
             text-align: center;
             margin-top: 30px;
             padding-top: 20px;
             border-top: 1px solid #e9ecef;
             color: #666;
+            font-size: 0.9em;
         }
-        
-        .icon {
-            font-size: 2em;
-            margin-bottom: 10px;
+
+        .footer code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🌐 Nginx Services Portal</h1>
-        <p class="subtitle">Central hub for nginx-hosted applications</p>
-        
+        <p class="subtitle">Static sites and documentation hosted on nginx.ai-servicers.com</p>
+
         <div class="services-grid">
-            <a href="https://diagrams.nginx.ai-servicers.com" class="service-card">
-                <div class="icon">📊</div>
-                <h3>Diagrams <span class="status active">Active</span></h3>
-                <p>View and import generated infrastructure diagrams, architecture visualizations, and Draw.io files</p>
+            <a href="/infrastructure-docs/" class="service-card">
+                <div class="icon">🏗️</div>
+                <h3>Infrastructure Documentation</h3>
+                <p>Complete architecture diagram documenting all 46 projects, network topology, service dependencies, and deployment information for the ai-servicers.com infrastructure.</p>
             </a>
-            
-            <div class="service-card" style="opacity: 0.6; cursor: not-allowed;">
-                <div class="icon">📝</div>
-                <h3>Docs <span class="status coming-soon">Coming Soon</span></h3>
-                <p>Technical documentation, API references, and system guides</p>
-            </div>
-            
-            <div class="service-card" style="opacity: 0.6; cursor: not-allowed;">
-                <div class="icon">📈</div>
-                <h3>Metrics <span class="status coming-soon">Coming Soon</span></h3>
-                <p>System metrics, performance dashboards, and monitoring tools</p>
-            </div>
-            
-            <div class="service-card" style="opacity: 0.6; cursor: not-allowed;">
-                <div class="icon">🔧</div>
-                <h3>Tools <span class="status coming-soon">Coming Soon</span></h3>
-                <p>Web-based utilities and administrative tools</p>
-            </div>
+
+            <a href="/langchain-portal/" class="service-card">
+                <div class="icon">🔗</div>
+                <h3>LangChain Portal</h3>
+                <p>API directory and quick reference for LangChain services. Access all LangServe endpoints, chain definitions, and integration documentation.</p>
+            </a>
+
+            <a href="/claude-context/" class="service-card">
+                <div class="icon">🤖</div>
+                <h3>Claude Code CLI Structure</h3>
+                <p>Multi-layered context management architecture. Documentation of initialization files, commands, skills, agents, and persistent memory system for Claude Code AI assistant.</p>
+            </a>
         </div>
-        
+
         <div class="footer">
             <p><strong>Server:</strong> linuxserver.lan | <strong>Powered by:</strong> Nginx + Traefik</p>
-            <p style="margin-top: 10px; font-size: 0.9em;">
-                Add more services by creating subdomains like <code>[service].nginx.ai-servicers.com</code>
+            <p style="margin-top: 10px;">
+                All sites available at <code>nginx.ai-servicers.com/[site-name]/</code>
             </p>
         </div>
     </div>

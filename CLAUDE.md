@@ -10,20 +10,65 @@ NGINX serves as the main reverse proxy and static site host:
 - Subdomain-based routing for different services
 - SSL termination and certificate management via Traefik
 
-### Static Sites Hosted
-- **nginx-portal** - https://nginx.ai-servicers.com
-  - Main portal/landing page for nginx-hosted services
-  - Links to diagrams and other nginx services
+### Static Sites Hosted (Path-Based on nginx.ai-servicers.com)
+All static sites are now served under **nginx.ai-servicers.com** using path-based routing:
+- **Landing Page** - https://nginx.ai-servicers.com/
+  - Portal with index of all hosted sites
   - Created: 2025-11-04
-- **langchain-portal** - https://langchain-portal.ai-servicers.com
+- **Infrastructure Documentation** - https://nginx.ai-servicers.com/infrastructure-docs/
+  - Complete architecture diagram and system documentation
+  - Created: 2025-11-04
+- **LangChain Portal** - https://nginx.ai-servicers.com/langchain-portal/
   - LangChain API directory and quick links
-  - Beautiful portal page with all LangServe endpoints
-  - Created: 2025-09-30
+  - Migrated from subdomain to path: 2025-11-04
+- **Claude Code CLI Structure** - https://nginx.ai-servicers.com/claude-context/
+  - Multi-layered context management architecture documentation
+  - Covers: initialization files, commands, skills, agents, persistent memory
+  - Created: 2025-11-04
 
 ## Recent Work & Changes
 _This section is updated by Claude during each session_
 
-### Session: 2025-11-04
+### Session: 2025-11-04 (Part 3 - Claude Context Documentation)
+- **Added Claude Code CLI Structure Documentation**: New comprehensive documentation page
+  - **URL**: https://nginx.ai-servicers.com/claude-context/
+  - **Purpose**: Documents the multi-layered context management system for Claude Code CLI
+  - **Content**:
+    - Executive summary of context architecture
+    - 5-layer system: Initialization, Project Docs, Commands, Skills, Agents
+    - Complete documentation of memoryfiles.md bootstrap process
+    - 9 core AINotes files loaded on every session
+    - 50+ CLAUDE.md project documentation files
+    - 11 slash commands with two-tier system
+    - 13 infrastructure skills
+    - 4 specialized agents with inter-agent protocol
+    - OpenMemory (mem0) persistent memory integration
+    - 64+ MCP tools across 8 servers
+    - Session state management in ~/.claude/
+  - **Visual Elements**: SVG architecture diagram, statistics grid, layer cards
+  - **Deployment**:
+    - Created directory: `/home/administrator/projects/nginx/sites/claude-context/`
+    - Added location block to nginx-portal.conf
+    - Added card to landing page
+    - Deployed successfully
+
+### Session: 2025-11-04 (Part 2 - Path-Based Routing)
+- **Migrated to Path-Based Architecture**: Consolidated all static sites under single domain
+  - **Why**: Avoids need for multi-wildcard certificates (*.ai-servicers.com AND *.nginx.ai-servicers.com)
+  - **Pattern**: All sites served from `nginx.ai-servicers.com/[site-name]/`
+  - **Structure**:
+    ```
+    sites/nginx-portal/          → nginx.ai-servicers.com/
+    sites/infrastructure-docs/   → nginx.ai-servicers.com/infrastructure-docs/
+    sites/langchain-portal/      → nginx.ai-servicers.com/langchain-portal/
+    ```
+  - Created landing page at nginx.ai-servicers.com with clickable index
+  - Updated nginx-portal.conf with `location` blocks using `alias` directives
+  - Removed subdomain configs (infrastructure-docs.conf, langchain-portal.conf)
+  - Updated Traefik routing to single domain: `Host(\`nginx.ai-servicers.com\`)`
+  - **Benefits**: Single domain, single cert, easy to add new sites
+
+### Session: 2025-11-04 (Part 1 - Infrastructure Consolidation)
 - **Infrastructure Consolidation**: Eliminated main-nginx container
   - Moved nginx.ai-servicers.com portal from separate main-nginx container to general nginx container
   - Created nginx-portal site under nginx/sites/nginx-portal/
@@ -221,73 +266,123 @@ docker exec -it nginx sh
 - Keep KEYCLOAK_CLIENT_SECRET secure
 - Regular updates recommended for security patches
 
-## Static Site Hosting Standard
+## Static Site Hosting Standard (Path-Based)
 
-### Creating a New Static Site
+### Current Architecture (Updated 2025-11-04)
 
-**Standard Pattern**: Pages (not projects) go under `nginx/sites/`
+**All static sites are served under `nginx.ai-servicers.com` using path-based routing.**
 
-#### 1. Create Site Directory
-```bash
-mkdir -p /home/administrator/projects/nginx/sites/{site-name}/
+**URL Pattern**: `nginx.ai-servicers.com/[site-name]/`
+
+**Benefits**:
+- ✅ Single domain, single certificate (*.ai-servicers.com covers it)
+- ✅ No multi-wildcard certificates needed
+- ✅ Easy to add new sites (directory + location block + link)
+- ✅ Clean disk organization
+- ✅ Simple landing page shows all available sites
+
+### Directory Structure
+```
+/home/administrator/projects/nginx/sites/
+├── nginx-portal/          → nginx.ai-servicers.com/ (landing page)
+├── infrastructure-docs/   → nginx.ai-servicers.com/infrastructure-docs/
+├── langchain-portal/      → nginx.ai-servicers.com/langchain-portal/
+├── claude-context/        → nginx.ai-servicers.com/claude-context/
+└── [new-site]/           → nginx.ai-servicers.com/[new-site]/
 ```
 
-#### 2. Add HTML Content
+### Deploying a New Static Site
+
+#### Step 1: Create Site Directory
+```bash
+mkdir -p /home/administrator/projects/nginx/sites/[site-name]/
+```
+
+#### Step 2: Add HTML Content
 ```bash
 # Create your index.html
-/home/administrator/projects/nginx/sites/{site-name}/index.html
+cat > /home/administrator/projects/nginx/sites/[site-name]/index.html <<'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Site Title</title>
+</head>
+<body>
+    <h1>Your Site Content</h1>
+</body>
+</html>
+EOF
 ```
 
-#### 3. Create NGINX Virtual Host Config
-```bash
-# Create config file
-/home/administrator/projects/nginx/configs/{site-name}.conf
-```
-
-Example config:
+#### Step 3: Add Location Block to nginx-portal.conf
+Edit `/home/administrator/projects/nginx/configs/nginx-portal.conf`:
 ```nginx
-server {
-    listen 80;
-    server_name {site-name}.ai-servicers.com;
-
-    root /usr/share/nginx/sites/{site-name};
+# Add this before the health check endpoint:
+# Your New Site
+location /[site-name]/ {
+    alias /usr/share/nginx/sites/[site-name]/;
     index index.html;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
-    # Security headers
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
+    try_files $uri $uri/ =404;
 }
 ```
 
-#### 4. Deploy
+#### Step 4: Add Link to Landing Page
+Edit `/home/administrator/projects/nginx/sites/nginx-portal/index.html` and add:
+```html
+<a href="/[site-name]/" class="service-card">
+    <div class="icon">🎯</div>
+    <h3>Your Site Name</h3>
+    <p>Description of your site</p>
+</a>
+```
+
+#### Step 5: Deploy
 ```bash
 cd /home/administrator/projects/nginx
 ./deploy.sh
 ```
 
-The deploy.sh already includes:
-- Sites directory mount: `-v /home/administrator/projects/nginx/sites:/usr/share/nginx/sites:ro`
-- Traefik labels for automatic HTTPS routing
-- Let's Encrypt certificate generation
+#### Step 6: Access
+Your site will be available at: `https://nginx.ai-servicers.com/[site-name]/`
 
-#### 5. Access
-Your site will be available at: `https://{site-name}.ai-servicers.com`
+### Configuration Details
 
-### Benefits of This Pattern
-- ✅ No additional Docker containers needed
-- ✅ Automatic HTTPS via Traefik
-- ✅ Easy to add new pages (just mkdir + add config)
-- ✅ Centralized static content management
-- ✅ Follows separation: projects vs pages
+**nginx-portal.conf structure**:
+```nginx
+server {
+    listen 80;
+    server_name nginx.ai-servicers.com;
 
-### Authentication
-- **Public sites**: No additional config needed
-- **Protected sites**: Add OAuth2 proxy labels or create separate proxy container
+    root /usr/share/nginx/sites/nginx-portal;
+    index index.html;
+
+    # Landing page
+    location = / {
+        try_files /index.html =404;
+    }
+
+    # Each site gets a location block with alias
+    location /infrastructure-docs/ {
+        alias /usr/share/nginx/sites/infrastructure-docs/;
+        index index.html;
+        try_files $uri $uri/ =404;
+    }
+
+    # Add more sites here...
+}
+```
+
+**Traefik Routing** (in deploy.sh):
+```bash
+--label "traefik.http.routers.nginx.rule=Host(\`nginx.ai-servicers.com\`)"
+```
+
+### Important Notes
+- **No separate config files** - All sites use one nginx-portal.conf
+- **No Traefik changes** - Single domain handles all paths
+- **No certificate changes** - *.ai-servicers.com wildcard covers nginx.ai-servicers.com
+- **Clean URLs** - Users see nginx.ai-servicers.com/site-name/ (no "sites" in URL)
+- **Organized disk** - All sites in sites/ directory
 
 ---
 *Last Updated: 2025-09-30 by Claude*
