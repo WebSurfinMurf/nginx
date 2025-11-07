@@ -106,6 +106,9 @@
     <div class="container">
         <h1>🌐 Nginx Services Portal</h1>
         <p class="subtitle">Static sites and documentation hosted on nginx.ai-servicers.com</p>
+        <div style="text-align: center; margin-bottom: 30px; padding: 15px; background: #e7f3ff; border-radius: 10px; border-left: 4px solid #667eea;">
+            <strong>📍 Quick Access:</strong> All sites are available at <code style="background: white; padding: 4px 8px; border-radius: 4px;">nginx.ai-servicers.com/[site-name]/</code>
+        </div>
 
         <div class="services-grid">
             <a href="/infrastructure-docs/" class="service-card">
@@ -122,15 +125,24 @@
 
             <a href="/claude-context/" class="service-card">
                 <div class="icon">🤖</div>
-                <h3>Claude Code CLI Structure</h3>
-                <p>Multi-layered context management architecture. Documentation of initialization files, commands, skills, agents, and persistent memory system for Claude Code AI assistant.</p>
+                <h3>Claude Context Management</h3>
+                <p>Comprehensive guide to agent context management covering memory tiers, hierarchical loading, subagents, skills, tools, and workflows. Manual documentation format.</p>
+            </a>
+
+            <a href="/context-architecture/" class="service-card">
+                <div class="icon">🏗️</div>
+                <h3>Context Architecture Diagram</h3>
+                <p>Professional architecture diagram with SVG visuals showing data flows, processing pipeline, system layers, and agent orchestration. Generated using architecture-diagram-creator skill.</p>
             </a>
         </div>
 
         <div class="footer">
-            <p><strong>Server:</strong> linuxserver.lan | <strong>Powered by:</strong> Nginx + Traefik</p>
-            <p style="margin-top: 10px;">
-                All sites available at <code>nginx.ai-servicers.com/[site-name]/</code>
+            <p><strong>🖥️ Server:</strong> linuxserver.lan | <strong>⚡ Powered by:</strong> Nginx + Traefik + Keycloak SSO</p>
+            <p style="margin-top: 10px; color: #999;">
+                <strong>Total Sites:</strong> 4 active | <strong>Last Updated:</strong> 2025-11-07
+            </p>
+            <p style="margin-top: 10px; font-size: 0.85em; color: #999;">
+                💡 To add a new site: See <code>/home/administrator/.claude/skills/nginx-static-site/SKILL.md</code>
             </p>
         </div>
     </div>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code Context Loading Architecture</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .principle-box {
+            background: #e7f3ff;
+            border-left: 4px solid #4299e1;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+
+        .principle-box strong {
+            color: #2b6cb0;
+            font-size: 1.1rem;
+        }
+
+        .section {
+            margin: 3rem 0;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .diagram-container {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .layer-description {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .layer-description h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .layer-description .layer-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .layer-description ul {
+            margin-left: 2.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .layer-description li {
+            margin: 0.3rem 0;
+            color: #4a5568;
+        }
+
+        .code {
+            background: #2d3748;
+            color: #68d391;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .recommendation-box {
+            background: #fef5e7;
+            border-left: 4px solid #ed8936;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+
+        .recommendation-box strong {
+            color: #c05621;
+            font-size: 1.1rem;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .comparison-card {
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .comparison-card.before {
+            background: #fff5f5;
+            border: 2px solid #fc8181;
+        }
+
+        .comparison-card.after {
+            background: #f0fff4;
+            border: 2px solid #68d391;
+        }
+
+        .comparison-card h4 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comparison-card.before h4 {
+            color: #c53030;
+        }
+
+        .comparison-card.after h4 {
+            color: #2f855a;
+        }
+
+        .legend {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .legend-title {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 2px solid #2d3748;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .benefit-card {
+            background: #f0fff4;
+            border: 2px solid #68d391;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .benefit-card h4 {
+            color: #2f855a;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏗️ Claude Code Context Loading Architecture</h1>
+        <p class="subtitle">Understanding the Four-Layer Context Loading Sequence</p>
+
+        <div class="principle-box">
+            <strong>Core Principle:</strong> Context loads from <strong>general → specific</strong>.
+            User settings load first, then infrastructure knowledge, then workspace context,
+            then project-specific details. <strong>Skills</strong> are loaded (available) but invoked on-demand.
+            <strong>mem0</strong> is never auto-loaded - it's queried at task-start with task-specific context.
+        </div>
+
+        <div class="principle-box" style="background: #fff5f5; border-left: 4px solid #fc8181;">
+            <strong style="color: #c53030;">Files vs mem0 Distinction:</strong><br>
+            <strong>Files (CLAUDE.md, AINotes):</strong> Authoritative documentation, current architecture, how things work<br>
+            <strong>mem0 (persistent memory):</strong> Lessons learned, past decisions, gotchas, "why we did it this way"<br>
+            → <em>Query mem0 when starting a task, not when entering a directory</em>
+        </div>
+
+        <!-- Main Architecture Diagram -->
+        <div class="section">
+            <h2 class="section-title">Context Loading Sequence</h2>
+
+            <div class="diagram-container">
+                <svg viewBox="0 0 1000 1400" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#2d3748"/>
+                        </marker>
+                    </defs>
+
+                    <!-- Layer 1: User Bootstrap -->
+                    <rect x="100" y="50" width="800" height="200" rx="15"
+                          fill="#4299e1" stroke="#2b6cb0" stroke-width="3"/>
+                    <text x="500" y="90" text-anchor="middle" fill="white" font-size="24" font-weight="bold">
+                        LAYER 1: User Bootstrap
+                    </text>
+                    <text x="500" y="125" text-anchor="middle" fill="white" font-size="18">
+                        ~/.claude/
+                    </text>
+                    <text x="140" y="165" fill="white" font-size="14">
+                        • User preferences and settings
+                    </text>
+                    <text x="140" y="190" fill="white" font-size="14">
+                        • Global agents (4 specialized agents)
+                    </text>
+                    <text x="140" y="215" fill="white" font-size="14">
+                        • Session state and history
+                    </text>
+                    <text x="520" y="165" fill="white" font-size="14">
+                        • Skills loaded (14 available for invocation)
+                    </text>
+                    <text x="520" y="190" fill="white" font-size="14">
+                        • User-specific tools and plugins
+                    </text>
+                    <text x="520" y="215" fill="white" font-size="14">
+                        • Environment configuration
+                    </text>
+
+                    <!-- Arrow 1 to 2 -->
+                    <path d="M 500 250 L 500 310" stroke="#2d3748" stroke-width="4"
+                          marker-end="url(#arrowhead)" fill="none"/>
+                    <text x="520" y="285" fill="#2d3748" font-size="16" font-weight="bold">AUTO</text>
+
+                    <!-- Layer 2: Infrastructure Context -->
+                    <rect x="100" y="320" width="800" height="250" rx="15"
+                          fill="#ed8936" stroke="#c05621" stroke-width="3"/>
+                    <text x="500" y="360" text-anchor="middle" fill="white" font-size="24" font-weight="bold">
+                        LAYER 2: Infrastructure Context
+                    </text>
+                    <text x="500" y="395" text-anchor="middle" fill="white" font-size="18">
+                        ~/projects/.claude/
+                    </text>
+                    <rect x="150" y="415" width="700" height="130" rx="10"
+                          fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="2"/>
+                    <text x="500" y="445" text-anchor="middle" fill="white" font-size="16" font-weight="bold">
+                        memoryfiles.md → Loads 9 Core AINotes Files
+                    </text>
+                    <text x="180" y="475" fill="white" font-size="14">
+                        • SYSTEM-OVERVIEW.md (architecture)
+                    </text>
+                    <text x="180" y="495" fill="white" font-size="14">
+                        • network.md (topology, IPs, DNS)
+                    </text>
+                    <text x="180" y="515" fill="white" font-size="14">
+                        • security.md (auth, secrets, firewall)
+                    </text>
+                    <text x="550" y="475" fill="white" font-size="14">
+                        • integration.md (service patterns)
+                    </text>
+                    <text x="550" y="495" fill="white" font-size="14">
+                        • codingstandards.md (conventions)
+                    </text>
+                    <text x="550" y="515" fill="white" font-size="14">
+                        • logging.md, serverinventory.md, etc.
+                    </text>
+
+                    <!-- Arrow 2 to 3 -->
+                    <path d="M 500 570 L 500 630" stroke="#2d3748" stroke-width="4"
+                          marker-end="url(#arrowhead)" fill="none"/>
+                    <text x="520" y="605" fill="#2d3748" font-size="16" font-weight="bold">AUTO</text>
+
+                    <!-- Layer 3: Project Context -->
+                    <rect x="100" y="640" width="800" height="220" rx="15"
+                          fill="#9f7aea" stroke="#6b46c1" stroke-width="3"/>
+                    <text x="500" y="680" text-anchor="middle" fill="white" font-size="24" font-weight="bold">
+                        LAYER 3: Project Context
+                    </text>
+                    <text x="500" y="715" text-anchor="middle" fill="white" font-size="18">
+                        ~/projects/{projectname}/
+                    </text>
+                    <text x="140" y="755" fill="white" font-size="14">
+                        • CLAUDE.md (project-specific docs)
+                    </text>
+                    <text x="140" y="780" fill="white" font-size="14">
+                        • .claude/ directory (project config)
+                    </text>
+                    <text x="140" y="805" fill="white" font-size="14">
+                        • Hierarchical loading (walks up tree)
+                    </text>
+                    <text x="520" y="755" fill="white" font-size="14">
+                        • Project-specific skills
+                    </text>
+                    <text x="520" y="780" fill="white" font-size="14">
+                        • Project-specific commands
+                    </text>
+                    <text x="520" y="805" fill="white" font-size="14">
+                        • Service deployment details
+                    </text>
+
+                    <!-- Arrow 3 to 4 -->
+                    <path d="M 500 860 L 500 920" stroke="#2d3748" stroke-width="4"
+                          marker-end="url(#arrowhead)" fill="none"/>
+                    <text x="520" y="895" fill="#2d3748" font-size="16" font-weight="bold">WORK</text>
+
+                    <!-- Layer 4: Execution Context -->
+                    <rect x="100" y="930" width="800" height="400" rx="15"
+                          fill="#68d391" stroke="#2f855a" stroke-width="3"/>
+                    <text x="500" y="970" text-anchor="middle" fill="white" font-size="24" font-weight="bold">
+                        LAYER 4: Execution Context (On-Demand)
+                    </text>
+                    <text x="500" y="1005" text-anchor="middle" fill="white" font-size="18">
+                        Skills Invoked | mem0 Queried with Task Context
+                    </text>
+
+                    <!-- Skills Box -->
+                    <rect x="140" y="1030" width="330" height="140" rx="10"
+                          fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="2"/>
+                    <text x="305" y="1060" text-anchor="middle" fill="white" font-size="16" font-weight="bold">
+                        Skills (Invoked)
+                    </text>
+                    <text x="160" y="1090" fill="white" font-size="13">
+                        • service-deployment
+                    </text>
+                    <text x="160" y="1110" fill="white" font-size="13">
+                        • keycloak-setup
+                    </text>
+                    <text x="160" y="1130" fill="white" font-size="13">
+                        • postgres-integration
+                    </text>
+                    <text x="160" y="1150" fill="white" font-size="13">
+                        • traefik-setup, nginx-static-site...
+                    </text>
+
+                    <!-- mem0 Box -->
+                    <rect x="530" y="1030" width="330" height="140" rx="10"
+                          fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="2"/>
+                    <text x="695" y="1060" text-anchor="middle" fill="white" font-size="16" font-weight="bold">
+                        mem0 (Task-Start Queries)
+                    </text>
+                    <text x="550" y="1090" fill="white" font-size="13">
+                        • Lessons learned from past work
+                    </text>
+                    <text x="550" y="1110" fill="white" font-size="13">
+                        • "Why we did it this way" decisions
+                    </text>
+                    <text x="550" y="1130" fill="white" font-size="13">
+                        • Gotchas and edge cases encountered
+                    </text>
+                    <text x="550" y="1150" fill="white" font-size="13">
+                        • Queried with task-specific context
+                    </text>
+
+                    <!-- MCP Tools Box -->
+                    <rect x="140" y="1190" width="330" height="120" rx="10"
+                          fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="2"/>
+                    <text x="305" y="1220" text-anchor="middle" fill="white" font-size="16" font-weight="bold">
+                        MCP Tools (64+)
+                    </text>
+                    <text x="160" y="1250" fill="white" font-size="13">
+                        • PostgreSQL, TimescaleDB
+                    </text>
+                    <text x="160" y="1270" fill="white" font-size="13">
+                        • Filesystem, Fetch
+                    </text>
+                    <text x="160" y="1290" fill="white" font-size="13">
+                        • n8n, Minio, Playwright
+                    </text>
+
+                    <!-- Commands Box -->
+                    <rect x="530" y="1190" width="330" height="120" rx="10"
+                          fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="2"/>
+                    <text x="695" y="1220" text-anchor="middle" fill="white" font-size="16" font-weight="bold">
+                        Commands (11)
+                    </text>
+                    <text x="550" y="1250" fill="white" font-size="13">
+                        • /cexit, /claude-diff
+                    </text>
+                    <text x="550" y="1270" fill="white" font-size="13">
+                        • /detect-patterns
+                    </text>
+                    <text x="550" y="1290" fill="white" font-size="13">
+                        • Custom slash commands
+                    </text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Layer Details -->
+        <div class="section">
+            <h2 class="section-title">Layer Breakdown</h2>
+
+            <div class="layer-description">
+                <h3><span class="layer-number">1</span> User Bootstrap</h3>
+                <p><strong>Location:</strong> <span class="code">~/.claude/</span></p>
+                <p><strong>Loaded:</strong> At session start (automatic)</p>
+                <p><strong>Purpose:</strong> User-specific preferences, global agents, session state</p>
+                <ul>
+                    <li>Global agent definitions (PM, Architect, Security, Developer)</li>
+                    <li><strong>Skills loaded</strong> - 14 infrastructure skills available for invocation</li>
+                    <li>User preferences and settings</li>
+                    <li>Session history and state management</li>
+                </ul>
+            </div>
+
+            <div class="layer-description">
+                <h3><span class="layer-number">2</span> Infrastructure Context</h3>
+                <p><strong>Location:</strong> <span class="code">~/projects/.claude/</span></p>
+                <p><strong>Loaded:</strong> When entering projects workspace (automatic)</p>
+                <p><strong>Purpose:</strong> System-wide infrastructure knowledge for ALL projects</p>
+                <ul>
+                    <li><strong>memoryfiles.md</strong> loads 9 core AINotes files automatically</li>
+                    <li>Network topology, security policies, coding standards</li>
+                    <li>Server inventory, integration patterns, logging standards</li>
+                    <li>Available before any project-specific context</li>
+                </ul>
+                <div class="recommendation-box" style="margin-top: 1rem;">
+                    <strong>⚠️ KEY CHANGE:</strong> Move memoryfiles.md invocation HERE (from manual /cinit).
+                    This ensures infrastructure knowledge loads automatically for all projects.
+                </div>
+            </div>
+
+            <div class="layer-description">
+                <h3><span class="layer-number">3</span> Project Context</h3>
+                <p><strong>Location:</strong> <span class="code">~/projects/{projectname}/CLAUDE.md</span> + <span class="code">.claude/</span></p>
+                <p><strong>Loaded:</strong> When entering specific project directory (automatic)</p>
+                <p><strong>Purpose:</strong> Project-specific documentation and configuration</p>
+                <ul>
+                    <li>CLAUDE.md with project architecture, deployment details, recent changes</li>
+                    <li>Project-specific .claude/ directory (if present)</li>
+                    <li>Hierarchical loading: walks up directory tree loading all CLAUDE.md files</li>
+                    <li>Builds on infrastructure knowledge from Layer 2</li>
+                </ul>
+            </div>
+
+            <div class="layer-description">
+                <h3><span class="layer-number">4</span> Execution Context</h3>
+                <p><strong>Location:</strong> Various (on-demand)</p>
+                <p><strong>Loaded:</strong> During work execution (as needed)</p>
+                <p><strong>Purpose:</strong> Dynamic context invoked when relevant</p>
+                <ul>
+                    <li><strong>Skills:</strong> Invoked when task matches skill description (loaded in Layer 1, executed here)</li>
+                    <li><strong>mem0:</strong> Queried at task-start with task context (lessons learned, gotchas, past decisions)</li>
+                    <li><strong>MCP Tools:</strong> Called when specific operations needed (64+ tools)</li>
+                    <li><strong>Commands:</strong> User-invoked slash commands (11 custom commands)</li>
+                </ul>
+                <div class="recommendation-box" style="margin-top: 1rem;">
+                    <strong>🎯 mem0 Query Pattern:</strong> Query mem0 when <em>starting</em> a task, not when entering a directory.
+                    Example: "Deploying nginx service" → query mem0 for "nginx deployment" to recall past issues, decisions, and gotchas.
+                </div>
+            </div>
+        </div>
+
+        <!-- Before/After Comparison -->
+        <div class="section">
+            <h2 class="section-title">Recommended Change: Move memoryfiles.md Up</h2>
+
+            <div class="comparison-grid">
+                <div class="comparison-card before">
+                    <h4>❌ Current (Manual)</h4>
+                    <ol>
+                        <li>~/.claude/ (user)</li>
+                        <li>projects/.claude/ (workspace)</li>
+                        <li>projects/{name}/CLAUDE.md (project)</li>
+                        <li><strong style="color: #c53030;">User types /cinit manually</strong></li>
+                        <li>memoryfiles.md loads AINotes</li>
+                        <li>Work begins</li>
+                    </ol>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(252,129,129,0.2); border-radius: 6px;">
+                        <strong>Problems:</strong>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Manual step required</li>
+                            <li>Easy to forget</li>
+                            <li>Loads AFTER project context</li>
+                            <li>Infrastructure knowledge comes too late</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="comparison-card after">
+                    <h4>✅ Recommended (Automatic)</h4>
+                    <ol>
+                        <li>~/.claude/ (user)</li>
+                        <li>projects/.claude/<br><strong style="color: #2f855a;">→ Auto-loads memoryfiles.md</strong><br><strong style="color: #2f855a;">→ AINotes loaded here</strong></li>
+                        <li>projects/{name}/CLAUDE.md (project)</li>
+                        <li>Work begins</li>
+                    </ol>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(104,211,145,0.2); border-radius: 6px;">
+                        <strong>Benefits:</strong>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Fully automatic</li>
+                            <li>Never forgotten</li>
+                            <li>Proper hierarchy (general → specific)</li>
+                            <li>Infrastructure knowledge available immediately</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits -->
+        <div class="section">
+            <h2 class="section-title">Benefits of Proper Layering</h2>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <h4>🎯 Automatic Context</h4>
+                    <p>No manual /cinit command needed. Infrastructure knowledge loads automatically when you enter the projects workspace.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <h4>📚 Proper Hierarchy</h4>
+                    <p>General → Specific. Infrastructure knowledge (network, security) loads before project-specific details.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <h4>♻️ DRY Principle</h4>
+                    <p>AINotes loaded once at workspace level, available for all projects. No redundant loading per project.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <h4>🚀 Always Available</h4>
+                    <p>Infrastructure context ready before any project work. Standards, patterns, and topology known immediately.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <h4>🔍 On-Demand Execution</h4>
+                    <p>Skills and mem0 invoked only when needed. Efficient context usage without upfront loading overhead.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <h4>📈 Scalable</h4>
+                    <p>Add new projects without changing context loading. Infrastructure knowledge automatically available.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- mem0 Query Workflow -->
+        <div class="section">
+            <h2 class="section-title">mem0 Query Workflow</h2>
+
+            <div class="principle-box" style="background: #fef5e7; border-left: 4px solid #ed8936;">
+                <strong style="color: #c05621;">Key Insight:</strong> mem0 is for <strong>experiential knowledge</strong>, not documentation.
+                <br>Query it when starting a task to recall past lessons, not when entering a directory to load facts.
+            </div>
+
+            <div class="layer-description">
+                <h3>📋 When to Query mem0</h3>
+                <ul>
+                    <li><strong>Starting a deployment:</strong> "What issues did we encounter last time we deployed this service?"</li>
+                    <li><strong>Beginning development:</strong> "What decisions did we make about this component?"</li>
+                    <li><strong>Troubleshooting:</strong> "Have we seen this error before? How did we fix it?"</li>
+                    <li><strong>Making architectural choices:</strong> "Why did we choose this approach over alternatives?"</li>
+                    <li><strong>User preferences:</strong> "What are the user's naming preferences? Preferred tools?"</li>
+                </ul>
+            </div>
+
+            <div class="layer-description">
+                <h3>❌ When NOT to Query mem0</h3>
+                <ul>
+                    <li><strong>On directory entry:</strong> Don't auto-load mem0 when cd into a project</li>
+                    <li><strong>For current architecture:</strong> Use CLAUDE.md instead</li>
+                    <li><strong>For standards/policies:</strong> Use AINotes (network.md, security.md, etc.) instead</li>
+                    <li><strong>For deployment steps:</strong> Use CLAUDE.md and skills instead</li>
+                </ul>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card after">
+                    <h4>✅ Files (Authoritative)</h4>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li><strong>CLAUDE.md:</strong> "Nginx is deployed with these Traefik labels..."</li>
+                        <li><strong>network.md:</strong> "The IP address is 192.168.10.45"</li>
+                        <li><strong>security.md:</strong> "Always use Keycloak for auth"</li>
+                        <li><strong>integration.md:</strong> "Services use 3-network OAuth2 pattern"</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-weight: bold; color: #2f855a;">
+                        → Current state, how things work
+                    </p>
+                </div>
+
+                <div class="comparison-card before" style="background: #fff5f5; border: 2px solid #fc8181;">
+                    <h4 style="color: #c53030;">🧠 mem0 (Experiential)</h4>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li><strong>Gotcha:</strong> "Remember to update the landing page after adding a site!"</li>
+                        <li><strong>Decision:</strong> "We switched to path-based routing to avoid cert complexity"</li>
+                        <li><strong>Preference:</strong> "User prefers hyphen-separated names"</li>
+                        <li><strong>Lesson:</strong> "Last nginx deployment failed due to port conflict - check first"</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-weight: bold; color: #c53030;">
+                        → Lessons learned, why we did it this way
+                    </p>
+                </div>
+            </div>
+
+            <div class="layer-description">
+                <h3>🎯 Practical Query Examples</h3>
+                <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                    <p><strong>Task:</strong> "Deploy postgres service"</p>
+                    <p style="margin-top: 0.5rem;"><strong>Query mem0:</strong> "postgres deployment", "postgres configuration", "database setup"</p>
+                    <p style="margin-top: 0.5rem; color: #4a5568;">
+                        <em>Expected results:</em> Past issues with postgres, preferred connection pooling settings,
+                        backup strategy decisions, why certain configurations were chosen
+                    </p>
+                </div>
+                <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <p><strong>Task:</strong> "Add new static site to nginx"</p>
+                    <p style="margin-top: 0.5rem;"><strong>Query mem0:</strong> "nginx static site", "landing page updates"</p>
+                    <p style="margin-top: 0.5rem; color: #4a5568;">
+                        <em>Expected results:</em> "Don't forget to update landing page!", past mistakes,
+                        naming preferences, typical gotchas
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation -->
+        <div class="section">
+            <h2 class="section-title">Implementation Steps</h2>
+
+            <div class="recommendation-box">
+                <strong>📋 Action Items:</strong>
+                <ol style="margin-left: 2rem; margin-top: 1rem; line-height: 1.8;">
+                    <li>Create <span class="code">~/projects/.claude/init.md</span> (or similar auto-loaded file)</li>
+                    <li>Add content: <span class="code">@memoryfiles.md</span></li>
+                    <li>Remove or repurpose <span class="code">/cinit</span> command (no longer needed)</li>
+                    <li>Test: Enter any project directory, verify AINotes loaded automatically</li>
+                    <li>Update documentation to reflect automatic loading</li>
+                </ol>
+            </div>
+
+            <div class="layer-description" style="margin-top: 2rem;">
+                <h3>📝 Sample Implementation</h3>
+                <p><strong>File:</strong> <span class="code">~/projects/.claude/init.md</span></p>
+                <pre style="background: #2d3748; color: #68d391; padding: 1rem; border-radius: 8px; overflow-x: auto; margin-top: 1rem;">
+# Infrastructure Bootstrap
+
+This file automatically loads system-wide infrastructure context
+for all projects in the workspace.
+
+@memoryfiles.md
+
+## What This Loads
+
+memoryfiles.md references 9 core AINotes files:
+- SYSTEM-OVERVIEW.md (architecture and technology stack)
+- network.md (topology, IP addresses, DNS configuration)
+- security.md (authentication, secrets, firewall rules)
+- integration.md (service integration patterns)
+- codingstandards.md (naming conventions, code style)
+- logging.md (logging standards and observability)
+- serverinventory.md (hardware and service inventory)
+- workflows.md (common operational workflows)
+- lastsession.md (recent work and session continuity)
+
+These provide infrastructure knowledge needed for ANY project work.
+</pre>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-title">🎨 Layer Color Code</div>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4299e1;"></div>
+                    <span><strong>Blue:</strong> User/Session (Layer 1)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ed8936;"></div>
+                    <span><strong>Orange:</strong> Infrastructure (Layer 2)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9f7aea;"></div>
+                    <span><strong>Purple:</strong> Project (Layer 3)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #68d391;"></div>
+                    <span><strong>Green:</strong> Execution (Layer 4)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Architecture:</strong> Claude Code Context Loading System</p>
+            <p style="margin-top: 0.5rem;"><strong>Updated:</strong> 2025-11-07</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                📚 See also: <a href="/claude-context/" style="color: #667eea;">Manual Context Guide</a> |
+                <a href="/" style="color: #667eea;">All Documentation</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
