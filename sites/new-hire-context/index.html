@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The New Hire Analogy: Understanding Layered Context in AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 2rem;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #1e3c72;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            font-style: italic;
+        }
+
+        .intro {
+            background: #f0f7ff;
+            border-left: 4px solid #4299e1;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+        }
+
+        .level-section {
+            margin: 3rem 0;
+            padding: 2rem;
+            background: #f7fafc;
+            border-radius: 12px;
+            border-left: 6px solid #4299e1;
+        }
+
+        .level-section.level-0 { border-left-color: #a0aec0; }
+        .level-section.level-1 { border-left-color: #4299e1; }
+        .level-section.level-2 { border-left-color: #ed8936; }
+        .level-section.level-3 { border-left-color: #9f7aea; }
+        .level-section.level-4 { border-left-color: #48bb78; }
+
+        .level-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .level-badge {
+            display: inline-block;
+            background: #1e3c72;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+        }
+
+        .level-title {
+            font-size: 1.8rem;
+            color: #2d3748;
+            font-weight: bold;
+        }
+
+        .level-content {
+            margin-top: 1.5rem;
+        }
+
+        .level-content h3 {
+            color: #1e3c72;
+            margin: 1.5rem 0 0.75rem 0;
+            font-size: 1.2rem;
+        }
+
+        .level-content p {
+            color: #4a5568;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .example-box {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .example-box strong {
+            color: #1e3c72;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .comparison-section {
+            margin: 4rem 0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #1e3c72;
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #4299e1;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr;
+            gap: 0;
+            border: 2px solid #2d3748;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .grid-header {
+            background: #1e3c72;
+            color: white;
+            padding: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .grid-cell {
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        .grid-cell.level-label {
+            background: #f7fafc;
+            font-weight: bold;
+            color: #1e3c72;
+            text-align: center;
+        }
+
+        .grid-cell.level-0-bg { background: #f7fafc; }
+        .grid-cell.level-1-bg { background: #ebf8ff; }
+        .grid-cell.level-2-bg { background: #feebc8; }
+        .grid-cell.level-3-bg { background: #faf5ff; }
+        .grid-cell.level-4-bg { background: #f0fff4; }
+
+        .summary-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 12px;
+            margin: 3rem 0;
+        }
+
+        .summary-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .summary-section p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .key-insight {
+            background: rgba(255,255,255,0.2);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 4px solid white;
+        }
+
+        .key-insight strong {
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 2rem;
+            color: #4299e1;
+            margin: 1rem 0;
+        }
+
+        .highlight {
+            background: #fef5e7;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #c05621;
+        }
+
+        ul {
+            margin-left: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+            color: #4a5568;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 The New Hire Analogy</h1>
+        <p class="subtitle">Understanding How Layered Context Creates Specialized Workers (Human and AI)</p>
+
+        <div class="intro">
+            <p><strong>Consider this scenario:</strong> A software engineer graduates from college with a computer science degree. They have general programming knowledge, understand algorithms and data structures, and can write code. But they're not yet productive at any specific company.</p>
+            <p style="margin-top: 1rem;"><strong>Why?</strong> Because they lack <span class="highlight">context</span>. Over their first months, they'll learn four additional layers of context that transform them from a general graduate into a specialized, productive team member.</p>
+            <p style="margin-top: 1rem;">This same principle applies to AI systems like Claude Code. Just as a new hire needs layered context to be effective, Claude Code loads context in layers to become a specialized infrastructure assistant.</p>
+        </div>
+
+        <!-- Level 0: Baseline -->
+        <div class="level-section level-0">
+            <div class="level-header">
+                <span class="level-badge">LEVEL 0</span>
+                <h2 class="level-title">The Baseline: General Education</h2>
+            </div>
+            <div class="level-content">
+                <h3>📚 College Graduate with CS Degree</h3>
+                <p>Fresh out of college, our new hire has:</p>
+                <ul>
+                    <li>Understanding of programming languages (Java, Python, C++)</li>
+                    <li>Knowledge of algorithms, data structures, and design patterns</li>
+                    <li>General software engineering principles</li>
+                    <li>Academic projects and maybe an internship</li>
+                </ul>
+
+                <div class="example-box">
+                    <strong>What They Can Do:</strong>
+                    <p>Write a sorting algorithm, create a web server, build a simple CRUD application. General-purpose programming work.</p>
+                </div>
+
+                <div class="example-box">
+                    <strong>What They Cannot Do:</strong>
+                    <p>Deploy to your company's infrastructure, follow your coding standards, integrate with your specific tech stack, understand your business domain.</p>
+                </div>
+
+                <h3>🎯 The Problem</h3>
+                <p>General knowledge alone doesn't make someone productive. <span class="highlight">Context is what transforms capability into productivity.</span></p>
+            </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <!-- Level 1: Company -->
+        <div class="level-section level-1">
+            <div class="level-header">
+                <span class="level-badge">LEVEL 1</span>
+                <h2 class="level-title">Company Context</h2>
+            </div>
+            <div class="level-content">
+                <h3>🏢 First Week: Company Onboarding</h3>
+                <p>During their first week, the new hire learns <strong>company-wide context</strong> that applies to everyone:</p>
+                <ul>
+                    <li><strong>Company values and mission:</strong> Why the company exists, what it values</li>
+                    <li><strong>Organizational structure:</strong> Different departments, how they interact</li>
+                    <li><strong>Company-wide tools:</strong> Slack, GitHub, Jira, Google Workspace</li>
+                    <li><strong>HR policies:</strong> Time off, benefits, working hours</li>
+                    <li><strong>Security protocols:</strong> Access badges, VPN, password policies</li>
+                </ul>
+
+                <div class="example-box">
+                    <strong>Example: First Day</strong>
+                    <p>"Welcome to TechCorp! We're a SaaS company serving Fortune 500 clients. We value customer obsession, innovation, and work-life balance. Here's your badge, laptop, and access to Slack. You'll be in the Platform Engineering department."</p>
+                </div>
+
+                <h3>🎯 What This Enables</h3>
+                <p>The new hire can now navigate the company, communicate with colleagues, access tools, and understand the business. But they still can't write code that fits the company's standards or deploy to production.</p>
+            </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <!-- Level 2: Department -->
+        <div class="level-section level-2">
+            <div class="level-header">
+                <span class="level-badge">LEVEL 2</span>
+                <h2 class="level-title">Department Context</h2>
+            </div>
+            <div class="level-content">
+                <h3>🏗️ First Month: Department Integration</h3>
+                <p>Over the first month, the new hire learns <strong>department-specific context</strong> shared by their entire team:</p>
+                <ul>
+                    <li><strong>Technology stack:</strong> Python/Django backend, React frontend, PostgreSQL, Redis, AWS</li>
+                    <li><strong>Architecture patterns:</strong> Microservices, event-driven, API-first design</li>
+                    <li><strong>Infrastructure standards:</strong> Kubernetes deployment, Traefik routing, centralized logging</li>
+                    <li><strong>Code review process:</strong> Pull request templates, approval requirements</li>
+                    <li><strong>Testing requirements:</strong> Unit tests required, integration tests for APIs</li>
+                    <li><strong>Deployment pipeline:</strong> CI/CD with GitHub Actions, staging → production flow</li>
+                    <li><strong>Monitoring and alerting:</strong> Grafana dashboards, PagerDuty escalation</li>
+                </ul>
+
+                <div class="example-box">
+                    <strong>Example: Week 2 Training</strong>
+                    <p>"Platform Engineering owns the infrastructure layer. We use Docker containers deployed to Kubernetes. All services must integrate with our Keycloak SSO, follow the 3-network pattern (traefik-net, keycloak-net, app-net), and send logs to Loki. Here's our coding standards doc, network topology diagram, and deployment runbook."</p>
+                </div>
+
+                <h3>🎯 What This Enables</h3>
+                <p>The new hire can now write code that follows department standards, deploy using the right patterns, and understand how services integrate. But they don't yet know the specific service they'll be working on.</p>
+            </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <!-- Level 3: Job Role -->
+        <div class="level-section level-3">
+            <div class="level-header">
+                <span class="level-badge">LEVEL 3</span>
+                <h2 class="level-title">Job Role Context</h2>
+            </div>
+            <div class="level-content">
+                <h3>🎯 First Quarter: Role-Specific Training</h3>
+                <p>Over their first 2-3 months, the new hire learns <strong>project-specific context</strong> for their assigned area:</p>
+                <ul>
+                    <li><strong>Service ownership:</strong> "You'll be working on the API Gateway service"</li>
+                    <li><strong>Codebase walkthrough:</strong> Repository structure, main components, entry points</li>
+                    <li><strong>Service architecture:</strong> How this specific service works, its dependencies</li>
+                    <li><strong>API endpoints:</strong> What endpoints exist, what they do, request/response formats</li>
+                    <li><strong>Database schema:</strong> Tables this service uses, relationships, indexes</li>
+                    <li><strong>Integration points:</strong> Which other services this talks to, message formats</li>
+                    <li><strong>Known issues:</strong> Technical debt, gotchas, things to be careful about</li>
+                    <li><strong>Recent changes:</strong> What was recently deployed, what's in progress</li>
+                </ul>
+
+                <div class="example-box">
+                    <strong>Example: Month 2 Shadowing</strong>
+                    <p>"You're assigned to the API Gateway team. This service handles all external traffic, does rate limiting, and routes to backend microservices. Here's the repo structure: /src/routes/ defines endpoints, /src/middleware/ has auth logic, /src/services/ has business logic. The gateway_config table in PostgreSQL stores routing rules. Watch out for the rate limiter—it's Redis-backed and has some edge cases with burst traffic."</p>
+                </div>
+
+                <h3>🎯 What This Enables</h3>
+                <p>The new hire can now understand the specific service, navigate the codebase, make small changes, and review PRs. But they still need guidance on individual tasks and assignments.</p>
+            </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <!-- Level 4: Assignment -->
+        <div class="level-section level-4">
+            <div class="level-header">
+                <span class="level-badge">LEVEL 4</span>
+                <h2 class="level-title">Assignment Context</h2>
+            </div>
+            <div class="level-content">
+                <h3>⚡ Daily Work: Task-Specific Context</h3>
+                <p>For each assignment, the new hire receives <strong>task-specific context</strong> loaded on-demand:</p>
+                <ul>
+                    <li><strong>Ticket/Issue details:</strong> What needs to be built or fixed</li>
+                    <li><strong>Business requirements:</strong> Why this matters, success criteria</li>
+                    <li><strong>Technical approach:</strong> Design discussion, architecture decisions</li>
+                    <li><strong>Relevant documentation:</strong> RFCs, API specs, related tickets</li>
+                    <li><strong>Dependencies:</strong> What else needs to happen first, who to coordinate with</li>
+                    <li><strong>Code references:</strong> Similar implementations, patterns to follow</li>
+                    <li><strong>Test scenarios:</strong> Edge cases to handle, test data</li>
+                    <li><strong>Deployment plan:</strong> Feature flags, rollout strategy, rollback plan</li>
+                </ul>
+
+                <div class="example-box">
+                    <strong>Example: Sprint Planning</strong>
+                    <p>"Your assignment this sprint: Add OAuth2 client credential support to the API Gateway. Marketing wants to give partners API access without user login. We need to validate client_id/client_secret against Keycloak, issue short-lived tokens, and add rate limiting per client. Look at how the user OAuth flow works in /src/auth/oauth_user.py—you'll follow a similar pattern. The Keycloak integration guide is in the wiki. We'll use feature flag 'partner_api_enabled' and roll out to 10% of traffic first. Tests should cover the happy path plus invalid credentials, expired tokens, and rate limit scenarios."</p>
+                </div>
+
+                <div class="example-box">
+                    <strong>Tools Learned On-Demand</strong>
+                    <p>While working on this task, the new hire learns tools as needed: "You'll need to test the OAuth flow—here's how to use Postman to simulate client credentials. Create a collection for the partner API endpoints. Also, we track this work in Jira—here's our team's workflow for moving tickets through dev, code review, QA, and deployment."</p>
+                    <p style="margin-top: 0.5rem;"><em>Just like Claude Code loads skills (keycloak-setup) and MCP tools (postgres queries) when the task requires them.</em></p>
+                </div>
+
+                <h3>🎯 What This Enables</h3>
+                <p>The new hire can now execute the specific task with all necessary context. They know what to build, why it matters, how it fits in, what patterns to follow, and how to test it. <strong>They also learn task-specific tools (Postman, Jira) on-demand</strong> rather than memorizing every tool upfront. <span class="highlight">They're now a productive specialist.</span></p>
+            </div>
+        </div>
+
+        <!-- Comparison Section -->
+        <div class="comparison-section">
+            <h2 class="section-title">🤝 The Parallel: New Hire vs. <a href="/context-architecture/" style="color: #1e3c72; text-decoration: underline;">Claude Code Context</a></h2>
+
+            <div class="comparison-grid">
+                <div class="grid-header">Level</div>
+                <div class="grid-header">🧑‍💼 New Hire Context</div>
+                <div class="grid-header">🤖 Claude Code Context</div>
+
+                <!-- Level 0 -->
+                <div class="grid-cell level-label level-0-bg">LEVEL 0<br>Baseline</div>
+                <div class="grid-cell level-0-bg">
+                    <strong>College Graduate</strong>
+                    <ul>
+                        <li>General CS knowledge</li>
+                        <li>Programming languages</li>
+                        <li>Algorithms & patterns</li>
+                        <li>Academic projects</li>
+                    </ul>
+                </div>
+                <div class="grid-cell level-0-bg">
+                    <strong>AI Model (ChatGPT, Copilot)</strong>
+                    <ul>
+                        <li>General AI training</li>
+                        <li>Programming languages</li>
+                        <li>Common patterns</li>
+                        <li>No specific context</li>
+                    </ul>
+                </div>
+
+                <!-- Level 1 -->
+                <div class="grid-cell level-label level-1-bg">LEVEL 1<br>Broad</div>
+                <div class="grid-cell level-1-bg">
+                    <strong>Company Context</strong>
+                    <ul>
+                        <li>Mission & values</li>
+                        <li>Company-wide tools (Slack, GitHub)</li>
+                        <li>Security protocols</li>
+                        <li>Organizational structure</li>
+                    </ul>
+                    <em>→ First week onboarding</em>
+                </div>
+                <div class="grid-cell level-1-bg">
+                    <strong>User Level Context & Tools</strong>
+                    <ul>
+                        <li>~/.claude/ preferences</li>
+                        <li>General-purpose skills (6)</li>
+                        <li>Session history</li>
+                        <li>Default Claude Code agents</li>
+                    </ul>
+                    <em>→ Loaded at session start</em>
+                </div>
+
+                <!-- Level 2 -->
+                <div class="grid-cell level-label level-2-bg">LEVEL 2<br>Domain</div>
+                <div class="grid-cell level-2-bg">
+                    <strong>Department Context</strong>
+                    <ul>
+                        <li>Tech stack (Python, PostgreSQL, Kubernetes)</li>
+                        <li>Architecture patterns (microservices)</li>
+                        <li>Deployment pipeline (CI/CD)</li>
+                        <li>Coding standards & network topology</li>
+                    </ul>
+                    <em>→ First month training</em>
+                </div>
+                <div class="grid-cell level-2-bg">
+                    <strong>Project Level Common Context & Tools</strong>
+                    <ul>
+                        <li>~/projects/.claude/ infrastructure docs</li>
+                        <li>Infrastructure skills (9): keycloak-setup, postgres-integration</li>
+                        <li>Network topology, security policies</li>
+                        <li>4 custom agents (PM, Architect, Developer, Security)</li>
+                    </ul>
+                    <em>→ Loaded when entering ~/projects/</em>
+                </div>
+
+                <!-- Level 3 -->
+                <div class="grid-cell level-label level-3-bg">LEVEL 3<br>Specific</div>
+                <div class="grid-cell level-3-bg">
+                    <strong>Job Role Context</strong>
+                    <ul>
+                        <li>Assigned service (API Gateway)</li>
+                        <li>Codebase structure</li>
+                        <li>Service dependencies</li>
+                        <li>Recent changes & known issues</li>
+                    </ul>
+                    <em>→ First quarter shadowing</em>
+                </div>
+                <div class="grid-cell level-3-bg">
+                    <strong>Project Specific Context & Tools</strong>
+                    <ul>
+                        <li>~/projects/nginx/CLAUDE.md</li>
+                        <li>Project architecture</li>
+                        <li>Deployment details</li>
+                        <li>Recent changes & troubleshooting</li>
+                    </ul>
+                    <em>→ Loaded when entering ~/projects/nginx/</em>
+                </div>
+
+                <!-- Level 4 -->
+                <div class="grid-cell level-label level-4-bg">LEVEL 4<br>Task</div>
+                <div class="grid-cell level-4-bg">
+                    <strong>Assignment Context</strong>
+                    <ul>
+                        <li>Business requirements</li>
+                        <li>Technical approach & patterns</li>
+                        <li>Test scenarios & deployment plan</li>
+                        <li><strong>Learn tools as needed:</strong> Jira workflow, Postman collections, specific APIs</li>
+                    </ul>
+                    <em>→ Sprint planning / task assignment</em>
+                </div>
+                <div class="grid-cell level-4-bg">
+                    <strong>Run-Time Context & Tool Loading</strong>
+                    <ul>
+                        <li>mem0 queried (past lessons)</li>
+                        <li>MCP tools (postgres queries)</li>
+                        <li>Task-specific context loaded on-demand</li>
+                        <li><strong>Load tools as needed:</strong> Task-specific skills, database queries, web fetches</li>
+                    </ul>
+                    <em>→ Loaded during work execution</em>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-section">
+            <h2>💡 The Power of Layered Context</h2>
+
+            <p>Just as a college graduate needs four layers of context to become a productive specialist, an AI assistant needs layered context to be effective.</p>
+
+            <div class="key-insight">
+                <strong>Key Insight #1: Context Builds Upon Itself</strong>
+                <p>Each layer assumes the previous layers are already known. A new hire can't learn department-specific deployment patterns until they understand the company's tool ecosystem. Claude Code can't apply infrastructure-specific skills until it has user-level tools available.</p>
+            </div>
+
+            <div class="key-insight">
+                <strong>Key Insight #2: Specialization Requires Domain-Scoped Context</strong>
+                <p>A general-purpose engineer with only a CS degree can't be productive at your company. They need your specific context. Similarly, a general-purpose AI (ChatGPT, Copilot) can't manage your infrastructure effectively. It needs your infrastructure's specific context, loaded in the right order.</p>
+            </div>
+
+            <div class="key-insight">
+                <strong>Key Insight #3: Not Everything Needs to Be Loaded Upfront</strong>
+                <p>New hires don't memorize every service on day one—they learn the API Gateway codebase when assigned to that team. Claude Code doesn't load all skill content at startup—it loads the keycloak-setup skill when configuring Keycloak. This is efficient for both humans and AI.</p>
+            </div>
+
+            <div class="key-insight">
+                <strong>Key Insight #4: Organization Enables Productivity</strong>
+                <p>A company with clear onboarding (Level 1), department documentation (Level 2), service runbooks (Level 3), and well-defined tickets (Level 4) creates productive employees faster. An AI system with organized context layers becomes productive immediately. <strong>Chaos at any layer degrades performance.</strong></p>
+            </div>
+
+            <p style="margin-top: 2rem; font-size: 1.25rem; text-align: center;">
+                <strong>Without layered context, you have generalists.<br>
+                With layered context, you build specialists.</strong>
+            </p>
+
+            <p style="margin-top: 1.5rem; text-align: center;">
+                This applies to humans and AI alike.
+            </p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Understanding Context Organization</strong></p>
+            <p style="margin-top: 0.5rem;">Created: 2025-11-07</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                📚 See also: <a href="/context-architecture/" style="color: #1e3c72;">Technical Context Architecture</a> |
+                <a href="/" style="color: #1e3c72;">All Documentation</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

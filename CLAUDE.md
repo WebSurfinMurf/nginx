@@ -30,9 +30,82 @@ All static sites are now served under **nginx.ai-servicers.com** using path-base
   - GitLab backup system documentation (claude-pull/claude-push)
   - mem0 bidirectional workflow patterns
   - Updated: 2025-11-07
+- **New Hire Context** - https://nginx.ai-servicers.com/new-hire-context/
+  - Executive-friendly analogy explaining layered context through new hire onboarding
+  - Parallels between human learning (college → company → department → role → task) and AI context loading
+  - Demonstrates why proper context organization creates specialists
+  - Created: 2025-11-07
+- **Context Comparison** - https://nginx.ai-servicers.com/context-compare/
+  - Side-by-side two-column comparison of human learning vs AI context loading
+  - Streamlined parallel examples in box format (inspired by context-architecture design)
+  - Easy to scan: read down left column for human progression, right column for AI progression
+  - Shows how both start general and progressively specialize through 5 layers (Level 0-4)
+  - Created: 2025-11-07
 
 ## Recent Work & Changes
 _This section is updated by Claude during each session_
+
+### Session: 2025-11-07 (Context Comparison Page - Side-by-Side)
+- **Created Context Comparison Page**: Streamlined two-column comparison format
+  - **URL**: https://nginx.ai-servicers.com/context-compare/
+  - **Design**: Side-by-side columns with parallel examples in box format
+  - **Inspiration**: Uses box design similar to context-architecture "Context Loading Sequence"
+  - **Layout**:
+    - Left column: Human learning progression (🧑‍💼 New Software Engineer)
+    - Right column: AI context loading (🤖 Claude Code)
+    - Parallel examples at each level show the equivalency
+  - **Content**: 5 levels (0-4) with streamlined examples
+    - Level 0: College Graduate vs AI Model (baseline)
+    - Level 1: Company Onboarding vs User Level Context
+    - Level 2: Department Training vs Project Level Common Context
+    - Level 3: Role Assignment vs Project Specific Context
+    - Level 4: Assignment Details vs Run-Time Tool Loading
+  - **Key Features**:
+    - Color-coded levels (gray, blue, orange, purple, green)
+    - Concise examples focusing on parallel concepts
+    - "Tools learned/loaded on-demand" shown at Level 4
+    - Links to other documentation pages
+  - **Deployment**:
+    - Created directory: `/home/administrator/projects/nginx/sites/context-compare/`
+    - Set permissions: `chmod 755` (avoiding 403 error)
+    - Added location block to nginx-portal.conf
+    - Added card to landing page (6 sites total)
+    - Deployed successfully
+
+### Session: 2025-11-07 (New Hire Context Analogy Page)
+- **Created New Hire Context Documentation**: Executive-friendly page explaining layered context
+  - **URL**: https://nginx.ai-servicers.com/new-hire-context/
+  - **Purpose**: Help executives understand the importance of context organization using a relatable analogy
+  - **Content**:
+    - Level 0: College Graduate (general knowledge) → AI Model (ChatGPT, Copilot)
+    - Level 1: Company Context (onboarding) → User Level Context & Tools
+    - Level 2: Department Context (training) → Project Level Common Context & Tools
+    - Level 3: Job Role Context (shadowing) → Project Specific Context & Tools
+    - Level 4: Assignment Context (sprint tasks) → Run-Time Context & Tool Loading
+    - Side-by-side comparison grid showing human vs AI context layers
+    - Summary explaining how layered context creates specialists
+  - **Design**: Clean, professional, easy-to-scan format for executive comprehension
+  - **Key Message**: "Without layered context, you have generalists. With layered context, you build specialists."
+  - **Deployment**:
+    - Created directory: `/home/administrator/projects/nginx/sites/new-hire-context/`
+    - Added location block to nginx-portal.conf
+    - Added card to landing page (5 sites total)
+    - Deployed successfully
+  - **Issue Fixed**: 403 Forbidden error due to incorrect directory permissions
+    - Directory was created with `700` (drwx------) instead of `755` (drwxr-xr-x)
+    - Fixed with `chmod 755 /home/administrator/projects/nginx/sites/new-hire-context/`
+    - Root cause: Write tool sometimes creates directories with restrictive permissions
+  - **Documentation Updated**:
+    - Updated `nginx-static-site` skill with permissions requirements in Step 2
+    - Added "403 Forbidden" troubleshooting section to skill
+    - Added "Common Gotcha: Directory Permissions" section to nginx/CLAUDE.md
+    - Future deployments will include `chmod 755` in the workflow
+  - **Page Enhancements**:
+    - Made "Claude Code Context" in heading a clickable link to /context-architecture/
+    - Added tool learning analogy to Level 4: "Learn tools as needed: Jira workflow, Postman collections, specific APIs"
+    - Added new example box showing on-demand tool learning (Postman, Jira)
+    - Parallels human learning tools (Postman, Jira) with AI loading tools (skills, MCP tools)
+    - Updated both narrative section and comparison grid
 
 ### Session: 2025-11-07 (GitLab Backup System & Architecture Refinement)
 - **Updated Context Architecture Documentation**: Added comprehensive backup system section
@@ -51,9 +124,9 @@ _This section is updated by Claude during each session_
     - Removed "Old Approach (Pre-2025-11-07)" historical comparison section
     - Refined layer names to be more descriptive:
       - Layer 1: "User Level Context & Tools"
-      - Layer 2: "Project level common context & tools"
-      - Layer 3: "Project Specific Context & tools"
-      - Layer 4: "Dynamic Context & Tool Loading"
+      - Layer 2: "Project Level Common Context & Tools"
+      - Layer 3: "Project Specific Context & Tools"
+      - Layer 4: "Run-Time Context & Tool Loading"
   - **Integration**: Backup system now documented alongside context loading architecture
 
 ### Session: 2025-11-04 (Part 3 - Claude Context Documentation)
@@ -411,5 +484,24 @@ server {
 - **Clean URLs** - Users see nginx.ai-servicers.com/site-name/ (no "sites" in URL)
 - **Organized disk** - All sites in sites/ directory
 
+### ⚠️ Common Gotcha: Directory Permissions
+
+**Problem**: New site returns "403 Forbidden"
+
+**Cause**: When creating directories with `mkdir` or using the Write tool, directories sometimes get created with `700` permissions (owner-only access). The nginx container process needs read/execute access.
+
+**Solution**: Always set directory permissions to `755` after creating a site directory:
+```bash
+chmod 755 /home/administrator/projects/nginx/sites/[site-name]/
+```
+
+**Check permissions**:
+```bash
+ls -ld /home/administrator/projects/nginx/sites/[site-name]/
+# Should show: drwxr-xr-x (755)
+```
+
+**All site directories must have `755` permissions for nginx to access them.**
+
 ---
-*Last Updated: 2025-09-30 by Claude*
+*Last Updated: 2025-11-07 by Claude*

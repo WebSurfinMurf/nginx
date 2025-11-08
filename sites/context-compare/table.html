@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Comparison - LinkedIn Graphic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            padding: 40px;
+        }
+
+        .graphic-container {
+            width: 1200px;
+            margin: 0 auto;
+            background: white;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #0077b5;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .comparison-table {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr;
+            border: 3px solid #0077b5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .column-header {
+            background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        .level-header {
+            background: #f3f6f8;
+            padding: 20px;
+            font-weight: bold;
+            color: #0077b5;
+            text-align: center;
+            border-right: 2px solid #e1e9ee;
+            border-bottom: 1px solid #e1e9ee;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .level-number {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .level-name {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .cell {
+            padding: 20px;
+            border-right: 1px solid #e1e9ee;
+            border-bottom: 1px solid #e1e9ee;
+            background: white;
+        }
+
+        .cell:last-child {
+            border-right: none;
+        }
+
+        .cell h3 {
+            color: #0077b5;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .cell p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .cell ul {
+            margin-left: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .cell li {
+            margin: 4px 0;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .row-0 .level-header { background: #f8f9fa; }
+        .row-1 .level-header { background: #e3f2fd; }
+        .row-2 .level-header { background: #fff3e0; }
+        .row-3 .level-header { background: #f3e5f5; }
+        .row-4 .level-header { background: #e8f5e9; }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #0077b5;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="graphic-container">
+        <div class="header">
+            <h1>The Universal Pattern: Human Learning vs AI Context Loading</h1>
+            <p>Same progression, different domain</p>
+        </div>
+
+        <div class="comparison-table">
+            <!-- Headers -->
+            <div class="column-header" style="border-right: 2px solid white;">Level</div>
+            <div class="column-header" style="border-right: 2px solid white;">👨‍🎓 Human Learning</div>
+            <div class="column-header">🤖 AI Context Loading</div>
+
+            <!-- Level 0 -->
+            <div class="level-header row-0">
+                <div class="level-number">LEVEL 0</div>
+                <div class="level-name">Baseline</div>
+            </div>
+            <div class="cell row-0">
+                <h3>College Graduate</h3>
+                <p><strong>Week 0:</strong> General education</p>
+                <ul>
+                    <li>Programming languages (Python, Java)</li>
+                    <li>Algorithms & data structures</li>
+                    <li>Academic projects</li>
+                </ul>
+                <p style="margin-top: 10px; font-style: italic;">Cannot deploy to your infrastructure</p>
+            </div>
+            <div class="cell row-0">
+                <h3>AI Model (ChatGPT, Copilot)</h3>
+                <p><strong>Base training:</strong> General knowledge</p>
+                <ul>
+                    <li>Programming languages (Python, Java)</li>
+                    <li>Common patterns & practices</li>
+                    <li>Public documentation</li>
+                </ul>
+                <p style="margin-top: 10px; font-style: italic;">No specific project context</p>
+            </div>
+
+            <!-- Level 1 -->
+            <div class="level-header row-1">
+                <div class="level-number">LEVEL 1</div>
+                <div class="level-name">Broad</div>
+            </div>
+            <div class="cell row-1">
+                <h3>Company Onboarding</h3>
+                <p><strong>Week 1:</strong> Company-wide knowledge</p>
+                <ul>
+                    <li>Mission & values</li>
+                    <li>Tools: Slack, GitHub, Jira</li>
+                    <li>Security protocols</li>
+                    <li>Org structure</li>
+                </ul>
+                <p style="margin-top: 10px;"><span class="highlight">Can navigate company</span></p>
+            </div>
+            <div class="cell row-1">
+                <h3>User Level Context</h3>
+                <p><strong>Session start:</strong> ~/.claude/</p>
+                <ul>
+                    <li>User preferences & settings</li>
+                    <li>6 general-purpose skills</li>
+                    <li>Session history</li>
+                    <li>Default agents</li>
+                </ul>
+                <p style="margin-top: 10px;"><span class="highlight">Can use general tools</span></p>
+            </div>
+
+            <!-- Level 2 -->
+            <div class="level-header row-2">
+                <div class="level-number">LEVEL 2</div>
+                <div class="level-name">Domain</div>
+            </div>
+            <div class="cell row-2">
+                <h3>Department Training</h3>
+                <p><strong>Month 1:</strong> Department standards</p>
+                <ul>
+                    <li>Tech stack: Python, PostgreSQL, K8s</li>
+                    <li>Architecture patterns</li>
+                    <li>CI/CD deployment pipeline</li>
+                    <li>Coding standards</li>
+                </ul>
+                <p style="margin-top: 10px;"><span class="highlight">Can follow team patterns</span></p>
+            </div>
+            <div class="cell row-2">
+                <h3>Workspace Context</h3>
+                <p><strong>Project entry:</strong> ~/projects/.claude/</p>
+                <ul>
+                    <li>Infrastructure docs (AINotes)</li>
+                    <li>9 infrastructure skills</li>
+                    <li>4 custom agents</li>
+                    <li>Network topology & policies</li>
+                </ul>
+                <p style="margin-top: 10px;"><span class="highlight">Can deploy to infrastructure</span></p>
+            </div>
+
+            <!-- Level 3 -->
+            <div class="level-header row-3">
+                <div class="level-number">LEVEL 3</div>
+                <div class="level-name">Specific</div>
+            </div>
+            <div class="cell row-3">
+                <h3>Role Assignment</h3>
+                <p><strong>Quarter 1:</strong> Project knowledge</p>
+                <ul>
+                    <li>Assigned service (API Gateway)</li>
+                    <li>Codebase structure</li>
+                    <li>Service dependencies</li>
+                    <li>Known issues & gotchas</li>
+                </ul>
+                <p style="margin-top: 10px;"><span class="highlight">Can navigate codebase</span></p>
+            </div>
+            <div class="cell row-3">
+                <h3>Project Context</h3>
+                <p><strong>Service entry:</strong> ~/projects/nginx/</p>
+                <ul>
+                    <li>Project docs (CLAUDE.md)</li>
+                    <li>Service architecture</li>
+                    <li>Configuration details</li>
+                    <li>Recent changes</li>
+                </ul>
+                <p style="margin-top: 10px;"><span class="highlight">Understands this service</span></p>
+            </div>
+
+            <!-- Level 4 -->
+            <div class="level-header row-4">
+                <div class="level-number">LEVEL 4</div>
+                <div class="level-name">Task</div>
+            </div>
+            <div class="cell row-4">
+                <h3>Assignment Details</h3>
+                <p><strong>Daily work:</strong> Task execution</p>
+                <ul>
+                    <li>Business requirements</li>
+                    <li>Technical approach</li>
+                    <li>Test scenarios</li>
+                    <li><strong>Tools:</strong> Postman, Jira, APIs</li>
+                </ul>
+                <p style="margin-top: 10px;"><span class="highlight">Can execute task</span></p>
+            </div>
+            <div class="cell row-4">
+                <h3>Runtime Tool Loading</h3>
+                <p><strong>Execution:</strong> On-demand</p>
+                <ul>
+                    <li>mem0 queried (lessons)</li>
+                    <li>MCP tools (DB, files, web)</li>
+                    <li>Task-specific context</li>
+                    <li><strong>Skills:</strong> keycloak, postgres</li>
+                </ul>
+                <p style="margin-top: 10px;"><span class="highlight">Can complete work</span></p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>The Pattern:</strong> Context organization transforms generalists into specialists</p>
+            <p style="margin-top: 10px;">Full details: <a href="https://nginx.ai-servicers.com/context-compare/">nginx.ai-servicers.com/context-compare</a></p>
+        </div>
+    </div>
+</body>
+</html>
