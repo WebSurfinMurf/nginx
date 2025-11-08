@@ -25,9 +25,30 @@ All static sites are now served under **nginx.ai-servicers.com** using path-base
   - Multi-layered context management architecture documentation
   - Covers: initialization files, commands, skills, agents, persistent memory
   - Created: 2025-11-04
+- **Context Architecture** - https://nginx.ai-servicers.com/context-architecture/
+  - 4-layer context loading architecture diagram
+  - GitLab backup system documentation (claude-pull/claude-push)
+  - mem0 bidirectional workflow patterns
+  - Updated: 2025-11-07
 
 ## Recent Work & Changes
 _This section is updated by Claude during each session_
+
+### Session: 2025-11-07 (GitLab Backup System)
+- **Updated Context Architecture Documentation**: Added comprehensive backup system section
+  - **URL**: https://nginx.ai-servicers.com/context-architecture/
+  - **New Content**:
+    - "Configuration Backup & Version Control" section
+    - Documentation of claude-pull and claude-push scripts
+    - GitLab repository structure (claude-code-config)
+    - What gets backed up vs excluded
+    - Best practices for backup workflow
+    - Repository location: gitlab.ai-servicers.com/administrators/claude-code-config
+  - **Updates to Existing Sections**:
+    - Added GitLab backup mentions to Layer 1 (User Bootstrap) and Layer 2 (Infrastructure)
+    - Updated implementation checklist with backup script creation
+    - Updated footer with backup repository link
+  - **Integration**: Backup system now documented alongside context loading architecture
 
 ### Session: 2025-11-04 (Part 3 - Claude Context Documentation)
 - **Added Claude Code CLI Structure Documentation**: New comprehensive documentation page

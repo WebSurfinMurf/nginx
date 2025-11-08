@@ -288,7 +288,7 @@
                         • User-specific tools and plugins
                     </text>
                     <text x="520" y="215" fill="white" font-size="14">
-                        • Environment configuration
+                        • 💾 Backed up to GitLab (claude-push/pull)
                     </text>
 
                     <!-- Arrow 1 to 2 -->
@@ -464,6 +464,7 @@
                     <li><strong>Skills loaded</strong> - 14 infrastructure skills available for invocation</li>
                     <li>User preferences and settings</li>
                     <li>Session history and state management</li>
+                    <li><strong>💾 Version controlled:</strong> Backed up to GitLab via <span class="code">claude-push</span></li>
                 </ul>
             </div>
 
@@ -477,6 +478,7 @@
                     <li>Network topology, security policies, coding standards</li>
                     <li>Server inventory, integration patterns, logging standards</li>
                     <li>Available before any project-specific context</li>
+                    <li><strong>💾 Version controlled:</strong> Infrastructure config backed up to GitLab</li>
                 </ul>
                 <div class="recommendation-box" style="margin-top: 1rem;">
                     <strong>⚠️ KEY CHANGE:</strong> Move memoryfiles.md invocation HERE (from manual /cinit).
@@ -601,11 +603,23 @@
 
         <!-- mem0 Query Workflow -->
         <div class="section">
-            <h2 class="section-title">mem0 Query Workflow</h2>
+            <h2 class="section-title">mem0 Bidirectional Workflow</h2>
 
             <div class="principle-box" style="background: #fef5e7; border-left: 4px solid #ed8936;">
                 <strong style="color: #c05621;">Key Insight:</strong> mem0 is for <strong>experiential knowledge</strong>, not documentation.
-                <br>Query it when starting a task to recall past lessons, not when entering a directory to load facts.
+                <br><strong>Query</strong> at task-start to recall lessons → <strong>Save</strong> with /cmemory after completing work → Keep mem0 aligned with reality
+            </div>
+
+            <div class="layer-description">
+                <h3>💾 /cmemory Command</h3>
+                <p><strong>Purpose:</strong> Save proven facts and lessons learned to mem0</p>
+                <p><strong>When to use:</strong> After completing work, solving problems, or making decisions</p>
+                <ul>
+                    <li><strong>After deployment:</strong> "Great, nginx deployed successfully. /cmemory"</li>
+                    <li><strong>After solving issues:</strong> "Fixed that postgres connection issue. /cmemory"</li>
+                    <li><strong>After decisions:</strong> "We decided to use redis for sessions. /cmemory"</li>
+                </ul>
+                <p style="margin-top: 1rem;"><strong>What it saves:</strong> Gotchas, lessons, solutions, decisions, user preferences (NOT documentation)</p>
             </div>
 
             <div class="layer-description">
@@ -678,18 +692,119 @@
             </div>
         </div>
 
+        <!-- Backup and Version Control -->
+        <div class="section">
+            <h2 class="section-title">💾 Configuration Backup & Version Control</h2>
+
+            <div class="principle-box" style="background: #e7f3ff; border-left: 4px solid #4299e1;">
+                <strong style="color: #2b6cb0;">GitLab Backup System:</strong> All Claude Code configuration is backed up to GitLab
+                using automated scripts. User config and infrastructure config are synchronized separately but versioned together.
+            </div>
+
+            <div class="layer-description">
+                <h3>🔧 Backup Scripts (devscripts/)</h3>
+                <p><strong>Location:</strong> <span class="code">/home/administrator/projects/devscripts/</span></p>
+                <p><strong>Purpose:</strong> Automated backup and restore of Claude Code configuration</p>
+
+                <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <p><strong style="color: #2d3748;">claude-push</strong> - Backup to GitLab</p>
+                    <pre style="background: #2d3748; color: #68d391; padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem;">claude-push "Optional commit message"</pre>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: #4a5568;">
+                        <li>Syncs <span class="code">~/.claude/</span> → <span class="code">claude-code-config/home/</span></li>
+                        <li>Syncs <span class="code">~/projects/.claude/</span> → <span class="code">claude-code-config/infrastructure/</span></li>
+                        <li>Commits and pushes to GitLab repository</li>
+                        <li>Excludes: .credentials.json, shell-snapshots/, file-history/, debug/</li>
+                    </ul>
+                </div>
+
+                <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <p><strong style="color: #2d3748;">claude-pull</strong> - Restore from GitLab</p>
+                    <pre style="background: #2d3748; color: #68d391; padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem;">claude-pull</pre>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: #4a5568;">
+                        <li>Pulls latest from GitLab repository</li>
+                        <li>Restores to <span class="code">~/.claude/</span> and <span class="code">~/projects/.claude/</span></li>
+                        <li>Preserves existing <span class="code">.credentials.json</span> (never overwrites API keys)</li>
+                        <li>Useful for disaster recovery or setting up new machines</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="layer-description">
+                <h3>📦 What Gets Backed Up</h3>
+                <div class="comparison-grid" style="margin-top: 1rem;">
+                    <div class="comparison-card after">
+                        <h4>✅ Backed Up to GitLab</h4>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li><strong>User Config:</strong> ~/.claude/settings.json, history.jsonl</li>
+                            <li><strong>Skills:</strong> All 14 infrastructure skills</li>
+                            <li><strong>Agents:</strong> 4 specialized agent definitions</li>
+                            <li><strong>Commands:</strong> 11 slash commands</li>
+                            <li><strong>Infrastructure:</strong> init.md, memoryfiles.md</li>
+                            <li><strong>Session State:</strong> Project-specific todos and state</li>
+                        </ul>
+                    </div>
+
+                    <div class="comparison-card before">
+                        <h4>🔒 Excluded (Security)</h4>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li><strong>.credentials.json</strong> - API keys and tokens</li>
+                            <li><strong>shell-snapshots/</strong> - Ephemeral state</li>
+                            <li><strong>file-history/</strong> - Large, transient data</li>
+                            <li><strong>debug/</strong> - Debug logs</li>
+                            <li><strong>*.secret, *.key, *.pem</strong> - Security files</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layer-description">
+                <h3>🌐 GitLab Repository Structure</h3>
+                <p><strong>Repository:</strong> <span class="code">gitlab.ai-servicers.com/administrators/claude-code-config</span></p>
+                <pre style="background: #2d3748; color: #68d391; padding: 1rem; border-radius: 8px; margin-top: 1rem; overflow-x: auto;">
+claude-code-config/
+├── home/                   # User-level config (from ~/.claude/)
+│   ├── skills/            # User-specific skills
+│   ├── settings.json      # User preferences
+│   └── history.jsonl      # Session history
+├── infrastructure/         # Workspace config (from ~/projects/.claude/)
+│   ├── agents/            # 4 specialized agents
+│   ├── skills/            # 14 infrastructure skills
+│   ├── commands/          # 11 slash commands
+│   └── init.md            # Bootstrap with @memoryfiles.md
+├── docs/                   # Documentation and references
+│   ├── agent-docs/        # Agent-specific documentation
+│   └── agent-context/     # Agent context examples
+└── config/                 # Configuration examples
+    └── mcp-servers.json   # MCP server configurations</pre>
+            </div>
+
+            <div class="recommendation-box" style="background: #fef5e7; border-left: 4px solid #ed8936; margin-top: 2rem;">
+                <strong style="color: #c05621;">💡 Best Practice:</strong> Run <span class="code">claude-push</span> after:
+                <ul style="margin-left: 2rem; margin-top: 0.5rem; line-height: 1.8;">
+                    <li>Creating or modifying skills</li>
+                    <li>Updating agent configurations</li>
+                    <li>Adding new slash commands</li>
+                    <li>Major infrastructure changes</li>
+                    <li>End of significant work sessions</li>
+                </ul>
+            </div>
+        </div>
+
         <!-- Implementation -->
         <div class="section">
             <h2 class="section-title">Implementation Steps</h2>
 
-            <div class="recommendation-box">
-                <strong>📋 Action Items:</strong>
+            <div class="recommendation-box" style="background: #f0fff4; border-left: 4px solid #68d391;">
+                <strong style="color: #2f855a;">✅ Migration Completed (2025-11-07):</strong>
                 <ol style="margin-left: 2rem; margin-top: 1rem; line-height: 1.8;">
-                    <li>Create <span class="code">~/projects/.claude/init.md</span> (or similar auto-loaded file)</li>
-                    <li>Add content: <span class="code">@memoryfiles.md</span></li>
-                    <li>Remove or repurpose <span class="code">/cinit</span> command (no longer needed)</li>
-                    <li>Test: Enter any project directory, verify AINotes loaded automatically</li>
-                    <li>Update documentation to reflect automatic loading</li>
+                    <li>✅ Created <span class="code">~/projects/.claude/init.md</span> with @memoryfiles.md</li>
+                    <li>✅ Moved agents/skills/commands to <span class="code">~/projects/.claude/</span></li>
+                    <li>✅ Removed symlinks from <span class="code">~/.claude/</span></li>
+                    <li>✅ Removed <span class="code">/cinit</span> command (replaced by auto-load)</li>
+                    <li>✅ Added <span class="code">/cmemory</span> command for bidirectional mem0 workflow</li>
+                    <li>✅ AINotes loaded automatically in ~/projects/ workspace</li>
+                    <li>✅ Created <span class="code">claude-pull</span> and <span class="code">claude-push</span> backup scripts</li>
+                    <li>✅ GitLab backup repository configured and operational</li>
                 </ol>
             </div>
 
@@ -747,7 +862,8 @@ These provide infrastructure knowledge needed for ANY project work.
 
         <div class="footer">
             <p><strong>Architecture:</strong> Claude Code Context Loading System</p>
-            <p style="margin-top: 0.5rem;"><strong>Updated:</strong> 2025-11-07</p>
+            <p style="margin-top: 0.5rem;"><strong>Updated:</strong> 2025-11-07 (Added GitLab backup system)</p>
+            <p style="margin-top: 0.5rem;"><strong>Backup:</strong> gitlab.ai-servicers.com/administrators/claude-code-config</p>
             <p style="margin-top: 1rem; font-size: 0.9rem;">
                 📚 See also: <a href="/claude-context/" style="color: #667eea;">Manual Context Guide</a> |
                 <a href="/" style="color: #667eea;">All Documentation</a>
