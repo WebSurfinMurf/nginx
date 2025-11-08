@@ -559,47 +559,52 @@
             </div>
         </div>
 
-        <!-- Before/After Comparison -->
+        <!-- Architecture Evolution -->
         <div class="section">
-            <h2 class="section-title">Recommended Change: Move memoryfiles.md Up</h2>
+            <h2 class="section-title">✅ Architecture Evolution: Automatic Context Loading</h2>
+
+            <div class="principle-box" style="background: #f0fff4; border-left: 4px solid #68d391;">
+                <strong style="color: #2f855a;">Migration Completed:</strong> memoryfiles.md now auto-loads at Layer 2 (Infrastructure).
+                No manual /cinit command needed - infrastructure context loads automatically when entering ~/projects/ workspace.
+            </div>
 
             <div class="comparison-grid">
                 <div class="comparison-card before">
-                    <h4>❌ Current (Manual)</h4>
+                    <h4>❌ Old Approach (Pre-2025-11-07)</h4>
                     <ol>
                         <li>~/.claude/ (user)</li>
                         <li>projects/.claude/ (workspace)</li>
                         <li>projects/{name}/CLAUDE.md (project)</li>
-                        <li><strong style="color: #c53030;">User types /cinit manually</strong></li>
-                        <li>memoryfiles.md loads AINotes</li>
-                        <li>Work begins</li>
+                        <li><strong style="color: #c53030;">User typed /cinit manually</strong></li>
+                        <li>memoryfiles.md loaded AINotes</li>
+                        <li>Work began</li>
                     </ol>
                     <div style="margin-top: 1rem; padding: 1rem; background: rgba(252,129,129,0.2); border-radius: 6px;">
                         <strong>Problems:</strong>
                         <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
                             <li>Manual step required</li>
                             <li>Easy to forget</li>
-                            <li>Loads AFTER project context</li>
-                            <li>Infrastructure knowledge comes too late</li>
+                            <li>Loaded AFTER project context</li>
+                            <li>Infrastructure knowledge came too late</li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="comparison-card after">
-                    <h4>✅ Recommended (Automatic)</h4>
+                    <h4>✅ Current Approach (Automatic)</h4>
                     <ol>
                         <li>~/.claude/ (user)</li>
-                        <li>projects/.claude/<br><strong style="color: #2f855a;">→ Auto-loads memoryfiles.md</strong><br><strong style="color: #2f855a;">→ AINotes loaded here</strong></li>
+                        <li>projects/.claude/<br><strong style="color: #2f855a;">→ init.md auto-loads @memoryfiles.md</strong><br><strong style="color: #2f855a;">→ 9 AINotes files loaded automatically</strong></li>
                         <li>projects/{name}/CLAUDE.md (project)</li>
-                        <li>Work begins</li>
+                        <li>Work begins with full context</li>
                     </ol>
                     <div style="margin-top: 1rem; padding: 1rem; background: rgba(104,211,145,0.2); border-radius: 6px;">
-                        <strong>Benefits:</strong>
+                        <strong>Benefits Achieved:</strong>
                         <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                            <li>Fully automatic</li>
-                            <li>Never forgotten</li>
-                            <li>Proper hierarchy (general → specific)</li>
-                            <li>Infrastructure knowledge available immediately</li>
+                            <li>✅ Fully automatic</li>
+                            <li>✅ Never forgotten</li>
+                            <li>✅ Proper hierarchy (general → specific)</li>
+                            <li>✅ Infrastructure knowledge available immediately</li>
                         </ul>
                     </div>
                 </div>
