@@ -34,7 +34,7 @@ All static sites are now served under **nginx.ai-servicers.com** using path-base
 ## Recent Work & Changes
 _This section is updated by Claude during each session_
 
-### Session: 2025-11-07 (GitLab Backup System)
+### Session: 2025-11-07 (GitLab Backup System & Architecture Refinement)
 - **Updated Context Architecture Documentation**: Added comprehensive backup system section
   - **URL**: https://nginx.ai-servicers.com/context-architecture/
   - **New Content**:
@@ -48,6 +48,12 @@ _This section is updated by Claude during each session_
     - Added GitLab backup mentions to Layer 1 (User Bootstrap) and Layer 2 (Infrastructure)
     - Updated implementation checklist with backup script creation
     - Updated footer with backup repository link
+    - Removed "Old Approach (Pre-2025-11-07)" historical comparison section
+    - Refined layer names to be more descriptive:
+      - Layer 1: "User Level Context & Tools"
+      - Layer 2: "Project level common context & tools"
+      - Layer 3: "Project Specific Context & tools"
+      - Layer 4: "Dynamic Context & Tool Loading"
   - **Integration**: Backup system now documented alongside context loading architecture
 
 ### Session: 2025-11-04 (Part 3 - Claude Context Documentation)

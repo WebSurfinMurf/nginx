@@ -274,7 +274,7 @@
                     <rect x="100" y="50" width="800" height="230" rx="15"
                           fill="#4299e1" stroke="#2b6cb0" stroke-width="3"/>
                     <text x="500" y="90" text-anchor="middle" fill="white" font-size="24" font-weight="bold">
-                        LAYER 1: User Bootstrap (ANTHROPIC DESIGN)
+                        LAYER 1: User Level Context & Tools
                     </text>
                     <text x="500" y="125" text-anchor="middle" fill="white" font-size="18">
                         ~/.claude/
@@ -313,7 +313,7 @@
                     <rect x="100" y="360" width="800" height="290" rx="15"
                           fill="#ed8936" stroke="#c05621" stroke-width="3"/>
                     <text x="500" y="400" text-anchor="middle" fill="white" font-size="24" font-weight="bold">
-                        LAYER 2: Infrastructure Context (OUR CUSTOMIZATION)
+                        LAYER 2: Project level common context & tools
                     </text>
                     <text x="500" y="435" text-anchor="middle" fill="white" font-size="18">
                         ~/projects/.claude/
@@ -361,7 +361,7 @@
                     <rect x="100" y="720" width="800" height="240" rx="15"
                           fill="#9f7aea" stroke="#6b46c1" stroke-width="3"/>
                     <text x="500" y="760" text-anchor="middle" fill="white" font-size="24" font-weight="bold">
-                        LAYER 3: Project Context (ANTHROPIC DESIGN)
+                        LAYER 3: Project Specific Context & tools
                     </text>
                     <text x="500" y="795" text-anchor="middle" fill="white" font-size="18">
                         ~/projects/{projectname}/
@@ -400,7 +400,7 @@
                     <rect x="100" y="1030" width="800" height="400" rx="15"
                           fill="#68d391" stroke="#2f855a" stroke-width="3"/>
                     <text x="500" y="1070" text-anchor="middle" fill="white" font-size="24" font-weight="bold">
-                        LAYER 4: Execution Context (On-Demand)
+                        LAYER 4: Dynamic Context & Tool Loading
                     </text>
                     <text x="500" y="1105" text-anchor="middle" fill="white" font-size="18">
                         Skills Invoked | mem0 Queried with Task Context
@@ -484,7 +484,7 @@
             <h2 class="section-title">Layer Breakdown</h2>
 
             <div class="layer-description">
-                <h3><span class="layer-number">1</span> User Bootstrap (ANTHROPIC DESIGN)</h3>
+                <h3><span class="layer-number">1</span> User Level Context & Tools</h3>
                 <p><strong>Location:</strong> <span class="code">~/.claude/</span></p>
                 <p><strong>Loaded:</strong> At session start (automatic)</p>
                 <p><strong>Purpose:</strong> User-specific preferences, session state, general-purpose tools</p>
@@ -499,7 +499,7 @@
             </div>
 
             <div class="layer-description">
-                <h3><span class="layer-number">2</span> Infrastructure Context (OUR CUSTOMIZATION)</h3>
+                <h3><span class="layer-number">2</span> Project level common context & tools</h3>
                 <p><strong>Location:</strong> <span class="code">~/projects/.claude/</span></p>
                 <p><strong>Loaded:</strong> When entering projects workspace (automatic)</p>
                 <p><strong>Purpose:</strong> System-wide infrastructure knowledge for ALL projects</p>
@@ -521,7 +521,7 @@
             </div>
 
             <div class="layer-description">
-                <h3><span class="layer-number">3</span> Project Context (ANTHROPIC DESIGN)</h3>
+                <h3><span class="layer-number">3</span> Project Specific Context & tools</h3>
                 <p><strong>Location:</strong> <span class="code">~/projects/{projectname}/CLAUDE.md</span> + optional <span class="code">.claude/</span></p>
                 <p><strong>Loaded:</strong> When entering specific project directory (automatic)</p>
                 <p><strong>Purpose:</strong> Project-specific documentation and configuration</p>
@@ -536,7 +536,7 @@
             </div>
 
             <div class="layer-description">
-                <h3><span class="layer-number">4</span> Execution Context</h3>
+                <h3><span class="layer-number">4</span> Dynamic Context & Tool Loading</h3>
                 <p><strong>Location:</strong> Various (on-demand)</p>
                 <p><strong>Loaded:</strong> During work execution (as needed)</p>
                 <p><strong>Purpose:</strong> Dynamic context invoked when relevant</p>
@@ -568,45 +568,22 @@
                 No manual /cinit command needed - infrastructure context loads automatically when entering ~/projects/ workspace.
             </div>
 
-            <div class="comparison-grid">
-                <div class="comparison-card before">
-                    <h4>❌ Old Approach (Pre-2025-11-07)</h4>
-                    <ol>
-                        <li>~/.claude/ (user)</li>
-                        <li>projects/.claude/ (workspace)</li>
-                        <li>projects/{name}/CLAUDE.md (project)</li>
-                        <li><strong style="color: #c53030;">User typed /cinit manually</strong></li>
-                        <li>memoryfiles.md loaded AINotes</li>
-                        <li>Work began</li>
-                    </ol>
-                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(252,129,129,0.2); border-radius: 6px;">
-                        <strong>Problems:</strong>
-                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                            <li>Manual step required</li>
-                            <li>Easy to forget</li>
-                            <li>Loaded AFTER project context</li>
-                            <li>Infrastructure knowledge came too late</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="comparison-card after">
-                    <h4>✅ Current Approach (Automatic)</h4>
-                    <ol>
-                        <li>~/.claude/ (user)</li>
-                        <li>projects/.claude/<br><strong style="color: #2f855a;">→ init.md auto-loads @memoryfiles.md</strong><br><strong style="color: #2f855a;">→ 9 AINotes files loaded automatically</strong></li>
-                        <li>projects/{name}/CLAUDE.md (project)</li>
-                        <li>Work begins with full context</li>
-                    </ol>
-                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(104,211,145,0.2); border-radius: 6px;">
-                        <strong>Benefits Achieved:</strong>
-                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                            <li>✅ Fully automatic</li>
-                            <li>✅ Never forgotten</li>
-                            <li>✅ Proper hierarchy (general → specific)</li>
-                            <li>✅ Infrastructure knowledge available immediately</li>
-                        </ul>
-                    </div>
+            <div class="layer-description">
+                <h3>✅ Current Loading Sequence</h3>
+                <ol style="line-height: 2; margin-left: 2rem;">
+                    <li>~/.claude/ (user)</li>
+                    <li>projects/.claude/<br><strong style="color: #2f855a;">→ init.md auto-loads @memoryfiles.md</strong><br><strong style="color: #2f855a;">→ 9 AINotes files loaded automatically</strong></li>
+                    <li>projects/{name}/CLAUDE.md (project)</li>
+                    <li>Work begins with full context</li>
+                </ol>
+                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(104,211,145,0.2); border-radius: 6px;">
+                    <strong>Benefits Achieved:</strong>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>✅ Fully automatic</li>
+                        <li>✅ Never forgotten</li>
+                        <li>✅ Proper hierarchy (general → specific)</li>
+                        <li>✅ Infrastructure knowledge available immediately</li>
+                    </ul>
                 </div>
             </div>
         </div>
