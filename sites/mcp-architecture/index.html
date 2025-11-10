@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Code Execution Architecture - Token-Efficient Multi-Tool Orchestration</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
+            --border: #475569;
+            --code-bg: #0a0e1a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+            border-radius: 12px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .meta {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin: 3rem 0 1.5rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            color: var(--secondary);
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box {
+            background: var(--surface);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: var(--surface);
+            border-left: 4px solid var(--warning);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .success-box {
+            background: var(--surface);
+            border-left: 4px solid var(--success);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+        }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .inline-code {
+            background: var(--surface-light);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+
+        .diagram {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        .flow-step {
+            margin: 0.5rem 0;
+            padding-left: 2rem;
+        }
+
+        .flow-arrow {
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: var(--surface-light);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .toc {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .toc a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0 0.25rem;
+        }
+
+        .badge-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .badge-info {
+            background: var(--primary);
+            color: white;
+        }
+
+        .comparison-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+        }
+
+        .comparison-card.old {
+            border-color: var(--danger);
+        }
+
+        .comparison-card.new {
+            border-color: var(--success);
+        }
+
+        .section {
+            margin-bottom: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MCP Code Execution Architecture</h1>
+            <p class="subtitle">Token-Efficient Multi-Tool Orchestration with Progressive Disclosure</p>
+            <p class="meta">
+                <span class="badge badge-success">Production Ready</span>
+                <span class="badge badge-info">Version 2.0</span>
+                <span class="badge badge-info">63 Tools</span>
+                <span class="badge badge-info">9 Servers</span>
+            </p>
+            <p class="meta">ai-servicers.com Infrastructure | Updated: November 2025</p>
+        </header>
+
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">Overview & Problem Statement</a></li>
+                <li><a href="#architecture">Architecture & Data Flow</a></li>
+                <li><a href="#components">Component Breakdown</a></li>
+                <li><a href="#configuration">Configuration Files</a></li>
+                <li><a href="#setup">Setting Up Your Own</a></li>
+                <li><a href="#usage">Usage Patterns</a></li>
+                <li><a href="#benefits">Token Efficiency Metrics</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <section id="overview" class="section">
+            <h2>📖 Overview & Problem Statement</h2>
+
+            <h3>The Challenge: Context Window Inefficiency</h3>
+
+            <p>Most MCP (Model Context Protocol) clients suffer from a critical inefficiency: <strong>they load all tool definitions upfront into the context window</strong>. When you have 63 tools across 9 different servers, this creates massive token waste:</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">~150K</div>
+                    <div class="stat-label">Tokens wasted loading all tool schemas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">70%+</div>
+                    <div class="stat-label">Context filled before user query</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$$$</div>
+                    <div class="stat-label">Unnecessary API costs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">Limited</div>
+                    <div class="stat-label">Remaining space for actual work</div>
+                </div>
+            </div>
+
+            <h3>Anthropic's Recommended Solution</h3>
+
+            <div class="highlight-box">
+                <h4>Code Execution with Progressive Disclosure</h4>
+                <p>Instead of loading 63 tool definitions upfront, expose <strong>ONE</strong> tool to the LLM: <span class="inline-code">execute_code</span>. The LLM writes code that discovers and uses tools on-demand.</p>
+
+                <p><strong>Key Benefits:</strong></p>
+                <ul>
+                    <li><strong>98.7% token reduction</strong> on multi-tool workflows (Anthropic's published metric)</li>
+                    <li><strong>Intermediate results stay in execution environment</strong> (never enter context)</li>
+                    <li><strong>Control flow in code</strong> (loops, conditionals, error handling)</li>
+                    <li><strong>Data filtering before model sees it</strong> (privacy-preserving)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="architecture" class="section">
+            <h2>🏗️ Architecture & Data Flow</h2>
+
+            <h3>System Architecture Diagram</h3>
+
+            <div class="diagram">
+<pre>
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         CLAUDE CODE CLI / API                            │
+│                                                                          │
+│  Context Window: 200K tokens                                             │
+│  MCP Config: ~/.claude/mcp.json                                          │
+│  Loads: code-executor ONLY (4 tools, ~100 tokens)                        │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                  │ stdio
+                                  │ docker exec -i mcp-code-executor npx tsx mcp-server.ts
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      MCP CODE-EXECUTOR SERVER                            │
+│                                                                          │
+│  Container: mcp-code-executor                                            │
+│  Exposes 4 MCP Tools:                                                    │
+│    • execute_code(code, timeout)         ← PRIMARY INTERFACE             │
+│    • search_tools(query, server, detail) ← Progressive discovery         │
+│    • get_tool_info(server, tool, detail) ← On-demand metadata            │
+│    • list_mcp_tools()                    ← Tool inventory                │
+│                                                                          │
+│  MCP Server (stdio): /app/mcp-server.ts                                  │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                  │ HTTP (port 9091 internal)
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      CODE EXECUTION ENGINE                               │
+│                                                                          │
+│  Fastify HTTP API: localhost:9091                                        │
+│  Sandbox: Node 20 + Python 3                                             │
+│  Workspace: /workspace/servers/ (63 TypeScript wrappers)                 │
+│                                                                          │
+│  POST /execute                                                           │
+│    - Wraps code in async IIFE if needed                                  │
+│    - Executes in /tmp/executions (tmpfs, noexec)                         │
+│    - Returns: output, executionTime, metrics                             │
+│                                                                          │
+│  GET /tools/search?query=&server=&detail=                                │
+│    - Progressive disclosure API                                          │
+│    - name: 245 tokens (97% savings)                                      │
+│    - description: 1,181 tokens (85% savings)                             │
+│    - full: ~7,685 tokens (only when needed)                              │
+└────────────────────────────────┬────────────────────────────────────────┘
+                                  │
+                   ┌──────────────┴──────────────┐
+                   │                             │
+                   ▼                             ▼
+┌──────────────────────────────┐  ┌─────────────────────────────────────┐
+│  TYPESCRIPT TOOL WRAPPERS    │  │     MCP HTTP CLIENT                  │
+│  (Generated)                 │  │                                     │
+│                              │  │  /app/client.ts                      │
+│  /workspace/servers/         │  │  callMCPTool(server, tool, args)    │
+│    ├── filesystem/           │  │                                     │
+│    │   ├── read_file.ts      │  │  Connects to MCP Proxy via HTTP     │
+│    │   ├── write_file.ts     │  └──────────────┬──────────────────────┘
+│    │   └── ...9 tools        │                  │ HTTP
+│    ├── postgres/             │                  ▼
+│    │   └── execute_sql.ts    │  ┌─────────────────────────────────────┐
+│    ├── timescaledb/          │  │      TBXark MCP PROXY                │
+│    ├── minio/                │  │                                     │
+│    ├── playwright/           │  │  Container: mcp-proxy               │
+│    ├── memory/               │  │  Port: 9090                          │
+│    ├── n8n/                  │  │  Transport: Streamable HTTP          │
+│    ├── ib/                   │  │  Config: /config/config.json         │
+│    └── arangodb/             │  │                                     │
+│        └── ...63 total       │  │  Routes:                             │
+└──────────────────────────────┘  │    /filesystem/mcp                   │
+                                  │    /postgres/mcp                     │
+                                  │    /timescaledb/mcp                  │
+                                  │    /... (9 servers total)            │
+                                  └──────────────┬──────────────────────┘
+                                                  │ stdio
+                   ┌──────────────────────────────┴────────────────────────────────┐
+                   │                              │                                │
+                   ▼                              ▼                                ▼
+        ┌──────────────────┐         ┌──────────────────┐            ┌──────────────────┐
+        │  MCP SERVERS     │         │  MCP SERVERS     │            │  MCP SERVERS     │
+        │                  │         │                  │            │                  │
+        │  Filesystem      │         │  PostgreSQL      │            │  Playwright      │
+        │  (9 tools)       │         │  (1 tool)        │            │  (6 tools)       │
+        │                  │         │                  │            │                  │
+        │  Memory          │         │  MinIO           │            │  N8N             │
+        │  (9 tools)       │         │  (9 tools)       │            │  (6 tools)       │
+        │                  │         │                  │            │                  │
+        │  TimescaleDB     │         │  IB Trading      │            │  ArangoDB        │
+        │  (6 tools)       │         │  (10 tools)      │            │  (7 tools)       │
+        └──────────────────┘         └──────────────────┘            └──────────────────┘
+</pre>
+            </div>
+
+            <h3>Data Flow Example: Multi-Tool Query</h3>
+
+            <div class="comparison-table">
+                <div class="comparison-card old">
+                    <h4>❌ Old Pattern (Direct MCP Loading)</h4>
+                    <pre><code>User: "Query database, filter results, upload to S3"
+
+1. Load 63 tool schemas (~800 tokens)
+2. Call postgres.execute_sql
+   → Returns 10K rows (50K tokens!)
+3. Claude filters in context window
+   → Processing 50K tokens
+4. Call minio.upload_object
+   → Upload filtered data (20K tokens)
+
+Total: ~70K tokens consumed</code></pre>
+                </div>
+
+                <div class="comparison-card new">
+                    <h4>✅ New Pattern (Code Execution)</h4>
+                    <pre><code>User: "Query database, filter results, upload to S3"
+
+1. Load code-executor (~100 tokens)
+2. Claude writes TypeScript code:
+   → Import timescaledb wrapper
+   → Import minio wrapper
+   → Execute query IN sandbox
+   → Filter data IN sandbox
+   → Upload to S3 IN sandbox
+   → Return: "Uploaded 145 rows"
+
+Total: ~2K tokens consumed
+<strong>Savings: 97.1%</strong></code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="components" class="section">
+            <h2>🔧 Component Breakdown</h2>
+
+            <h3>1. MCP Code-Executor Server</h3>
+
+            <p><strong>File:</strong> <span class="inline-code">/home/administrator/projects/mcp/code-executor/mcp-server.ts</span></p>
+
+            <p><strong>Purpose:</strong> Exposes code execution as an MCP server for Claude Code CLI integration.</p>
+
+            <h4>Exposed MCP Tools:</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tool Name</th>
+                        <th>Description</th>
+                        <th>Parameters</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>execute_code</code></td>
+                        <td>Execute TypeScript/JavaScript code with access to all MCP tools</td>
+                        <td>code: string, timeout?: number</td>
+                    </tr>
+                    <tr>
+                        <td><code>search_tools</code></td>
+                        <td>Search available MCP tools with progressive disclosure</td>
+                        <td>query?: string, server?: string, detail?: 'name'|'description'|'full'</td>
+                    </tr>
+                    <tr>
+                        <td><code>get_tool_info</code></td>
+                        <td>Get detailed information about a specific MCP tool</td>
+                        <td>server: string, tool: string, detail?: string</td>
+                    </tr>
+                    <tr>
+                        <td><code>list_mcp_tools</code></td>
+                        <td>List all available MCP tools across all servers</td>
+                        <td>(none)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Code Example:</h4>
+
+            <pre><code>// mcp-server.ts - Simplified excerpt
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+
+const server = new Server({
+  name: 'code-executor',
+  version: '1.0.0'
+});
+
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  switch (request.params.name) {
+    case 'execute_code':
+      const { code, timeout } = request.params.arguments;
+
+      // Forward to HTTP execution engine
+      const response = await fetch(`http://localhost:3000/execute`, {
+        method: 'POST',
+        body: JSON.stringify({ code, timeout })
+      });
+
+      return await response.json();
+  }
+});</code></pre>
+
+            <h3>2. Code Execution Engine</h3>
+
+            <p><strong>File:</strong> <span class="inline-code">/home/administrator/projects/mcp/code-executor/executor.ts</span></p>
+
+            <p><strong>Purpose:</strong> Sandboxed execution environment with security controls.</p>
+
+            <h4>Security Features:</h4>
+
+            <ul>
+                <li><strong>Non-root user</strong> (node, UID 1000)</li>
+                <li><strong>Network isolation</strong> (mcp-net only, no internet)</li>
+                <li><strong>Resource limits</strong> (1 CPU core, 1GB RAM)</li>
+                <li><strong>Execution timeout</strong> (5 minutes default)</li>
+                <li><strong>Output size limit</strong> (100KB max)</li>
+                <li><strong>Read-only root filesystem</strong></li>
+                <li><strong>tmpfs with noexec</strong> for /tmp/executions</li>
+            </ul>
+
+            <h4>Code Example:</h4>
+
+            <pre><code>// executor.ts - Auto-wrapping logic
+async function executeTypeScript(code: string, timeout: number) {
+  // Check if code needs async wrapping
+  const needsAsyncWrap = /\bawait\s/.test(code) &&
+                         !/^\s*\(?\s*async\s*\(/.test(code);
+
+  if (needsAsyncWrap) {
+    // Split imports from code
+    const imports = code.match(/^import .+$/gm) || [];
+    const rest = code.replace(/^import .+$/gm, '').trim();
+
+    // Wrap non-import code in async IIFE
+    wrappedCode = `${imports.join('\n')}\n\n` +
+                  `(async () => {\n${rest}\n})()` +
+                  `.catch(err => console.error(err));`;
+  }
+
+  // Execute with tsx
+  const result = await execAsync(
+    `tsx ${tempFile}`,
+    { timeout, maxBuffer: MAX_OUTPUT_SIZE }
+  );
+
+  return {
+    output: result.stdout,
+    executionTime: Date.now() - startTime,
+    metrics: { outputBytes: result.stdout.length }
+  };
+}</code></pre>
+
+            <h3>3. TypeScript Wrapper Generator</h3>
+
+            <p><strong>File:</strong> <span class="inline-code">/home/administrator/projects/mcp/code-executor/generate-wrappers.ts</span></p>
+
+            <p><strong>Purpose:</strong> Auto-generates type-safe TypeScript wrappers for all 63 MCP tools.</p>
+
+            <h4>Generated Wrapper Example:</h4>
+
+            <pre><code>// /workspace/servers/filesystem/read_file.ts (auto-generated)
+import { callMCPTool } from '/app/client.js';
+
+export type ReadFileInput = {
+  path: string;
+};
+
+export type ReadFileResponse = any;
+
+/** Read complete contents of a file. Only works within allowed directories. */
+export async function read_file(input: ReadFileInput): Promise&lt;ReadFileResponse&gt; {
+  return callMCPTool&lt;ReadFileResponse&gt;('filesystem', 'read_file', input);
+}</code></pre>
+
+            <h4>Directory Structure Generated:</h4>
+
+            <pre><code>/workspace/servers/
+├── filesystem/         (9 tools: read_file, write_file, list_directory, ...)
+├── postgres/           (1 tool: execute_sql)
+├── timescaledb/        (6 tools: execute_query, list_databases, ...)
+├── minio/              (9 tools: list_buckets, upload_object, ...)
+├── playwright/         (6 tools: navigate, screenshot, click, ...)
+├── memory/             (9 tools: entities, relations, search, ...)
+├── n8n/                (6 tools: workflows, execute, ...)
+├── ib/                 (10 tools: get_historical_data, positions, ...)
+├── arangodb/           (7 tools: query, insert, update, ...)
+└── discovery.ts        (utility: listServers, listTools)</code></pre>
+
+            <h3>4. MCP HTTP Client</h3>
+
+            <p><strong>File:</strong> <span class="inline-code">/home/administrator/projects/mcp/code-executor/client.ts</span></p>
+
+            <p><strong>Purpose:</strong> Communicates with TBXark MCP Proxy via HTTP to call actual MCP tools.</p>
+
+            <pre><code>// client.ts - Simplified excerpt
+const MCP_PROXY_BASE_URL = 'http://mcp-proxy:9090';
+
+export async function callMCPTool&lt;T&gt;(
+  server: string,
+  tool: string,
+  args: any
+): Promise&lt;T&gt; {
+  const response = await fetch(`${MCP_PROXY_BASE_URL}/${server}/mcp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: Date.now(),
+      method: 'tools/call',
+      params: { name: tool, arguments: args }
+    })
+  });
+
+  const result = await response.json();
+  return result.result.content[0].text;
+}</code></pre>
+
+            <h3>5. TBXark MCP Proxy</h3>
+
+            <p><strong>Image:</strong> <span class="inline-code">ghcr.io/tbxark/mcp-proxy:latest</span></p>
+            <p><strong>Config:</strong> <span class="inline-code">/home/administrator/projects/mcp/proxy/config.json</span></p>
+
+            <p><strong>Purpose:</strong> HTTP gateway that translates HTTP requests to stdio MCP protocol.</p>
+
+            <h4>Configuration Example:</h4>
+
+            <pre><code>{
+  "mcpProxy": {
+    "addr": ":9090",
+    "type": "streamable-http"
+  },
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem@0.6.2", "/workspace"]
+    },
+    "postgres": {
+      "command": "/wrappers/postgres-wrapper.sh"
+    },
+    "timescaledb": {
+      "command": "/wrappers/timescaledb-wrapper.sh"
+    }
+    // ... 6 more servers
+  }
+}</code></pre>
+        </section>
+
+        <section id="configuration" class="section">
+            <h2>⚙️ Configuration Files</h2>
+
+            <h3>Claude Code MCP Configuration</h3>
+
+            <p><strong>File:</strong> <span class="inline-code">~/.claude/mcp.json</span></p>
+
+            <div class="success-box">
+                <h4>✅ Correct Configuration (Post-Refactor)</h4>
+                <pre><code>{
+  "mcpServers": {
+    "code-executor": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "exec", "-i", "mcp-code-executor",
+        "npx", "tsx", "/app/mcp-server.ts"
+      ],
+      "env": {
+        "CODE_EXECUTOR_URL": "http://localhost:3000"
+      }
+    }
+  }
+}</code></pre>
+                <p><strong>Result:</strong> Claude Code loads ONLY the code-executor server (4 tools, ~100 tokens). All 63 actual tools are discovered on-demand via code execution.</p>
+            </div>
+
+            <div class="warning-box">
+                <h4>❌ Incorrect Configuration (Pre-Refactor)</h4>
+                <pre><code>{
+  "mcpServers": {
+    "filesystem": { "type": "sse", "url": "http://localhost:9073/sse" },
+    "postgres": { "type": "stdio", "command": "..." },
+    "timescaledb": { "type": "sse", "url": "http://localhost:9074/sse" },
+    "minio": { "type": "sse", "url": "http://localhost:9075/sse" },
+    "playwright": { "type": "sse", "url": "http://localhost:9076/sse" },
+    "memory": { "type": "sse", "url": "http://localhost:9077/sse" },
+    "n8n": { "type": "sse", "url": "http://localhost:9078/sse" },
+    "ib": { "type": "sse", "url": "http://localhost:9079/sse" },
+    "arangodb": { "type": "sse", "url": "http://localhost:9080/sse" }
+  }
+}</code></pre>
+                <p><strong>Problem:</strong> Loads all 9 servers upfront (~800-1200 tokens baseline). Every tool call passes through context. Intermediate results bloat context. <strong>This is the inefficient pattern we replaced.</strong></p>
+            </div>
+
+            <h3>Docker Compose Configuration</h3>
+
+            <p><strong>File:</strong> <span class="inline-code">/home/administrator/projects/mcp/code-executor/docker-compose.yml</span></p>
+
+            <pre><code>services:
+  mcp-code-executor:
+    build: .
+    container_name: mcp-code-executor
+    restart: unless-stopped
+
+    networks:
+      - mcp-net
+
+    ports:
+      - "9091:3000"  # Internal API (not exposed to Claude directly)
+
+    environment:
+      - PORT=3000
+      - EXECUTION_TIMEOUT=300000  # 5 minutes
+
+    # Security: tmpfs with proper permissions
+    tmpfs:
+      - /workspace:size=500m,uid=1000,gid=1000
+      - /tmp/executions:size=100m,noexec,uid=1000,gid=1000
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+
+    read_only: true
+
+networks:
+  mcp-net:
+    external: true</code></pre>
+        </section>
+
+        <section id="setup" class="section">
+            <h2>🚀 Setting Up Your Own</h2>
+
+            <h3>Prerequisites</h3>
+
+            <ul>
+                <li>Docker and Docker Compose</li>
+                <li>Claude Code CLI installed</li>
+                <li>Existing MCP servers or TBXark MCP Proxy configured</li>
+                <li>Network: <span class="inline-code">mcp-net</span> created</li>
+            </ul>
+
+            <h3>Step 1: Create Docker Network</h3>
+
+            <pre><code>docker network create mcp-net</code></pre>
+
+            <h3>Step 2: Deploy TBXark MCP Proxy</h3>
+
+            <pre><code># Create project directory
+mkdir -p ~/projects/mcp/proxy
+cd ~/projects/mcp/proxy
+
+# Create config.json (see "Configuration Files" section above)
+vim config.json
+
+# Create docker-compose.yml
+cat > docker-compose.yml << 'EOF'
+services:
+  mcp-proxy:
+    image: ghcr.io/tbxark/mcp-proxy:latest
+    container_name: mcp-proxy
+    restart: unless-stopped
+
+    networks:
+      - mcp-net
+
+    ports:
+      - "9090:9090"
+
+    volumes:
+      - ./config.json:/config/config.json:ro
+
+    command: ["/app/mcp-proxy", "-c", "/config/config.json"]
+
+networks:
+  mcp-net:
+    external: true
+EOF
+
+# Start proxy
+docker compose up -d</code></pre>
+
+            <h3>Step 3: Deploy Code-Executor</h3>
+
+            <pre><code># Create project directory
+mkdir -p ~/projects/mcp/code-executor
+cd ~/projects/mcp/code-executor
+
+# Clone or create files (see GitHub/documentation)
+# Files needed:
+#   - Dockerfile
+#   - docker-compose.yml
+#   - package.json
+#   - tsconfig.json
+#   - mcp-server.ts
+#   - executor.ts
+#   - client.ts
+#   - generate-wrappers.ts
+
+# Build and start
+docker compose build
+docker compose up -d
+
+# Fix tmpfs permissions (first-time only)
+docker exec -u root mcp-code-executor chown -R node:node /workspace /tmp/executions
+
+# Generate tool wrappers
+docker exec mcp-code-executor npm run generate-wrappers
+
+# Verify
+curl http://localhost:9091/health | jq</code></pre>
+
+            <h3>Step 4: Configure Claude Code</h3>
+
+            <pre><code># Edit Claude Code MCP configuration
+mkdir -p ~/.claude
+cat > ~/.claude/mcp.json << 'EOF'
+{
+  "mcpServers": {
+    "code-executor": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "exec", "-i", "mcp-code-executor",
+        "npx", "tsx", "/app/mcp-server.ts"
+      ],
+      "env": {
+        "CODE_EXECUTOR_URL": "http://localhost:3000"
+      }
+    }
+  }
+}
+EOF
+
+# Remove any old MCP server configs
+# Edit ~/.claude.json and remove "mcpServers" sections if present
+
+# Restart Claude Code
+# Exit current session, start new one</code></pre>
+
+            <h3>Step 5: Test the Setup</h3>
+
+            <pre><code># In Claude Code session:
+
+# Test 1: Check /mcp shows only code-executor
+# Type: /mcp
+# Expected: 1 server (code-executor)
+
+# Test 2: List available tools
+User: "Use mcp__code-executor__list_mcp_tools"
+# Expected: Returns 63 tools across 9 servers
+
+# Test 3: Execute simple code
+User: "Execute this code: console.log('Hello MCP!')"
+# Expected: Output: "Hello MCP!"
+
+# Test 4: Use filesystem tool
+User: "Use code execution to list files in /workspace"
+# Expected: Claude writes code using filesystem wrapper, executes, returns results</code></pre>
+
+            <h3>Step 6: Verify Token Efficiency</h3>
+
+            <pre><code># Check token usage at bottom of Claude Code responses
+# Before: 800-1200 tokens baseline (with 9 servers)
+# After: ~100 tokens baseline (with code-executor only)
+
+# Multi-tool workflow example:
+User: "Query timescaledb for last 100 metrics, filter values > 50, upload to minio as CSV"
+
+# Claude should:
+# 1. Write TypeScript code importing timescaledb and minio wrappers
+# 2. Execute query in sandbox
+# 3. Filter data in sandbox
+# 4. Generate CSV in sandbox
+# 5. Upload to minio in sandbox
+# 6. Return: "Uploaded 73 metrics to minio bucket 'exports'"
+
+# Token usage should be ~2K instead of ~70K (old pattern)</code></pre>
+        </section>
+
+        <section id="usage" class="section">
+            <h2>💡 Usage Patterns</h2>
+
+            <h3>Pattern 1: Simple Code Execution</h3>
+
+            <pre><code>User: "Calculate the Fibonacci sequence up to 10 terms"
+
+Claude writes:
+const fib = [0, 1];
+for (let i = 2; i < 10; i++) {
+  fib[i] = fib[i-1] + fib[i-2];
+}
+console.log(fib);
+
+Output: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]</code></pre>
+
+            <h3>Pattern 2: Progressive Tool Discovery</h3>
+
+            <pre><code>User: "What MCP tools are available for working with files?"
+
+Claude uses: search_tools({ query: "file", detail: "description" })
+
+Returns:
+{
+  "matches": [
+    {
+      "server": "filesystem",
+      "tool": "read_file",
+      "description": "Read complete contents of a file..."
+    },
+    {
+      "server": "filesystem",
+      "tool": "write_file",
+      "description": "Create a new file or overwrite..."
+    }
+    // ... more matches
+  ],
+  "tokenCost": 245
+}</code></pre>
+
+            <h3>Pattern 3: Single MCP Tool via Code</h3>
+
+            <pre><code>User: "Read the config.json file from /workspace"
+
+Claude writes:
+const { read_file } = await import('/workspace/servers/filesystem/read_file.js');
+const content = await read_file({ path: '/workspace/config.json' });
+console.log(content);
+
+Output: { "mcpProxy": { "addr": ":9090", ... } }</code></pre>
+
+            <h3>Pattern 4: Multi-Tool Composition (The Power Pattern)</h3>
+
+            <pre><code>User: "Get yesterday's stock prices from Interactive Brokers, filter for gainers > 5%, and save to ArangoDB"
+
+Claude writes:
+const { get_historical_data } = await import('/workspace/servers/ib/get_historical_data.js');
+const { arango_insert } = await import('/workspace/servers/arangodb/arango_insert.js');
+
+// Get historical data for multiple symbols
+const symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN'];
+const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+const results = [];
+for (const symbol of symbols) {
+  const data = await get_historical_data({
+    symbol,
+    startDate: yesterday,
+    endDate: yesterday,
+    barSize: '1 day'
+  });
+
+  // Calculate gain percentage
+  const gain = ((data.close - data.open) / data.open) * 100;
+
+  // Filter gainers > 5%
+  if (gain > 5) {
+    results.push({
+      symbol,
+      date: yesterday,
+      open: data.open,
+      close: data.close,
+      gain: gain.toFixed(2)
+    });
+  }
+}
+
+// Save to ArangoDB
+await arango_insert({
+  collection: 'stock_gainers',
+  document: {
+    date: yesterday,
+    gainers: results,
+    count: results.length
+  }
+});
+
+console.log(`Found ${results.length} gainers > 5%`);
+console.log(JSON.stringify(results, null, 2));
+
+Output: Found 2 gainers > 5%
+[
+  { "symbol": "AAPL", "gain": "6.23", ... },
+  { "symbol": "GOOGL", "gain": "5.87", ... }
+]
+
+<strong>Token Impact:</strong>
+- Old pattern: Load IB tools (10) + ArangoDB tools (7) = ~2K tokens upfront
+                Historical data returned to context = ~30K tokens
+                Total: ~32K tokens
+
+- New pattern: Load code-executor = ~100 tokens
+               Historical data stays in sandbox
+               Final output: ~500 tokens
+               Total: ~600 tokens
+
+<strong>Savings: 98.1%</strong></code></pre>
+
+            <h3>Pattern 5: Data Privacy (PII Filtering)</h3>
+
+            <pre><code>User: "Query postgres for user records and count how many have verified emails"
+
+Claude writes:
+const { execute_sql } = await import('/workspace/servers/postgres/execute_sql.js');
+
+// Query returns user records with email addresses (PII!)
+const result = await execute_sql({
+  sql: "SELECT email, email_verified FROM users"
+});
+
+// Filter in execution environment - PII never enters context
+const verifiedCount = result.rows.filter(r => r.email_verified).length;
+const totalCount = result.rows.length;
+
+console.log(`Verified: ${verifiedCount}/${totalCount} (${(verifiedCount/totalCount*100).toFixed(1)}%)`);
+
+Output: Verified: 847/1203 (70.4%)
+
+<strong>Privacy Win:</strong> 1203 email addresses never entered the LLM context window!</code></pre>
+        </section>
+
+        <section id="benefits" class="section">
+            <h2>📊 Token Efficiency Metrics</h2>
+
+            <h3>Progressive Disclosure Levels</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Detail Level</th>
+                        <th>All 63 Tools</th>
+                        <th>Per Tool</th>
+                        <th>Savings vs Full</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>name</strong></td>
+                        <td>245 tokens</td>
+                        <td>~4 tokens</td>
+                        <td>97%</td>
+                        <td>Initial discovery</td>
+                    </tr>
+                    <tr>
+                        <td><strong>description</strong></td>
+                        <td>1,181 tokens</td>
+                        <td>~19 tokens</td>
+                        <td>85%</td>
+                        <td>Understanding capabilities</td>
+                    </tr>
+                    <tr>
+                        <td><strong>full</strong></td>
+                        <td>~7,685 tokens</td>
+                        <td>~122 tokens</td>
+                        <td>0% (baseline)</td>
+                        <td>Implementation details</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Real-World Workflow Comparison</h3>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" style="color: var(--danger);">150K</div>
+                    <div class="stat-label">Old: All tools loaded upfront</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: var(--success);">2K</div>
+                    <div class="stat-label">New: Load only what's needed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: var(--success);">98.7%</div>
+                    <div class="stat-label">Token reduction (Anthropic metric)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: var(--primary);">$$$</div>
+                    <div class="stat-label">Cost savings on API calls</div>
+                </div>
+            </div>
+
+            <h3>Benchmark: Complex Multi-Tool Workflow</h3>
+
+            <div class="highlight-box">
+                <h4>Task: "Query TimescaleDB metrics, filter outliers, compute statistics, upload report to MinIO, log to ArangoDB"</h4>
+
+                <p><strong>Old Pattern (Direct MCP Loading):</strong></p>
+                <ul>
+                    <li>Load 63 tool definitions: 800 tokens</li>
+                    <li>Query TimescaleDB (10K rows returned): 50,000 tokens</li>
+                    <li>Claude filters in context: Context bloat</li>
+                    <li>Claude computes stats: More context usage</li>
+                    <li>Upload to MinIO (filtered data): 20,000 tokens</li>
+                    <li>Log to ArangoDB: 5,000 tokens</li>
+                    <li><strong>Total: ~75,800 tokens</strong></li>
+                </ul>
+
+                <p><strong>New Pattern (Code Execution):</strong></p>
+                <ul>
+                    <li>Load code-executor: 100 tokens</li>
+                    <li>Claude writes TypeScript code: 500 tokens</li>
+                    <li>All data processing in sandbox: 0 context tokens</li>
+                    <li>Result: "Uploaded 347 metrics, logged to ArangoDB": 50 tokens</li>
+                    <li><strong>Total: ~650 tokens</strong></li>
+                </ul>
+
+                <p><strong>Savings: 99.1% (75,150 tokens saved)</strong></p>
+            </div>
+        </section>
+
+        <section id="troubleshooting" class="section">
+            <h2>🔧 Troubleshooting</h2>
+
+            <h3>Issue: Multiple MCP Servers Showing in /mcp</h3>
+
+            <div class="warning-box">
+                <h4>Symptom</h4>
+                <p>Typing <span class="inline-code">/mcp</span> in Claude Code shows 9 servers instead of just code-executor.</p>
+
+                <h4>Root Cause</h4>
+                <p>Multiple configuration files loading simultaneously:</p>
+                <ul>
+                    <li><span class="inline-code">~/.claude/mcp.json</span> (user-level)</li>
+                    <li><span class="inline-code">~/.claude.json</span> (global + per-project)</li>
+                    <li><span class="inline-code">/project/.claude.json</span> (project-level)</li>
+                    <li><span class="inline-code">settings.local.json</span> (legacy permissions)</li>
+                </ul>
+
+                <h4>Solution</h4>
+                <pre><code># 1. Check ALL config locations
+cat ~/.claude/mcp.json | jq '.mcpServers | keys'
+cat ~/.claude.json | jq '.mcpServers | keys'
+cat ~/.claude.json | jq '.projects | to_entries[] | {path: .key, servers: .value.mcpServers | keys}'
+
+# 2. Remove MCP servers from all locations except mcp.json
+# Edit ~/.claude.json
+# Set "mcpServers": {} at all levels
+
+# 3. Verify only code-executor remains
+cat ~/.claude/mcp.json
+# Should show ONLY: {"mcpServers": {"code-executor": {...}}}
+
+# 4. Full restart required
+# Exit Claude Code completely, start new session</code></pre>
+            </div>
+
+            <h3>Issue: Code Execution Fails with "Module not found"</h3>
+
+            <div class="warning-box">
+                <h4>Symptom</h4>
+                <p>Error: <span class="inline-code">Cannot find module '/workspace/servers/filesystem/read_file.js'</span></p>
+
+                <h4>Root Cause</h4>
+                <p>Tool wrappers not generated yet.</p>
+
+                <h4>Solution</h4>
+                <pre><code># Generate wrappers
+docker exec mcp-code-executor npm run generate-wrappers
+
+# Verify generation
+docker exec mcp-code-executor ls -la /workspace/servers/
+
+# Should show 9 directories (arangodb, filesystem, ib, memory, minio, n8n, playwright, postgres, timescaledb)</code></pre>
+            </div>
+
+            <h3>Issue: "Permission denied" in /workspace</h3>
+
+            <div class="warning-box">
+                <h4>Symptom</h4>
+                <p>Error: <span class="inline-code">EACCES: permission denied, open '/workspace/...'</span></p>
+
+                <h4>Root Cause</h4>
+                <p>tmpfs mounted by Docker as root (UID 0), but code runs as node user (UID 1000).</p>
+
+                <h4>Solution</h4>
+                <pre><code># Fix ownership (workaround)
+docker exec -u root mcp-code-executor chown -R node:node /workspace /tmp/executions
+
+# Permanent fix: Update docker-compose.yml
+# Add uid/gid to tmpfs mount (requires Docker 20.10+)
+tmpfs:
+  - /workspace:size=500m,uid=1000,gid=1000
+  - /tmp/executions:size=100m,noexec,uid=1000,gid=1000</code></pre>
+            </div>
+
+            <h3>Issue: High Token Usage Despite Code-Executor</h3>
+
+            <div class="warning-box">
+                <h4>Symptom</h4>
+                <p>Token usage still high (~800 tokens baseline) even with code-executor.</p>
+
+                <h4>Root Cause</h4>
+                <p>Claude Code loading multiple MCP servers from hidden config locations.</p>
+
+                <h4>Diagnosis</h4>
+                <pre><code># Check debug logs for MCP server initialization
+ls -lt ~/.claude/debug/*.txt | head -1 | awk '{print $NF}' | xargs grep "MCP server" | grep -i "initializ"
+
+# Expected: ONLY "MCP server 'code-executor': Initializing..."
+# If you see filesystem, postgres, etc.: Config cleanup incomplete</code></pre>
+
+                <h4>Solution</h4>
+                <p>See "Multiple MCP Servers Showing" troubleshooting above.</p>
+            </div>
+
+            <h3>Diagnostic Commands</h3>
+
+            <pre><code># Check container health
+docker ps | grep mcp-code-executor
+docker logs mcp-code-executor --tail 50
+
+# Test execution engine directly
+curl -X POST http://localhost:9091/execute \
+  -H 'Content-Type: application/json' \
+  -d '{"code":"console.log(2+2)"}'
+
+# List available tools
+curl http://localhost:9091/health | jq
+
+# Test MCP server (from Claude Code)
+# Uses mcp__code-executor__execute_code tool
+
+# Verify wrapper generation
+docker exec mcp-code-executor find /workspace/servers -name "*.ts" | wc -l
+# Expected: 73 files (63 tools + 9 indexes + discovery.ts)</code></pre>
+        </section>
+
+        <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 2px solid var(--border); text-align: center; color: var(--text-dim);">
+            <p>MCP Code Execution Architecture v2.0</p>
+            <p>ai-servicers.com Infrastructure | November 2025</p>
+            <p>Following Anthropic's recommended pattern for token-efficient multi-tool orchestration</p>
+            <p style="margin-top: 1rem;">
+                <a href="https://www.anthropic.com/news/code-execution-with-mcp" style="color: var(--primary);">Anthropic: Code Execution with MCP</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
