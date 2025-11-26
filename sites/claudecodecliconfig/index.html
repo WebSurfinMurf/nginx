@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code CLI - Infrastructure Configuration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e4e4e4;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #a5b4fc;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.2em;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0,212,255,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(0,212,255,0.5);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            color: #fff;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-path {
+            font-family: monospace;
+            font-size: 0.85em;
+            color: #7c3aed;
+            background: rgba(124,58,237,0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .item-list {
+            list-style: none;
+        }
+
+        .item-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .item-list li:last-child {
+            border-bottom: none;
+        }
+
+        .item-icon {
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .item-name {
+            color: #00d4ff;
+            font-weight: 500;
+        }
+
+        .item-desc {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #00d4ff;
+        }
+
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .config-table th,
+        .config-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .config-table th {
+            color: #00d4ff;
+            font-weight: 600;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .config-table td:first-child {
+            font-family: monospace;
+            color: #7c3aed;
+        }
+
+        .architecture-diagram {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .architecture-diagram pre {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85em;
+            color: #e4e4e4;
+            line-height: 1.6;
+        }
+
+        .permission-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .badge-allow {
+            background: rgba(34,197,94,0.2);
+            color: #22c55e;
+        }
+
+        .badge-deny {
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+        }
+
+        .mcp-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .mcp-node {
+            background: rgba(0,212,255,0.1);
+            border: 1px solid rgba(0,212,255,0.3);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .mcp-arrow {
+            color: #00d4ff;
+            font-size: 1.5em;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .footer a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,58,237,0.1));
+            border: 1px solid rgba(0,212,255,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .highlight-box h4 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .three-column {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .three-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mini-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .mini-card .count {
+            font-size: 1.8em;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .mini-card .label {
+            color: #888;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/context-compare/" class="back-link">&larr; Back to Context Comparison</a>
+
+        <header>
+            <h1>Claude Code CLI Configuration</h1>
+            <p class="subtitle">Infrastructure Administrator Configuration on linuxserver.lan</p>
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">Config Levels</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">15</div>
+                    <div class="stat-label">Skills</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Agents</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">10</div>
+                    <div class="stat-label">Commands</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">71</div>
+                    <div class="stat-label">MCP Tools</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">174</div>
+                    <div class="stat-label">Permissions</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Architecture Overview -->
+        <div class="section">
+            <h2 class="section-title">Directory Structure</h2>
+            <div class="architecture-diagram">
+<pre>
+~/.claude/                              # USER LEVEL (personal preferences)
+├── config.toml                         # Trust levels, model preferences
+├── settings.json                       # Always-on features, global permissions
+├── commands/                           # User slash commands (6 commands)
+│   ├── cmemory.md                      # /cmemory - Save to OpenMemory
+│   ├── cdebug.md                       # /cdebug - Enable debug mode
+│   └── ...
+├── skills/                             # User skills (7 skills)
+│   ├── architecture-diagram-creator/
+│   ├── gitlab-integration/
+│   ├── naming-validator/
+│   ├── secrets-security/
+│   ├── skill-creator/
+│   └── ...
+├── agents/                             # User agents (1 agent)
+│   └── pm.md                           # Project Manager agent
+└── session-env/                        # Per-session environment snapshots
+
+~/projects/.claude/                     # PROJECT LEVEL (infrastructure-wide)
+├── settings.local.json                 # 174 pre-approved permissions
+├── init.md                             # Bootstrap file (loads memoryfiles.md)
+├── commands/                           # Project slash commands (4 commands)
+│   ├── cexit.md                        # /cexit - Session exit summary
+│   ├── cproject-health.md              # /cproject-health
+│   └── ...
+├── skills/                             # Infrastructure skills (8 skills)
+│   ├── keycloak-setup/
+│   ├── traefik-setup/
+│   ├── postgres-integration/
+│   ├── service-deployment/
+│   ├── troubleshooting/
+│   └── ...
+├── agents/                             # Infrastructure agents (3 agents)
+│   ├── architect.md                    # System architecture specialist
+│   ├── developer.md                    # Implementation specialist
+│   └── security.md                     # Security & network specialist
+└── docs/                               # Agent documentation
+</pre>
+            </div>
+        </div>
+
+        <!-- Configuration Files -->
+        <div class="section">
+            <h2 class="section-title">Configuration Files</h2>
+            <div class="two-column">
+                <div class="card">
+                    <h3 class="card-title">config.toml</h3>
+                    <div class="card-path">~/.claude/config.toml</div>
+                    <p style="color: #888; margin-bottom: 15px;">User-level preferences and trust settings</p>
+                    <table class="config-table">
+                        <tr>
+                            <th>Setting</th>
+                            <th>Value</th>
+                        </tr>
+                        <tr>
+                            <td>model</td>
+                            <td>gpt-5-codex</td>
+                        </tr>
+                        <tr>
+                            <td>/home/administrator</td>
+                            <td><span class="permission-badge badge-allow">trusted</span></td>
+                        </tr>
+                        <tr>
+                            <td>/home/administrator/projects</td>
+                            <td><span class="permission-badge badge-allow">trusted</span></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">settings.json</h3>
+                    <div class="card-path">~/.claude/settings.json</div>
+                    <p style="color: #888; margin-bottom: 15px;">Global settings and features</p>
+                    <table class="config-table">
+                        <tr>
+                            <th>Setting</th>
+                            <th>Value</th>
+                        </tr>
+                        <tr>
+                            <td>alwaysThinkingEnabled</td>
+                            <td><span class="permission-badge badge-allow">true</span></td>
+                        </tr>
+                        <tr>
+                            <td>enableAllProjectMcpServers</td>
+                            <td><span class="permission-badge badge-allow">true</span></td>
+                        </tr>
+                        <tr>
+                            <td>permissions.deny</td>
+                            <td>Read(/projects/administrator/projects/claude)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top: 20px;">
+                <h4>settings.local.json - Pre-Approved Permissions</h4>
+                <div class="card-path">~/projects/.claude/settings.local.json</div>
+                <p style="color: #888; margin-bottom: 15px;">174 pre-approved tool permissions for autonomous operation</p>
+                <div class="three-column">
+                    <div class="mini-card">
+                        <div class="count">85+</div>
+                        <div class="label">Bash Commands</div>
+                    </div>
+                    <div class="mini-card">
+                        <div class="count">7</div>
+                        <div class="label">Read Paths</div>
+                    </div>
+                    <div class="mini-card">
+                        <div class="count">8</div>
+                        <div class="label">WebFetch Domains</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <p style="color: #888; font-size: 0.9em;"><strong>Categories:</strong> Docker operations, Git workflows, File operations, Network diagnostics, Database access, System administration, MCP tools, Skills, Slash commands</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCP Integration -->
+        <div class="section">
+            <h2 class="section-title">MCP Integration</h2>
+            <div class="card">
+                <h3 class="card-title">code-executor - Primary MCP Server</h3>
+                <div class="card-path">docker exec -i mcp-code-executor npx tsx /app/mcp-server.ts</div>
+
+                <div class="mcp-flow">
+                    <div class="mcp-node">
+                        <strong>Claude Code</strong><br>
+                        <small>CLI</small>
+                    </div>
+                    <div class="mcp-arrow">&#8594;</div>
+                    <div class="mcp-node">
+                        <strong>code-executor</strong><br>
+                        <small>MCP Server</small>
+                    </div>
+                    <div class="mcp-arrow">&#8594;</div>
+                    <div class="mcp-node">
+                        <strong>MCP Proxy</strong><br>
+                        <small>:9090</small>
+                    </div>
+                    <div class="mcp-arrow">&#8594;</div>
+                    <div class="mcp-node">
+                        <strong>9 Backend Servers</strong><br>
+                        <small>71 Tools</small>
+                    </div>
+                </div>
+
+                <table class="config-table">
+                    <tr>
+                        <th>Server</th>
+                        <th>Tools</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>postgres</td>
+                        <td>9</td>
+                        <td>Database queries, schema info, table stats</td>
+                    </tr>
+                    <tr>
+                        <td>filesystem</td>
+                        <td>9</td>
+                        <td>File operations within /workspace</td>
+                    </tr>
+                    <tr>
+                        <td>arangodb</td>
+                        <td>7</td>
+                        <td>Document/graph database for AI memory</td>
+                    </tr>
+                    <tr>
+                        <td>memory</td>
+                        <td>9</td>
+                        <td>Knowledge graph storage</td>
+                    </tr>
+                    <tr>
+                        <td>minio</td>
+                        <td>9</td>
+                        <td>S3-compatible object storage</td>
+                    </tr>
+                    <tr>
+                        <td>ib</td>
+                        <td>10</td>
+                        <td>Interactive Brokers market data</td>
+                    </tr>
+                    <tr>
+                        <td>playwright</td>
+                        <td>6</td>
+                        <td>Browser automation, screenshots</td>
+                    </tr>
+                    <tr>
+                        <td>n8n</td>
+                        <td>6</td>
+                        <td>Workflow automation</td>
+                    </tr>
+                    <tr>
+                        <td>timescaledb</td>
+                        <td>6</td>
+                        <td>Time-series database</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="section">
+            <h2 class="section-title">Skills (15 Total)</h2>
+            <div class="two-column">
+                <div class="card">
+                    <h3 class="card-title">User Skills (7)</h3>
+                    <div class="card-path">~/.claude/skills/</div>
+                    <ul class="item-list">
+                        <li>
+                            <span class="item-icon">&#128736;</span>
+                            <div>
+                                <span class="item-name">architecture-diagram-creator</span>
+                                <div class="item-desc">Create project architecture diagrams</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128279;</span>
+                            <div>
+                                <span class="item-name">gitlab-integration</span>
+                                <div class="item-desc">GitLab repo management, MRs, CI/CD</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#9989;</span>
+                            <div>
+                                <span class="item-name">naming-validator</span>
+                                <div class="item-desc">Validate resource naming standards</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128274;</span>
+                            <div>
+                                <span class="item-name">secrets-security</span>
+                                <div class="item-desc">Secrets management, security hardening</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128218;</span>
+                            <div>
+                                <span class="item-name">skill-creator</span>
+                                <div class="item-desc">Guide for creating new skills</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128221;</span>
+                            <div>
+                                <span class="item-name">claudemd-generator</span>
+                                <div class="item-desc">Generate CLAUDE.md files</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#129504;</span>
+                            <div>
+                                <span class="item-name">openmemory</span>
+                                <div class="item-desc">OpenMemory (mem0) integration</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Infrastructure Skills (8)</h3>
+                    <div class="card-path">~/projects/.claude/skills/</div>
+                    <ul class="item-list">
+                        <li>
+                            <span class="item-icon">&#128272;</span>
+                            <div>
+                                <span class="item-name">keycloak-setup</span>
+                                <div class="item-desc">OIDC client configuration for SSO</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128208;</span>
+                            <div>
+                                <span class="item-name">traefik-setup</span>
+                                <div class="item-desc">Reverse proxy routing, SSL/TLS</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128451;</span>
+                            <div>
+                                <span class="item-name">postgres-integration</span>
+                                <div class="item-desc">Database setup, user management</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128640;</span>
+                            <div>
+                                <span class="item-name">service-deployment</span>
+                                <div class="item-desc">Docker deployment orchestration</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128295;</span>
+                            <div>
+                                <span class="item-name">troubleshooting</span>
+                                <div class="item-desc">Diagnostic procedures, log analysis</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128202;</span>
+                            <div>
+                                <span class="item-name">logging-observability</span>
+                                <div class="item-desc">Loki, Grafana, monitoring config</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#127760;</span>
+                            <div>
+                                <span class="item-name">network-config</span>
+                                <div class="item-desc">Docker networks, DNS, topology</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128196;</span>
+                            <div>
+                                <span class="item-name">nginx-static-site</span>
+                                <div class="item-desc">Static site deployment guide</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agents -->
+        <div class="section">
+            <h2 class="section-title">Specialized Agents (4 Total)</h2>
+            <div class="two-column">
+                <div class="card">
+                    <h3 class="card-title">User Agent</h3>
+                    <div class="card-path">~/.claude/agents/</div>
+                    <ul class="item-list">
+                        <li>
+                            <span class="item-icon">&#128188;</span>
+                            <div>
+                                <span class="item-name">pm (Project Manager)</span>
+                                <div class="item-desc">Multi-step project orchestration, coordinates architect/security/developer agents, tracks progress</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Infrastructure Agents</h3>
+                    <div class="card-path">~/projects/.claude/agents/</div>
+                    <ul class="item-list">
+                        <li>
+                            <span class="item-icon">&#128736;</span>
+                            <div>
+                                <span class="item-name">architect</span>
+                                <div class="item-desc">System design, technology stack decisions, integration planning, performance optimization</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128187;</span>
+                            <div>
+                                <span class="item-name">developer</span>
+                                <div class="item-desc">Implementation, deployment, debugging, database operations, container management</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128737;</span>
+                            <div>
+                                <span class="item-name">security</span>
+                                <div class="item-desc">Network topology, firewall, SSL/TLS, Keycloak/OAuth2, Traefik routing, security audits</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commands -->
+        <div class="section">
+            <h2 class="section-title">Slash Commands (10 Total)</h2>
+            <div class="two-column">
+                <div class="card">
+                    <h3 class="card-title">User Commands (6)</h3>
+                    <div class="card-path">~/.claude/commands/</div>
+                    <ul class="item-list">
+                        <li>
+                            <span class="item-icon">&#128190;</span>
+                            <div>
+                                <span class="item-name">/cmemory</span>
+                                <div class="item-desc">Save facts and lessons to OpenMemory (mem0)</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128270;</span>
+                            <div>
+                                <span class="item-name">/cdebug</span>
+                                <div class="item-desc">Enable debug mode for troubleshooting</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128683;</span>
+                            <div>
+                                <span class="item-name">/cundebug</span>
+                                <div class="item-desc">Disable debug mode</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#9989;</span>
+                            <div>
+                                <span class="item-name">/cvalidate-claude</span>
+                                <div class="item-desc">Validate Claude configuration</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Project Commands (4)</h3>
+                    <div class="card-path">~/projects/.claude/commands/</div>
+                    <ul class="item-list">
+                        <li>
+                            <span class="item-icon">&#128682;</span>
+                            <div>
+                                <span class="item-name">/cexit</span>
+                                <div class="item-desc">Save session summary before exiting</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128153;</span>
+                            <div>
+                                <span class="item-name">/cproject-health</span>
+                                <div class="item-desc">Check project health status</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128260;</span>
+                            <div>
+                                <span class="item-name">/cprojectswitch</span>
+                                <div class="item-desc">Switch between projects</div>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="item-icon">&#128640;</span>
+                            <div>
+                                <span class="item-name">/cvalidate-deploy</span>
+                                <div class="item-desc">Validate deployment readiness</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Context Loading -->
+        <div class="section">
+            <h2 class="section-title">Context Loading Flow</h2>
+            <div class="card">
+                <div class="architecture-diagram">
+<pre>
+SESSION START
+     |
+     v
++---------------------------+
+|  Layer 0: AI Model        |  Claude Opus 4.5 base knowledge
++---------------------------+
+     |
+     v
++---------------------------+
+|  Layer 1: User Context    |  ~/.claude/config.toml
+|                           |  ~/.claude/settings.json
+|                           |  User commands, skills, agents
++---------------------------+
+     |
+     v
++---------------------------+
+|  Layer 2: Project Context |  ~/projects/.claude/init.md
+|                           |  → @memoryfiles.md (9 AINotes files)
+|                           |  → CLAUDE.md per-project files
+|                           |  Project commands, skills, agents
++---------------------------+
+     |
+     v
++---------------------------+
+|  Layer 3: Permissions     |  settings.local.json
+|                           |  174 pre-approved operations
+|                           |  Autonomous operation enabled
++---------------------------+
+     |
+     v
++---------------------------+
+|  Layer 4: Runtime Tools   |  MCP code-executor
+|                           |  71 tools across 9 servers
+|                           |  Skills loaded on-demand
++---------------------------+
+</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Paths -->
+        <div class="section">
+            <h2 class="section-title">Key Paths Reference</h2>
+            <div class="card">
+                <table class="config-table">
+                    <tr>
+                        <th>Purpose</th>
+                        <th>Path</th>
+                    </tr>
+                    <tr>
+                        <td>User config</td>
+                        <td><code>~/.claude/config.toml</code></td>
+                    </tr>
+                    <tr>
+                        <td>User settings</td>
+                        <td><code>~/.claude/settings.json</code></td>
+                    </tr>
+                    <tr>
+                        <td>Project permissions</td>
+                        <td><code>~/projects/.claude/settings.local.json</code></td>
+                    </tr>
+                    <tr>
+                        <td>Bootstrap file</td>
+                        <td><code>~/projects/.claude/init.md</code></td>
+                    </tr>
+                    <tr>
+                        <td>Session history</td>
+                        <td><code>~/.claude/history.jsonl</code></td>
+                    </tr>
+                    <tr>
+                        <td>MCP config</td>
+                        <td><code>claude mcp list</code></td>
+                    </tr>
+                    <tr>
+                        <td>Project CLAUDE.md</td>
+                        <td><code>~/projects/CLAUDE.md</code></td>
+                    </tr>
+                    <tr>
+                        <td>AINotes (context)</td>
+                        <td><code>~/projects/AINotes/*.md</code></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Server:</strong> linuxserver.lan | <strong>Domain:</strong> ai-servicers.com</p>
+            <p style="margin-top: 10px;">
+                <a href="/">Back to Portal</a> |
+                <a href="/context-architecture/">Context Architecture</a> |
+                <a href="/mcp-architecture/">MCP Architecture</a>
+            </p>
+            <p style="margin-top: 15px; color: #555;">
+                Generated: 2025-11-25 | Claude Code CLI Infrastructure Configuration
+            </p>
+        </div>
+    </div>
+</body>
+</html>

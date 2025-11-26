@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security & Authentication - linuxserver.lan</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1117 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #a5b4fc;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(40, 167, 69, 0.1));
+            border-radius: 16px;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #dc3545, #28a745);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-size: 1.2em;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #dc3545;
+        }
+
+        .stat-label {
+            color: #8b949e;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* Section Styles */
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #58a6ff;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(88, 166, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            color: #f0883e;
+            font-size: 1.2em;
+            margin: 20px 0 15px 0;
+        }
+
+        /* Architecture Diagram */
+        .flow-diagram {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .flow-box {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.2), rgba(88, 166, 255, 0.1));
+            border: 2px solid #58a6ff;
+            border-radius: 10px;
+            padding: 15px 25px;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .flow-box.entry { border-color: #f0883e; background: linear-gradient(135deg, rgba(240, 136, 62, 0.2), rgba(240, 136, 62, 0.1)); }
+        .flow-box.auth { border-color: #dc3545; background: linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(220, 53, 69, 0.1)); }
+        .flow-box.keycloak { border-color: #28a745; background: linear-gradient(135deg, rgba(40, 167, 69, 0.2), rgba(40, 167, 69, 0.1)); }
+        .flow-box.service { border-color: #6f42c1; background: linear-gradient(135deg, rgba(111, 66, 193, 0.2), rgba(111, 66, 193, 0.1)); }
+
+        .flow-arrow {
+            color: #8b949e;
+            font-size: 1.5em;
+        }
+
+        .flow-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .flow-detail {
+            font-size: 0.8em;
+            color: #8b949e;
+        }
+
+        /* Protected Services Table */
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .services-table th,
+        .services-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .services-table th {
+            background: rgba(88, 166, 255, 0.1);
+            color: #58a6ff;
+            font-weight: 600;
+        }
+
+        .services-table tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .services-table code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #7ee787;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #161b22;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .code-block .comment { color: #8b949e; }
+        .code-block .key { color: #ff7b72; }
+        .code-block .value { color: #a5d6ff; }
+        .code-block .string { color: #7ee787; }
+        .code-block .env { color: #ffa657; }
+
+        /* Step Cards */
+        .step-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #58a6ff;
+            border-radius: 0 8px 8px 0;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #58a6ff;
+            color: #0d1117;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+
+        .step-content {
+            margin-top: 10px;
+            padding-left: 40px;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .info-box.warning {
+            background: rgba(240, 136, 62, 0.1);
+            border: 1px solid rgba(240, 136, 62, 0.3);
+        }
+
+        .info-box.tip {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .info-box.note {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+        }
+
+        .info-icon {
+            font-size: 1.5em;
+            flex-shrink: 0;
+        }
+
+        /* Troubleshooting */
+        .troubleshoot-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .symptom {
+            color: #dc3545;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .solution {
+            color: #28a745;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+
+        /* Navigation */
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .nav-link {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            color: #58a6ff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background: rgba(88, 166, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #8b949e;
+        }
+
+        footer a { color: #58a6ff; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            .flow-row { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+            .services-table { font-size: 0.85em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/infrastructure-docs/" class="back-link">&larr; Back to Infrastructure Documentation</a>
+
+        <header>
+            <h1>Security & Authentication</h1>
+            <p class="subtitle">Keycloak SSO and OAuth2 Proxy Architecture on linuxserver.lan</p>
+        </header>
+
+        <nav class="nav-links">
+            <a href="/" class="nav-link">Portal Home</a>
+            <a href="/infrastructure-docs/" class="nav-link">Infrastructure</a>
+            <a href="/deployment-patterns/" class="nav-link">Deployment Patterns</a>
+            <a href="/network-topology/" class="nav-link">Network Topology</a>
+        </nav>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">16</div>
+                <div class="stat-label">Protected Services</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1</div>
+                <div class="stat-label">SSO Provider (Keycloak)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">16</div>
+                <div class="stat-label">Keycloak Clients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Realm (master)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Admin Group</div>
+            </div>
+        </div>
+
+        <!-- Architecture Overview -->
+        <section class="section">
+            <h2>Architecture Overview</h2>
+            <p>All protected services use a consistent authentication pattern: Traefik routes traffic to an OAuth2 Proxy, which validates authentication with Keycloak before forwarding to the backend service.</p>
+
+            <div class="flow-diagram">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #f0f6fc;">SSO Authentication Flow</h3>
+
+                <div class="flow-row">
+                    <div class="flow-box entry">
+                        <div class="flow-label">Browser</div>
+                        <div class="flow-detail">User Request</div>
+                    </div>
+                    <span class="flow-arrow">-></span>
+                    <div class="flow-box entry">
+                        <div class="flow-label">Traefik</div>
+                        <div class="flow-detail">:443 (HTTPS)</div>
+                    </div>
+                    <span class="flow-arrow">-></span>
+                    <div class="flow-box auth">
+                        <div class="flow-label">OAuth2 Proxy</div>
+                        <div class="flow-detail">:4180</div>
+                    </div>
+                </div>
+
+                <div class="flow-row">
+                    <span class="flow-arrow" style="transform: rotate(90deg);">|</span>
+                </div>
+
+                <div class="flow-row">
+                    <div class="flow-box keycloak">
+                        <div class="flow-label">Keycloak</div>
+                        <div class="flow-detail">Token Validation</div>
+                    </div>
+                    <span class="flow-arrow"><-</span>
+                    <div class="flow-box auth">
+                        <div class="flow-label">Check Token</div>
+                        <div class="flow-detail">Valid Session?</div>
+                    </div>
+                </div>
+
+                <div class="flow-row">
+                    <span class="flow-arrow" style="transform: rotate(90deg);">|</span>
+                </div>
+
+                <div class="flow-row">
+                    <div class="flow-box keycloak">
+                        <div class="flow-label">Login Page</div>
+                        <div class="flow-detail">If no session</div>
+                    </div>
+                    <span class="flow-arrow">-></span>
+                    <div class="flow-box keycloak">
+                        <div class="flow-label">Authenticate</div>
+                        <div class="flow-detail">Username/Password</div>
+                    </div>
+                    <span class="flow-arrow">-></span>
+                    <div class="flow-box keycloak">
+                        <div class="flow-label">Issue Token</div>
+                        <div class="flow-detail">JWT + Session</div>
+                    </div>
+                </div>
+
+                <div class="flow-row">
+                    <span class="flow-arrow" style="transform: rotate(90deg);">|</span>
+                </div>
+
+                <div class="flow-row">
+                    <div class="flow-box auth">
+                        <div class="flow-label">Proxy Forwards</div>
+                        <div class="flow-detail">With Headers</div>
+                    </div>
+                    <span class="flow-arrow">-></span>
+                    <div class="flow-box service">
+                        <div class="flow-label">Backend Service</div>
+                        <div class="flow-detail">Grafana, Portainer, etc.</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Token Lifecycle</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li><strong>Access Token</strong>: Short-lived JWT (5 minutes default), contains user claims</li>
+                <li><strong>Refresh Token</strong>: Longer-lived token to obtain new access tokens</li>
+                <li><strong>Session Cookie</strong>: OAuth2 Proxy manages session via <code>_oauth2_proxy</code> cookie (7 days)</li>
+                <li><strong>SSO Session</strong>: Keycloak maintains server-side session for seamless login across services</li>
+            </ul>
+        </section>
+
+        <!-- Keycloak Configuration -->
+        <section class="section">
+            <h2>Keycloak Configuration</h2>
+
+            <div class="info-box note">
+                <span class="info-icon">&#x1F511;</span>
+                <div>
+                    <strong>Keycloak Admin Console</strong><br>
+                    <a href="https://keycloak.ai-servicers.com" style="color: #58a6ff;">https://keycloak.ai-servicers.com</a>
+                </div>
+            </div>
+
+            <h3>Realm Structure</h3>
+            <ul style="margin-left: 20px;">
+                <li><strong>Realm</strong>: <code>master</code> (default realm used for all services)</li>
+                <li><strong>Admin User</strong>: Configured via environment variables</li>
+                <li><strong>Identity Provider</strong>: Local database (no federation)</li>
+            </ul>
+
+            <h3>Client Configuration</h3>
+            <p>Each protected service has a corresponding Keycloak client:</p>
+
+            <div class="code-block">
+<span class="comment"># Standard client settings for OAuth2 Proxy integration</span>
+<span class="key">Client ID:</span>        <span class="value">{service-name}</span>
+<span class="key">Client Type:</span>      <span class="value">Confidential</span> <span class="comment">(has client secret)</span>
+<span class="key">Protocol:</span>         <span class="value">openid-connect</span>
+<span class="key">Access Type:</span>      <span class="value">confidential</span>
+<span class="key">Valid Redirect:</span>   <span class="string">https://{service}.ai-servicers.com/oauth2/callback</span>
+<span class="key">Web Origins:</span>      <span class="string">https://{service}.ai-servicers.com</span>
+            </div>
+
+            <h3>Groups & Roles</h3>
+            <ul style="margin-left: 20px;">
+                <li><strong>/administrators</strong>: Primary admin group with full access</li>
+                <li>Group membership checked via OAuth2 Proxy <code>--allowed-group</code> flag</li>
+                <li>Some services allow all authenticated users (no group restriction)</li>
+            </ul>
+
+            <h3>Required Keycloak Networks</h3>
+            <p>Keycloak container must be accessible from:</p>
+            <ul style="margin-left: 20px;">
+                <li><code>keycloak-net</code>: OAuth2 proxies connect here for token validation</li>
+                <li><code>traefik-net</code>: External access via Traefik</li>
+                <li><code>postgres-net</code>: Database connectivity</li>
+            </ul>
+        </section>
+
+        <!-- Protected Services -->
+        <section class="section">
+            <h2>Protected Services</h2>
+            <p>All 16 services protected by OAuth2 Proxy + Keycloak SSO:</p>
+
+            <table class="services-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Auth Proxy Container</th>
+                        <th>URL</th>
+                        <th>Keycloak Client</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AList (File Manager)</td>
+                        <td><code>alist-auth-proxy</code></td>
+                        <td>alist.ai-servicers.com</td>
+                        <td><code>alist</code></td>
+                    </tr>
+                    <tr>
+                        <td>ArangoDB (Graph DB)</td>
+                        <td><code>arangodb-auth-proxy</code></td>
+                        <td>arangodb.ai-servicers.com</td>
+                        <td><code>arangodb</code></td>
+                    </tr>
+                    <tr>
+                        <td>Dashy (Dashboard)</td>
+                        <td><code>dashy-auth-proxy</code></td>
+                        <td>dashy.ai-servicers.com</td>
+                        <td><code>dashy</code></td>
+                    </tr>
+                    <tr>
+                        <td>Dozzle (Docker Logs)</td>
+                        <td><code>dozzle-auth-proxy</code></td>
+                        <td>dozzle.ai-servicers.com</td>
+                        <td><code>dozzle</code></td>
+                    </tr>
+                    <tr>
+                        <td>Draw.io (Diagrams)</td>
+                        <td><code>drawio-auth-proxy</code></td>
+                        <td>drawio.ai-servicers.com</td>
+                        <td><code>drawio</code></td>
+                    </tr>
+                    <tr>
+                        <td>Grafana (Monitoring)</td>
+                        <td><code>grafana-auth-proxy</code></td>
+                        <td>grafana.ai-servicers.com</td>
+                        <td><code>grafana</code></td>
+                    </tr>
+                    <tr>
+                        <td>Loki (Log Aggregation)</td>
+                        <td><code>loki-auth-proxy</code></td>
+                        <td>loki.ai-servicers.com</td>
+                        <td><code>loki</code></td>
+                    </tr>
+                    <tr>
+                        <td>Microbin (Paste Service)</td>
+                        <td><code>microbin-auth-proxy</code></td>
+                        <td>microbin.ai-servicers.com</td>
+                        <td><code>microbin</code></td>
+                    </tr>
+                    <tr>
+                        <td>Mongo Express (MongoDB UI)</td>
+                        <td><code>mongo-express-auth-proxy</code></td>
+                        <td>mongo-express.ai-servicers.com</td>
+                        <td><code>mongo-express</code></td>
+                    </tr>
+                    <tr>
+                        <td>Netdata (System Metrics)</td>
+                        <td><code>netdata-auth-proxy</code></td>
+                        <td>netdata.ai-servicers.com</td>
+                        <td><code>netdata</code></td>
+                    </tr>
+                    <tr>
+                        <td>Obsidian LiveSync</td>
+                        <td><code>obsidian-auth-proxy</code></td>
+                        <td>obsidian.ai-servicers.com</td>
+                        <td><code>obsidian</code></td>
+                    </tr>
+                    <tr>
+                        <td>OpenMemory UI (Mem0)</td>
+                        <td><code>openmemory-ui-auth-proxy</code></td>
+                        <td>openmemory.ai-servicers.com</td>
+                        <td><code>openmemory</code></td>
+                    </tr>
+                    <tr>
+                        <td>Portainer (Docker Mgmt)</td>
+                        <td><code>portainer-auth-proxy</code></td>
+                        <td>portainer.ai-servicers.com</td>
+                        <td><code>portainer</code></td>
+                    </tr>
+                    <tr>
+                        <td>Qdrant (Vector DB)</td>
+                        <td><code>qdrant-auth-proxy</code></td>
+                        <td>qdrant.ai-servicers.com</td>
+                        <td><code>qdrant</code></td>
+                    </tr>
+                    <tr>
+                        <td>Redis Commander</td>
+                        <td><code>redis-commander-auth-proxy</code></td>
+                        <td>redis-commander.ai-servicers.com</td>
+                        <td><code>redis-commander</code></td>
+                    </tr>
+                    <tr>
+                        <td>Stirling PDF</td>
+                        <td><code>stirling-pdf-auth-proxy</code></td>
+                        <td>stirling.ai-servicers.com</td>
+                        <td><code>stirling-pdf</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- OAuth2 Proxy Configuration -->
+        <section class="section">
+            <h2>OAuth2 Proxy Configuration</h2>
+            <p>Standard configuration template for new OAuth2 Proxy instances:</p>
+
+            <div class="code-block">
+<span class="comment"># OAuth2 Proxy Container Configuration</span>
+<span class="comment"># Image: quay.io/oauth2-proxy/oauth2-proxy:latest</span>
+
+<span class="comment"># === OIDC Provider Settings ===</span>
+<span class="env">OAUTH2_PROXY_PROVIDER</span>=<span class="string">"keycloak-oidc"</span>
+<span class="env">OAUTH2_PROXY_CLIENT_ID</span>=<span class="string">"{service-name}"</span>
+<span class="env">OAUTH2_PROXY_CLIENT_SECRET</span>=<span class="string">"{from-keycloak}"</span>
+
+<span class="comment"># === OIDC Discovery (Bypass for internal routing) ===</span>
+<span class="env">OAUTH2_PROXY_SKIP_OIDC_DISCOVERY</span>=<span class="string">"true"</span>
+<span class="env">OAUTH2_PROXY_OIDC_ISSUER_URL</span>=<span class="string">"https://keycloak.ai-servicers.com/realms/master"</span>
+<span class="env">OAUTH2_PROXY_OIDC_JWKS_URL</span>=<span class="string">"http://keycloak:8080/realms/master/protocol/openid-connect/certs"</span>
+<span class="env">OAUTH2_PROXY_LOGIN_URL</span>=<span class="string">"https://keycloak.ai-servicers.com/realms/master/protocol/openid-connect/auth"</span>
+<span class="env">OAUTH2_PROXY_REDEEM_URL</span>=<span class="string">"http://keycloak:8080/realms/master/protocol/openid-connect/token"</span>
+
+<span class="comment"># === Upstream Service ===</span>
+<span class="env">OAUTH2_PROXY_UPSTREAMS</span>=<span class="string">"http://{service}:{port}/"</span>
+<span class="env">OAUTH2_PROXY_HTTP_ADDRESS</span>=<span class="string">"0.0.0.0:4180"</span>
+
+<span class="comment"># === Cookie Configuration ===</span>
+<span class="env">OAUTH2_PROXY_COOKIE_SECRET</span>=<span class="string">"{32-byte-base64}"</span>  <span class="comment"># Generate with: openssl rand -base64 32</span>
+<span class="env">OAUTH2_PROXY_COOKIE_SECURE</span>=<span class="string">"true"</span>
+<span class="env">OAUTH2_PROXY_COOKIE_DOMAINS</span>=<span class="string">".ai-servicers.com"</span>
+
+<span class="comment"># === Email/User Settings ===</span>
+<span class="env">OAUTH2_PROXY_EMAIL_DOMAINS</span>=<span class="string">"*"</span>  <span class="comment"># Allow all email domains</span>
+<span class="env">OAUTH2_PROXY_PASS_USER_HEADERS</span>=<span class="string">"true"</span>
+<span class="env">OAUTH2_PROXY_SET_XAUTHREQUEST</span>=<span class="string">"true"</span>
+
+<span class="comment"># === Reverse Proxy Mode ===</span>
+<span class="env">OAUTH2_PROXY_REVERSE_PROXY</span>=<span class="string">"true"</span>
+<span class="env">OAUTH2_PROXY_REDIRECT_URL</span>=<span class="string">"https://{service}.ai-servicers.com/oauth2/callback"</span>
+            </div>
+
+            <h3>Critical Configuration Notes</h3>
+
+            <div class="info-box warning">
+                <span class="info-icon">&#x26A0;</span>
+                <div>
+                    <strong>OIDC Discovery Bypass</strong><br>
+                    We use <code>SKIP_OIDC_DISCOVERY=true</code> because OAuth2 Proxy connects to Keycloak internally
+                    via <code>http://keycloak:8080</code>, but the issuer URL in tokens is
+                    <code>https://keycloak.ai-servicers.com</code>. This mismatch causes validation failures without the bypass.
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <span class="info-icon">&#x1F4A1;</span>
+                <div>
+                    <strong>Cookie Secret Generation</strong><br>
+                    Generate a secure cookie secret: <code>openssl rand -base64 32 | tr -d '\n'</code><br>
+                    Store in secrets file: <code>$HOME/secrets/{service}.env</code>
+                </div>
+            </div>
+
+            <h3>Required Networks (3-Network Pattern)</h3>
+            <p>Each OAuth2 Proxy container must be on three networks:</p>
+            <ul style="margin-left: 20px;">
+                <li><code>traefik-net</code>: Receive traffic from Traefik</li>
+                <li><code>keycloak-net</code>: Connect to Keycloak for token validation</li>
+                <li><code>{service}-net</code>: Connect to backend service (or observability-net, etc.)</li>
+            </ul>
+        </section>
+
+        <!-- Adding a New Protected Service -->
+        <section class="section">
+            <h2>Adding a New Protected Service</h2>
+            <p>Step-by-step guide to protect a new service with OAuth2 Proxy and Keycloak SSO:</p>
+
+            <div class="step-card">
+                <span class="step-number">1</span>
+                <span class="step-title">Create Keycloak Client</span>
+                <div class="step-content">
+                    <ol style="margin-left: 20px;">
+                        <li>Go to <a href="https://keycloak.ai-servicers.com" style="color: #58a6ff;">Keycloak Admin Console</a></li>
+                        <li>Navigate to Clients -> Create client</li>
+                        <li>Set Client ID: <code>{service-name}</code></li>
+                        <li>Client type: OpenID Connect</li>
+                        <li>Enable Client authentication (confidential)</li>
+                        <li>Valid redirect URIs: <code>https://{service}.ai-servicers.com/oauth2/callback</code></li>
+                        <li>Web origins: <code>https://{service}.ai-servicers.com</code></li>
+                        <li>Copy the client secret from Credentials tab</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <span class="step-number">2</span>
+                <span class="step-title">Create Secrets File</span>
+                <div class="step-content">
+                    <div class="code-block">
+<span class="comment"># Create $HOME/secrets/{service}.env</span>
+<span class="env">KEYCLOAK_CLIENT_ID</span>=<span class="string">"{service-name}"</span>
+<span class="env">KEYCLOAK_CLIENT_SECRET</span>=<span class="string">"{from-step-1}"</span>
+<span class="env">OAUTH2_COOKIE_SECRET</span>=<span class="string">"$(openssl rand -base64 32 | tr -d '\n')"</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <span class="step-number">3</span>
+                <span class="step-title">Add OAuth2 Proxy to deploy.sh</span>
+                <div class="step-content">
+                    <div class="code-block">
+<span class="comment"># Load secrets</span>
+set -a
+source $HOME/secrets/{service}.env
+set +a
+
+<span class="comment"># Deploy OAuth2 Proxy container</span>
+docker run -d \
+  --name {service}-auth-proxy \
+  --network traefik-net \
+  --restart unless-stopped \
+  -e OAUTH2_PROXY_PROVIDER=keycloak-oidc \
+  -e OAUTH2_PROXY_CLIENT_ID=$KEYCLOAK_CLIENT_ID \
+  -e OAUTH2_PROXY_CLIENT_SECRET=$KEYCLOAK_CLIENT_SECRET \
+  -e OAUTH2_PROXY_COOKIE_SECRET=$OAUTH2_COOKIE_SECRET \
+  -e OAUTH2_PROXY_SKIP_OIDC_DISCOVERY=true \
+  -e OAUTH2_PROXY_OIDC_ISSUER_URL=https://keycloak.ai-servicers.com/realms/master \
+  -e OAUTH2_PROXY_OIDC_JWKS_URL=http://keycloak:8080/realms/master/protocol/openid-connect/certs \
+  -e OAUTH2_PROXY_LOGIN_URL=https://keycloak.ai-servicers.com/realms/master/protocol/openid-connect/auth \
+  -e OAUTH2_PROXY_REDEEM_URL=http://keycloak:8080/realms/master/protocol/openid-connect/token \
+  -e OAUTH2_PROXY_UPSTREAMS=http://{service}:{port}/ \
+  -e OAUTH2_PROXY_HTTP_ADDRESS=0.0.0.0:4180 \
+  -e OAUTH2_PROXY_COOKIE_SECURE=true \
+  -e OAUTH2_PROXY_COOKIE_DOMAINS=.ai-servicers.com \
+  -e OAUTH2_PROXY_EMAIL_DOMAINS=* \
+  -e OAUTH2_PROXY_PASS_USER_HEADERS=true \
+  -e OAUTH2_PROXY_REVERSE_PROXY=true \
+  -e OAUTH2_PROXY_REDIRECT_URL=https://{service}.ai-servicers.com/oauth2/callback \
+  --label "traefik.enable=true" \
+  --label "traefik.http.routers.{service}.rule=Host(\`{service}.ai-servicers.com\`)" \
+  --label "traefik.http.routers.{service}.entrypoints=websecure" \
+  --label "traefik.http.routers.{service}.tls.certresolver=letsencrypt" \
+  --label "traefik.http.services.{service}.loadbalancer.server.port=4180" \
+  quay.io/oauth2-proxy/oauth2-proxy:latest
+
+<span class="comment"># Connect to additional networks</span>
+docker network connect keycloak-net {service}-auth-proxy
+docker network connect {service}-net {service}-auth-proxy  <span class="comment"># Or appropriate service network</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <span class="step-number">4</span>
+                <span class="step-title">Deploy and Verify</span>
+                <div class="step-content">
+                    <div class="code-block">
+<span class="comment"># Deploy</span>
+./deploy.sh
+
+<span class="comment"># Check container status</span>
+docker ps | grep {service}-auth-proxy
+
+<span class="comment"># Check logs for errors</span>
+docker logs {service}-auth-proxy --tail 20
+
+<span class="comment"># Test authentication flow</span>
+curl -I https://{service}.ai-servicers.com
+<span class="comment"># Should redirect to Keycloak login</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section class="section">
+            <h2>Troubleshooting</h2>
+
+            <div class="troubleshoot-item">
+                <div class="symptom">Symptom: 401 Unauthorized / Token validation failed</div>
+                <div class="solution">Solution: Check OIDC discovery bypass configuration</div>
+                <p>OAuth2 Proxy must use internal URLs for token validation but external URL for issuer:</p>
+                <div class="code-block">
+<span class="comment"># Verify these settings:</span>
+<span class="env">OAUTH2_PROXY_SKIP_OIDC_DISCOVERY</span>=<span class="string">"true"</span>
+<span class="env">OAUTH2_PROXY_OIDC_JWKS_URL</span>=<span class="string">"http://keycloak:8080/..."</span>  <span class="comment"># Internal</span>
+<span class="env">OAUTH2_PROXY_REDEEM_URL</span>=<span class="string">"http://keycloak:8080/..."</span>     <span class="comment"># Internal</span>
+<span class="env">OAUTH2_PROXY_LOGIN_URL</span>=<span class="string">"https://keycloak.ai-servicers.com/..."</span>  <span class="comment"># External (browser redirect)</span>
+                </div>
+            </div>
+
+            <div class="troubleshoot-item">
+                <div class="symptom">Symptom: Redirect loop / ERR_TOO_MANY_REDIRECTS</div>
+                <div class="solution">Solution: Check cookie domain and secure settings</div>
+                <ul style="margin-left: 20px;">
+                    <li>Ensure <code>COOKIE_DOMAINS=.ai-servicers.com</code> (note leading dot)</li>
+                    <li>Ensure <code>COOKIE_SECURE=true</code> when using HTTPS</li>
+                    <li>Clear browser cookies and try again</li>
+                    <li>Check redirect URL matches Keycloak client configuration</li>
+                </ul>
+            </div>
+
+            <div class="troubleshoot-item">
+                <div class="symptom">Symptom: 502 Bad Gateway</div>
+                <div class="solution">Solution: Verify network connectivity</div>
+                <div class="code-block">
+<span class="comment"># Check OAuth2 Proxy can reach backend service</span>
+docker exec {service}-auth-proxy wget -O- http://{service}:{port}/health
+
+<span class="comment"># Verify network attachments</span>
+docker inspect {service}-auth-proxy --format '{{json .NetworkSettings.Networks}}' | jq .
+
+<span class="comment"># Connect missing networks</span>
+docker network connect {service}-net {service}-auth-proxy
+                </div>
+            </div>
+
+            <div class="troubleshoot-item">
+                <div class="symptom">Symptom: "i/o timeout" connecting to Keycloak</div>
+                <div class="solution">Solution: OAuth2 Proxy not on keycloak-net</div>
+                <div class="code-block">
+<span class="comment"># Connect to keycloak network</span>
+docker network connect keycloak-net {service}-auth-proxy
+
+<span class="comment"># Verify connection</span>
+docker exec {service}-auth-proxy ping -c 1 keycloak
+                </div>
+            </div>
+
+            <div class="troubleshoot-item">
+                <div class="symptom">Symptom: Access denied after login / Group check failed</div>
+                <div class="solution">Solution: Verify user group membership in Keycloak</div>
+                <ul style="margin-left: 20px;">
+                    <li>Go to Keycloak Admin -> Users -> Select user</li>
+                    <li>Check Groups tab for <code>/administrators</code> membership</li>
+                    <li>If no group restriction needed, remove <code>--allowed-group</code> from OAuth2 Proxy config</li>
+                </ul>
+            </div>
+
+            <h3>Debug Commands</h3>
+            <div class="code-block">
+<span class="comment"># View OAuth2 Proxy logs</span>
+docker logs {service}-auth-proxy -f
+
+<span class="comment"># Check Keycloak logs</span>
+docker logs keycloak --tail 50 | grep -i error
+
+<span class="comment"># Verify Keycloak client exists</span>
+curl -s http://keycloak:8080/realms/master/.well-known/openid-configuration | jq .
+
+<span class="comment"># Test token endpoint (requires valid credentials)</span>
+curl -X POST http://keycloak:8080/realms/master/protocol/openid-connect/token \
+  -d "client_id={client}" \
+  -d "client_secret={secret}" \
+  -d "grant_type=client_credentials"
+            </div>
+        </section>
+
+        <!-- Quick Reference -->
+        <section class="section">
+            <h2>Quick Reference</h2>
+
+            <h3>URLs</h3>
+            <ul style="margin-left: 20px;">
+                <li><strong>Keycloak Admin</strong>: <a href="https://keycloak.ai-servicers.com" style="color: #58a6ff;">https://keycloak.ai-servicers.com</a></li>
+                <li><strong>OIDC Discovery</strong>: <code>https://keycloak.ai-servicers.com/realms/master/.well-known/openid-configuration</code></li>
+                <li><strong>OAuth2 Callback</strong>: <code>https://{service}.ai-servicers.com/oauth2/callback</code></li>
+            </ul>
+
+            <h3>Files</h3>
+            <ul style="margin-left: 20px;">
+                <li><strong>Secrets Location</strong>: <code>$HOME/secrets/{service}.env</code></li>
+                <li><strong>Keycloak Project</strong>: <code>/home/administrator/projects/keycloak/</code></li>
+                <li><strong>Keycloak Setup Skill</strong>: <code>$HOME/.claude/skills/keycloak-setup/</code></li>
+            </ul>
+
+            <h3>Networks</h3>
+            <ul style="margin-left: 20px;">
+                <li><strong>traefik-net</strong>: External traffic routing</li>
+                <li><strong>keycloak-net</strong>: Token validation (OAuth2 Proxy -> Keycloak)</li>
+                <li><strong>postgres-net</strong>: Keycloak database connection</li>
+            </ul>
+        </section>
+
+        <footer>
+            <p>Last Updated: 2025-11-25 | <a href="/">Nginx Portal</a> | <a href="/infrastructure-docs/">Infrastructure</a></p>
+            <p style="margin-top: 10px; font-size: 0.9em;">linuxserver.lan - ai-servicers.com</p>
+        </footer>
+    </div>
+</body>
+</html>

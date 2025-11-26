@@ -11,36 +11,72 @@ NGINX serves as the main reverse proxy and static site host:
 - SSL termination and certificate management via Traefik
 
 ### Static Sites Hosted (Path-Based on nginx.ai-servicers.com)
-All static sites are now served under **nginx.ai-servicers.com** using path-based routing:
+All static sites are now served under **nginx.ai-servicers.com** using path-based routing.
+
+#### Main Portal Sites (3 sites on landing page)
 - **Landing Page** - https://nginx.ai-servicers.com/
-  - Portal with index of all hosted sites
-  - Created: 2025-11-04
-- **Infrastructure Documentation** - https://nginx.ai-servicers.com/infrastructure-docs/
+  - Portal with index of top-level documentation
+- **Context Comparison** - /context-compare/ *(has sub-pages)*
+  - Side-by-side comparison of human learning vs AI context loading
+  - Quick-access nav bar links to Claude Code documentation sub-pages
+- **Infrastructure Documentation** - /infrastructure-docs/ *(has sub-pages)*
   - Complete architecture diagram and system documentation
-  - Created: 2025-11-04
-- **LangChain Portal** - https://nginx.ai-servicers.com/langchain-portal/
+- **MCP Architecture Guide** - /mcp-architecture/
+  - Token-efficient MCP architecture documentation
+
+#### Sub-Pages (accessed via Context Comparison)
+These pages are NOT listed on the main portal - they are accessed via quick-access nav bar on `/context-compare/`:
+- **Claude Code CLI Config** - /claudecodecliconfig/
+  - Executive summary of Claude Code CLI configuration
+- **LLM Memory** - /llm-memory/
+  - How Claude Code remembers: CLAUDE.md vs OpenMemory
+- **User-Level Skills** - /user-level-skills/
+  - Documentation of 7 user-level skills from ~/.claude/skills/
+- **Project-Level Skills** - /project-skills/
+  - Documentation of 8 project-level skills from ~/projects/.claude/skills/
+- **User-Level Agents** - /user-level-agents/
+  - Documentation of PM agent from ~/.claude/agents/
+- **Project-Level Agents** - /project-agents/
+  - Documentation of 3 agents from ~/projects/.claude/agents/
+- **LangChain Portal** - /langchain-portal/
   - LangChain API directory and quick links
-  - Migrated from subdomain to path: 2025-11-04
-- **Claude Code CLI Structure** - https://nginx.ai-servicers.com/claude-context/
-  - Multi-layered context management architecture documentation
-  - Covers: initialization files, commands, skills, agents, persistent memory
-  - Created: 2025-11-04
-- **Context Architecture** - https://nginx.ai-servicers.com/context-architecture/
-  - 4-layer context loading architecture diagram
-  - GitLab backup system documentation (claude-pull/claude-push)
-  - mem0 bidirectional workflow patterns
-  - Updated: 2025-11-07
-- **New Hire Context** - https://nginx.ai-servicers.com/new-hire-context/
-  - Executive-friendly analogy explaining layered context through new hire onboarding
-  - Parallels between human learning (college → company → department → role → task) and AI context loading
-  - Demonstrates why proper context organization creates specialists
-  - Created: 2025-11-07
-- **Context Comparison** - https://nginx.ai-servicers.com/context-compare/
-  - Side-by-side two-column comparison of human learning vs AI context loading
-  - Streamlined parallel examples in box format (inspired by context-architecture design)
-  - Easy to scan: read down left column for human progression, right column for AI progression
-  - Shows how both start general and progressively specialize through 5 layers (Level 0-4)
-  - Created: 2025-11-07
+
+#### Sub-Pages (accessed via Infrastructure Documentation)
+These pages are NOT listed on the main portal - they are accessed via nav buttons on `/infrastructure-docs/`:
+- **Hosted Applications** - /applications/
+  - Directory of all self-hosted applications (25+ apps across 8 categories)
+- **Deployment Patterns** - /deployment-patterns/
+  - Standard patterns for deploying services to linuxserver.lan
+- **Security & Authentication** - /security-auth/
+  - Keycloak SSO and OAuth2 Proxy architecture
+- **Network Topology** - /network-topology/
+  - Docker network architecture visualization
+- **DevScripts** - /devscripts/
+  - Infrastructure automation tools (27+ scripts for git, maintenance, Claude Code)
+
+#### Sub-Page Hierarchy
+```
+Main Portal (3 sites)
+├── /context-compare/  (quick-access nav bar to Claude Code docs)
+│   ├── /claudecodecliconfig/
+│   ├── /llm-memory/
+│   ├── /mcp-architecture/
+│   ├── /user-level-skills/
+│   ├── /project-skills/
+│   ├── /user-level-agents/
+│   ├── /project-agents/
+│   └── /langchain-portal/
+│
+├── /infrastructure-docs/  (nav buttons to infra docs)
+│   ├── /applications/
+│   ├── /deployment-patterns/
+│   ├── /security-auth/
+│   ├── /network-topology/
+│   └── /devscripts/
+│
+└── /mcp-architecture/
+```
+**Note**: When adding/removing sub-pages, update both the parent page nav AND ensure back-links exist on sub-pages.
 
 ## Recent Work & Changes
 _This section is updated by Claude during each session_
@@ -483,6 +519,15 @@ server {
 - **No certificate changes** - *.ai-servicers.com wildcard covers nginx.ai-servicers.com
 - **Clean URLs** - Users see nginx.ai-servicers.com/site-name/ (no "sites" in URL)
 - **Organized disk** - All sites in sites/ directory
+
+### ⚠️ Common Gotcha: Use Relative URLs
+
+**All internal links within nginx.ai-servicers.com sites must use relative paths.**
+
+- ✅ `href="/infrastructure-docs/"` (relative)
+- ❌ `href="https://nginx.ai-servicers.com/infrastructure-docs/"` (absolute)
+
+**Why**: Sites are all served from the same domain. Relative paths are cleaner, portable, and work correctly regardless of protocol (http/https).
 
 ### ⚠️ Common Gotcha: Directory Permissions
 

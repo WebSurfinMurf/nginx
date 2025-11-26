@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project-Level Skills - Claude Code</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c23 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2d5016;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .location-box {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f0f7e6;
+            border-radius: 10px;
+            border-left: 4px solid #4a7c23;
+        }
+
+        .location-box code {
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .intro {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4a7c23;
+        }
+
+        .intro h2 {
+            color: #2d5016;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .intro p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .skill-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .skill-card:hover {
+            border-color: #4a7c23;
+            box-shadow: 0 5px 20px rgba(74, 124, 35, 0.15);
+        }
+
+        .skill-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .skill-icon {
+            font-size: 2.5em;
+        }
+
+        .skill-title {
+            flex: 1;
+        }
+
+        .skill-title h3 {
+            color: #2d5016;
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+
+        .skill-name {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #e8f5e9;
+            color: #2d5016;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+
+        .skill-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .skill-triggers {
+            background: #fff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .skill-triggers h4 {
+            color: #4a7c23;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .trigger-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .trigger {
+            background: #f0f7e6;
+            color: #2d5016;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .skill-features {
+            background: #fff;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .skill-features h4 {
+            color: #4a7c23;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            color: #666;
+            font-size: 0.85em;
+            padding: 3px 0;
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4a7c23;
+            font-weight: bold;
+        }
+
+        .comparison-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .comparison-section h2 {
+            color: #2d5016;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: #2d5016;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f0f7e6;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .footer a {
+            color: #4a7c23;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4a7c23;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .stat-box {
+            display: inline-block;
+            background: #4a7c23;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+
+        .stats-row {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/context-compare/" class="back-link">&larr; Back to Context Comparison</a>
+
+        <h1>Project-Level Skills</h1>
+        <p class="subtitle">Infrastructure-specific skills loaded from the projects directory</p>
+
+        <div class="location-box">
+            <strong>Location:</strong> <code>~/projects/.claude/skills/</code>
+        </div>
+
+        <div class="stats-row">
+            <span class="stat-box">8 Skills</span>
+            <span class="stat-box">Infrastructure-Focused</span>
+            <span class="stat-box">Auto-Loaded by Claude Code</span>
+        </div>
+
+        <div class="intro">
+            <h2>What Are Project-Level Skills?</h2>
+            <p>
+                Project-level skills are specialized knowledge modules stored at <code>~/projects/.claude/skills/</code>.
+                Unlike <a href="/user-level-skills/">user-level skills</a> which apply universally, these skills are
+                specific to the linuxserver.lan infrastructure project. They provide deep operational knowledge for
+                deploying, configuring, and troubleshooting services within this particular environment.
+            </p>
+        </div>
+
+        <div class="skills-grid">
+            <!-- Skill 1: keycloak-setup -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">🔐</span>
+                    <div class="skill-title">
+                        <h3>Keycloak Setup</h3>
+                        <span class="skill-name">keycloak-setup</span>
+                    </div>
+                </div>
+                <p class="skill-description">
+                    Comprehensive guide for setting up Keycloak OIDC clients for new applications. Covers both
+                    automated and manual client creation, configuration for OAuth2 proxy vs direct OIDC patterns,
+                    and integration with the existing SSO infrastructure.
+                </p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases</h4>
+                    <div class="trigger-list">
+                        <span class="trigger">keycloak client</span>
+                        <span class="trigger">OIDC setup</span>
+                        <span class="trigger">SSO integration</span>
+                        <span class="trigger">OAuth2 proxy</span>
+                    </div>
+                </div>
+                <div class="skill-features">
+                    <h4>Key Features</h4>
+                    <ul class="feature-list">
+                        <li>Automated client creation via API</li>
+                        <li>Manual client configuration steps</li>
+                        <li>OAuth2 Proxy vs Direct OIDC patterns</li>
+                        <li>Group and role mapping setup</li>
+                        <li>Secret management integration</li>
+                        <li>Troubleshooting common issues</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Skill 2: logging-observability -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">📊</span>
+                    <div class="skill-title">
+                        <h3>Logging & Observability</h3>
+                        <span class="skill-name">logging-observability</span>
+                    </div>
+                </div>
+                <p class="skill-description">
+                    Complete observability stack management including log aggregation, metrics collection,
+                    and monitoring configuration. Ensures proper logging setup when deploying or modifying services.
+                </p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases</h4>
+                    <div class="trigger-list">
+                        <span class="trigger">logging</span>
+                        <span class="trigger">monitoring</span>
+                        <span class="trigger">metrics</span>
+                        <span class="trigger">observability</span>
+                    </div>
+                </div>
+                <div class="skill-features">
+                    <h4>Key Features</h4>
+                    <ul class="feature-list">
+                        <li>Loki log aggregation setup</li>
+                        <li>Promtail configuration</li>
+                        <li>Grafana dashboard integration</li>
+                        <li>Netdata system monitoring</li>
+                        <li>Dozzle container log viewer</li>
+                        <li>TimescaleDB metrics storage</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Skill 3: network-config -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">🌐</span>
+                    <div class="skill-title">
+                        <h3>Network Configuration</h3>
+                        <span class="skill-name">network-config</span>
+                    </div>
+                </div>
+                <p class="skill-description">
+                    Essential knowledge for Docker network architecture, port mappings, DNS configuration,
+                    and security isolation. Used proactively when adding network endpoints or troubleshooting connectivity.
+                </p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases</h4>
+                    <div class="trigger-list">
+                        <span class="trigger">network</span>
+                        <span class="trigger">DNS</span>
+                        <span class="trigger">port mapping</span>
+                        <span class="trigger">connectivity</span>
+                    </div>
+                </div>
+                <div class="skill-features">
+                    <h4>Key Features</h4>
+                    <ul class="feature-list">
+                        <li>Docker network patterns (1/2/3-network)</li>
+                        <li>Port allocation standards</li>
+                        <li>DNS setup procedures</li>
+                        <li>Security isolation patterns</li>
+                        <li>Inter-container communication</li>
+                        <li>Network troubleshooting</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Skill 4: nginx-static-site -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">📄</span>
+                    <div class="skill-title">
+                        <h3>Nginx Static Site</h3>
+                        <span class="skill-name">nginx-static-site</span>
+                    </div>
+                </div>
+                <p class="skill-description">
+                    Standard procedures for deploying static websites, HTML pages, and documentation
+                    under nginx.ai-servicers.com. Covers directory structure, configuration, and deployment steps.
+                </p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases</h4>
+                    <div class="trigger-list">
+                        <span class="trigger">deploy site</span>
+                        <span class="trigger">static site</span>
+                        <span class="trigger">host HTML</span>
+                        <span class="trigger">nginx portal</span>
+                    </div>
+                </div>
+                <div class="skill-features">
+                    <h4>Key Features</h4>
+                    <ul class="feature-list">
+                        <li>Path-based routing configuration</li>
+                        <li>Directory structure standards</li>
+                        <li>Nginx location block setup</li>
+                        <li>Landing page integration</li>
+                        <li>Permission requirements (755/644)</li>
+                        <li>Deployment verification</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Skill 5: postgres-integration -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">🐘</span>
+                    <div class="skill-title">
+                        <h3>PostgreSQL Integration</h3>
+                        <span class="skill-name">postgres-integration</span>
+                    </div>
+                </div>
+                <p class="skill-description">
+                    Complete guide for integrating applications with PostgreSQL. Covers database creation,
+                    user management, connection configuration by programming language, and security best practices.
+                </p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases</h4>
+                    <div class="trigger-list">
+                        <span class="trigger">database</span>
+                        <span class="trigger">PostgreSQL</span>
+                        <span class="trigger">psql</span>
+                        <span class="trigger">DB connection</span>
+                    </div>
+                </div>
+                <div class="skill-features">
+                    <h4>Key Features</h4>
+                    <ul class="feature-list">
+                        <li>Database creation procedures</li>
+                        <li>User and role management</li>
+                        <li>Language-specific connection strings</li>
+                        <li>Connection pooling setup</li>
+                        <li>Backup and recovery</li>
+                        <li>Performance monitoring</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Skill 6: service-deployment -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">🚀</span>
+                    <div class="skill-title">
+                        <h3>Service Deployment</h3>
+                        <span class="skill-name">service-deployment</span>
+                    </div>
+                </div>
+                <p class="skill-description">
+                    Master orchestration skill for deploying any new service. Coordinates Docker deployment,
+                    OAuth2 authentication, environment configuration, Traefik integration, and post-deployment verification.
+                </p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases</h4>
+                    <div class="trigger-list">
+                        <span class="trigger">deploy</span>
+                        <span class="trigger">install</span>
+                        <span class="trigger">setup service</span>
+                        <span class="trigger">containerize</span>
+                    </div>
+                </div>
+                <div class="skill-features">
+                    <h4>Key Features</h4>
+                    <ul class="feature-list">
+                        <li>Docker container deployment</li>
+                        <li>Network selection guidance</li>
+                        <li>OAuth2 authentication setup</li>
+                        <li>Environment configuration</li>
+                        <li>Traefik label configuration</li>
+                        <li>Health check verification</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Skill 7: traefik-setup -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">🔀</span>
+                    <div class="skill-title">
+                        <h3>Traefik Setup</h3>
+                        <span class="skill-name">traefik-setup</span>
+                    </div>
+                </div>
+                <p class="skill-description">
+                    Configuration guide for Traefik reverse proxy routing. Covers HTTP/HTTPS routing,
+                    TCP routing, SSL/TLS certificates, middleware configuration, and service labels.
+                </p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases</h4>
+                    <div class="trigger-list">
+                        <span class="trigger">Traefik</span>
+                        <span class="trigger">routing</span>
+                        <span class="trigger">SSL certificate</span>
+                        <span class="trigger">reverse proxy</span>
+                    </div>
+                </div>
+                <div class="skill-features">
+                    <h4>Key Features</h4>
+                    <ul class="feature-list">
+                        <li>HTTP/HTTPS routing rules</li>
+                        <li>TCP routing configuration</li>
+                        <li>Let's Encrypt SSL automation</li>
+                        <li>Middleware setup (auth, headers)</li>
+                        <li>Service label templates</li>
+                        <li>Entry point configuration</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Skill 8: troubleshooting -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">🔧</span>
+                    <div class="skill-title">
+                        <h3>Troubleshooting</h3>
+                        <span class="skill-name">troubleshooting</span>
+                    </div>
+                </div>
+                <p class="skill-description">
+                    Systematic debugging methodologies and diagnostic procedures for the entire infrastructure.
+                    Covers log analysis, service-specific diagnostics, and common problem resolution patterns.
+                </p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases</h4>
+                    <div class="trigger-list">
+                        <span class="trigger">debug</span>
+                        <span class="trigger">error</span>
+                        <span class="trigger">not working</span>
+                        <span class="trigger">diagnose</span>
+                    </div>
+                </div>
+                <div class="skill-features">
+                    <h4>Key Features</h4>
+                    <ul class="feature-list">
+                        <li>Systematic debugging workflow</li>
+                        <li>Service-specific diagnostics</li>
+                        <li>Log analysis techniques</li>
+                        <li>Common error patterns</li>
+                        <li>Emergency procedures</li>
+                        <li>Recovery playbooks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-section">
+            <h2>Project Skills vs User Skills</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Project-Level Skills</th>
+                        <th>User-Level Skills</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Location</strong></td>
+                        <td><code>~/projects/.claude/skills/</code></td>
+                        <td><code>~/.claude/skills/</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scope</strong></td>
+                        <td>Infrastructure-specific</td>
+                        <td>Universal/general-purpose</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Count</strong></td>
+                        <td>8 skills</td>
+                        <td>7 skills</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Purpose</strong></td>
+                        <td>Deploy & operate services on linuxserver.lan</td>
+                        <td>General development & documentation tasks</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Examples</strong></td>
+                        <td>keycloak-setup, traefik-setup, postgres-integration</td>
+                        <td>naming-validator, secrets-security, gitlab-integration</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>Related:</strong>
+                <a href="/user-level-skills/">User-Level Skills</a> |
+                <a href="/context-compare/">Context Architecture</a> |
+                <a href="/claudecodecliconfig/">Claude CLI Configuration</a>
+            </p>
+            <p style="margin-top: 10px; color: #999;">
+                Skills are auto-discovered by Claude Code from <code>~/projects/.claude/skills/</code>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

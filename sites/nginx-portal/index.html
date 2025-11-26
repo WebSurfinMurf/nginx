@@ -26,7 +26,7 @@
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 900px;
+            max-width: 1200px;
             width: 100%;
         }
 
@@ -46,9 +46,21 @@
 
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-bottom: 30px;
+        }
+
+        @media (max-width: 1000px) {
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 650px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .service-card {
@@ -76,13 +88,13 @@
         .service-card h3 {
             color: #667eea;
             margin-bottom: 10px;
-            font-size: 1.4em;
+            font-size: 1.3em;
         }
 
         .service-card p {
             color: #666;
             line-height: 1.6;
-            font-size: 0.95em;
+            font-size: 0.9em;
         }
 
         .footer {
@@ -100,73 +112,76 @@
             border-radius: 3px;
             font-size: 0.9em;
         }
+
+        .start-here-badge {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 50%, #ff6b6b 100%);
+            background-size: 200% 200%;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            animation: pulse 1.5s ease-in-out infinite, gradient 3s ease infinite;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌐 Nginx Services Portal</h1>
+        <h1>Nginx Services Portal</h1>
         <p class="subtitle">Static sites and documentation hosted on nginx.ai-servicers.com</p>
         <div style="text-align: center; margin-bottom: 30px; padding: 15px; background: #e7f3ff; border-radius: 10px; border-left: 4px solid #667eea;">
-            <strong>📍 Quick Access:</strong> All sites are available at <code style="background: white; padding: 4px 8px; border-radius: 4px;">nginx.ai-servicers.com/[site-name]/</code>
+            <strong>Quick Access:</strong> All sites are available at <code style="background: white; padding: 4px 8px; border-radius: 4px;">nginx.ai-servicers.com/[site-name]/</code>
         </div>
 
         <div class="services-grid">
-            <a href="/infrastructure-docs/" class="service-card">
-                <div class="icon">🏗️</div>
-                <h3>Infrastructure Documentation</h3>
-                <p>Complete architecture diagram documenting all 46 projects, network topology, service dependencies, and deployment information for the ai-servicers.com infrastructure.</p>
-            </a>
-
-            <a href="/langchain-portal/" class="service-card">
-                <div class="icon">🔗</div>
-                <h3>LangChain Portal</h3>
-                <p>API directory and quick reference for LangChain services. Access all LangServe endpoints, chain definitions, and integration documentation.</p>
-            </a>
-
-            <a href="/claude-context/" class="service-card">
-                <div class="icon">🤖</div>
-                <h3>Claude Context Management</h3>
-                <p>Comprehensive guide to agent context management covering memory tiers, hierarchical loading, subagents, skills, tools, and workflows. Manual documentation format.</p>
-            </a>
-
-            <a href="/context-architecture/" class="service-card">
-                <div class="icon">🏗️</div>
-                <h3>Context Architecture Diagram</h3>
-                <p>4-layer context loading architecture with SVG diagrams. Covers user bootstrap, infrastructure context, project context, and execution layers. Includes GitLab backup system (claude-pull/push) and mem0 workflow patterns.</p>
-            </a>
-
-            <a href="/new-hire-context/" class="service-card">
-                <div class="icon">🎓</div>
-                <h3>New Hire Context Analogy</h3>
-                <p>Executive-friendly explanation of layered context using new hire onboarding as an analogy. Shows how context layers (company, department, role, task) mirror AI context loading. Demonstrates why proper context organization creates specialists.</p>
-            </a>
-
-            <a href="/context-compare/" class="service-card">
+            <a href="/context-compare/" class="service-card" style="position: relative;">
+                <div class="start-here-badge">
+                    <span>★ START HERE! ★</span>
+                </div>
                 <div class="icon">🎯</div>
                 <h3>Context Comparison</h3>
-                <p>Side-by-side comparison of human learning vs AI context loading. Two-column layout with parallel examples showing how both progress from general knowledge to specialized expertise through layered context. Streamlined, easy-to-scan format.</p>
+                <p>Side-by-side comparison of human learning vs AI context loading. Two-column layout with parallel examples showing progression from general knowledge to specialized expertise.</p>
             </a>
 
-            <a href="/mcp-code-execution/" class="service-card">
-                <div class="icon">🚀</div>
-                <h3>MCP Code Execution Guide</h3>
-                <p>Revolutionary AI agent architecture: 98.7% token reduction via code execution with progressive disclosure. Complete implementation plan for linuxserver.lan including ROI analysis ($20K+/year savings), 4-week timeline, security patterns, and skills framework.</p>
+            <a href="/infrastructure-docs/" class="service-card">
+                <div class="icon">🏢</div>
+                <h3>Infrastructure Documentation</h3>
+                <p>Complete architecture diagram documenting all projects, network topology, service dependencies, and deployment information for the ai-servicers.com infrastructure.</p>
             </a>
 
             <a href="/mcp-architecture/" class="service-card">
                 <div class="icon">⚙️</div>
                 <h3>MCP Architecture Guide</h3>
-                <p>Complete technical guide to our token-efficient MCP architecture. Covers code-executor server, TypeScript wrapper generation, progressive disclosure API, security sandbox, and configuration. Includes architecture diagrams, setup instructions, usage patterns, and troubleshooting. Post-refactor implementation using Anthropic's recommended pattern.</p>
+                <p>Complete technical guide to token-efficient MCP architecture. Covers code-executor server, TypeScript wrapper generation, progressive disclosure API, and security sandbox.</p>
             </a>
+
         </div>
 
         <div class="footer">
-            <p><strong>🖥️ Server:</strong> linuxserver.lan | <strong>⚡ Powered by:</strong> Nginx + Traefik + Keycloak SSO</p>
+            <p><strong>Server:</strong> linuxserver.lan | <strong>Powered by:</strong> Nginx + Traefik + Keycloak SSO</p>
             <p style="margin-top: 10px; color: #999;">
-                <strong>Total Sites:</strong> 8 active | <strong>Last Updated:</strong> 2025-11-09
+                <strong>Total Sites:</strong> 3 active | <strong>Last Updated:</strong> 2025-11-26
             </p>
             <p style="margin-top: 10px; font-size: 0.85em; color: #999;">
-                💡 To add a new site: See <code>/home/administrator/.claude/skills/nginx-static-site/SKILL.md</code>
+                To add a new site: See <code>/home/administrator/.claude/skills/nginx-static-site/SKILL.md</code>
             </p>
         </div>
     </div>

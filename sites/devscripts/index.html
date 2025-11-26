@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevScripts - Infrastructure Automation Tools</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #a5b4fc;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #a0aec0;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #a5b4fc;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .category {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .category-icon {
+            font-size: 1.5rem;
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            color: #fff;
+        }
+
+        .scripts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .script-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .script-card.user-script {
+            border-left: 3px solid #f6ad55;
+        }
+
+        .script-name {
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: #68d391;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .script-desc {
+            color: #a0aec0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .script-usage {
+            margin-top: 0.5rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #718096;
+            background: rgba(0,0,0,0.2);
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .tag-user { background: #f6ad55; color: #1a202c; }
+        .tag-python { background: #3776ab; color: white; }
+        .tag-auto { background: #718096; color: white; }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: #a5b4fc;
+            text-decoration: none;
+        }
+
+        .footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/infrastructure-docs/" class="back-link">&larr; Back to Infrastructure Documentation</a>
+
+        <h1>DevScripts</h1>
+        <p class="subtitle">Infrastructure Automation Tools for linuxserver.lan</p>
+
+        <div class="legend">
+            <div class="legend-item"><span class="tag tag-user">USER</span> Human-invoked CLI commands (no extension)</div>
+            <div class="legend-item"><span class="tag tag-python">Python</span> <span class="tag tag-auto">Auto</span> LLM/automation scripts</div>
+        </div>
+
+        <div class="stats-bar">
+            <a href="https://github.com/WebSurfinMurf/devscripts" target="_blank" class="stat" style="background: rgba(139, 148, 158, 0.15); border: 1px solid rgba(139, 148, 158, 0.3); text-decoration: none;">
+                <div class="stat-value" style="font-size: 1.5rem;">🐙</div>
+                <div class="stat-label" style="color: #8b949e;">GitHub Repo</div>
+            </a>
+            <div class="stat">
+                <div class="stat-value">21+</div>
+                <div class="stat-label">Scripts</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">6</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">8</div>
+                <div class="stat-label">User Commands</div>
+            </div>
+        </div>
+
+        <!-- Git Management (User Commands) -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">📦</span>
+                <span class="category-title">Git Management</span>
+            </div>
+            <div class="scripts-grid">
+                <div class="script-card user-script">
+                    <div class="script-name">gitinit <span class="tag tag-user">USER</span></div>
+                    <div class="script-desc">Initialize git repo on GitLab or GitHub. Creates remote repo and pushes initial commit.</div>
+                    <div class="script-usage">gitinit -gitlab [group] | gitinit -github</div>
+                </div>
+                <div class="script-card user-script">
+                    <div class="script-name">gitpush <span class="tag tag-user">USER</span></div>
+                    <div class="script-desc">Git push helper with 3-attempt retry and exponential backoff. Supports single, current (.), or all projects.</div>
+                    <div class="script-usage">gitpush &lt;project|.|all&gt; "message"</div>
+                </div>
+                <div class="script-card user-script">
+                    <div class="script-name">gitpull <span class="tag tag-user">USER</span></div>
+                    <div class="script-desc">Git pull helper. Supports GitLab/GitHub, handles new clones and existing repos.</div>
+                    <div class="script-usage">gitpull &lt;project|.|all&gt; [-gitlab]</div>
+                </div>
+                <div class="script-card user-script">
+                    <div class="script-name">gitversion <span class="tag tag-user">USER</span></div>
+                    <div class="script-desc">Git version/tag helper. Creates patch, stable, or major version tags.</div>
+                    <div class="script-usage">gitversion &lt;project&gt; [-stable|-major] "msg"</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Utilities -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">🛠️</span>
+                <span class="category-title">User Utilities</span>
+            </div>
+            <div class="scripts-grid">
+                <div class="script-card user-script">
+                    <div class="script-name">mergecode <span class="tag tag-user">USER</span></div>
+                    <div class="script-desc">Merge code from multiple sources into a single project.</div>
+                    <div class="script-usage">mergecode &lt;source&gt; &lt;dest&gt;</div>
+                </div>
+                <div class="script-card user-script">
+                    <div class="script-name">restorecode <span class="tag tag-user">USER</span></div>
+                    <div class="script-desc">Restore code from backups.</div>
+                    <div class="script-usage">restorecode &lt;project&gt;</div>
+                </div>
+                <div class="script-card user-script">
+                    <div class="script-name">sharefile <span class="tag tag-user">USER</span></div>
+                    <div class="script-desc">Create temporary file sharing links.</div>
+                    <div class="script-usage">sharefile &lt;file&gt;</div>
+                </div>
+                <div class="script-card user-script">
+                    <div class="script-name">glab <span class="tag tag-user">USER</span></div>
+                    <div class="script-desc">Official GitLab CLI (v1.77.0). Configured for gitlab.ai-servicers.com.</div>
+                    <div class="script-usage">glab &lt;command&gt;</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Maintenance (Automation) -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">🔧</span>
+                <span class="category-title">System Maintenance</span>
+            </div>
+            <div class="scripts-grid">
+                <div class="script-card">
+                    <div class="script-name">healthcheck.sh <span class="tag tag-auto">Auto</span></div>
+                    <div class="script-desc">System and Docker health monitoring. Checks containers, disk, memory, CPU. Analyzes recent log errors.</div>
+                    <div class="script-usage">./healthcheck.sh</div>
+                </div>
+                <div class="script-card">
+                    <div class="script-name">cleanserver.sh <span class="tag tag-auto">Auto</span></div>
+                    <div class="script-desc">Docker cleanup and log rotation. Removes stopped containers, dangling images, old logs (90+ days).</div>
+                    <div class="script-usage">./cleanserver.sh</div>
+                </div>
+                <div class="script-card">
+                    <div class="script-name">updatelinux.sh <span class="tag tag-auto">Auto</span></div>
+                    <div class="script-desc">System update automation. Updates Ubuntu packages and Docker components.</div>
+                    <div class="script-usage">./updatelinux.sh</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Claude Code Management (Automation) -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">🤖</span>
+                <span class="category-title">Claude Code Management</span>
+            </div>
+            <div class="scripts-grid">
+                <div class="script-card">
+                    <div class="script-name">validate-claude-md.py <span class="tag tag-python">Python</span></div>
+                    <div class="script-desc">Validates structure and content of CLAUDE.md files across projects.</div>
+                    <div class="script-usage">python3 validate-claude-md.py .</div>
+                </div>
+                <div class="script-card">
+                    <div class="script-name">bulk-generate-claude.sh <span class="tag tag-auto">Auto</span></div>
+                    <div class="script-desc">Auto-generates CLAUDE.md files for all projects missing one.</div>
+                    <div class="script-usage">./bulk-generate-claude.sh</div>
+                </div>
+                <div class="script-card">
+                    <div class="script-name">build-claude-index.py <span class="tag tag-python">Python</span></div>
+                    <div class="script-desc">Builds searchable JSON index of projects and documentation.</div>
+                    <div class="script-usage">python3 build-claude-index.py</div>
+                </div>
+                <div class="script-card">
+                    <div class="script-name">detect-patterns.py <span class="tag tag-python">Python</span></div>
+                    <div class="script-desc">Analyzes projects for infrastructure patterns (oauth2, db, monitoring).</div>
+                    <div class="script-usage">python3 detect-patterns.py</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backup & Maintenance (Automation) -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">💾</span>
+                <span class="category-title">Backup & Maintenance</span>
+            </div>
+            <div class="scripts-grid">
+                <div class="script-card">
+                    <div class="script-name">backup/backup-projects-data.sh <span class="tag tag-auto">Auto</span></div>
+                    <div class="script-desc">Main backup script for ~/projects/data. Daily, weekly, and monthly retention.</div>
+                    <div class="script-usage">./backup-projects-data.sh</div>
+                </div>
+                <div class="script-card">
+                    <div class="script-name">backup/setup-backup-mount.sh <span class="tag tag-auto">Auto</span></div>
+                    <div class="script-desc">One-time USB drive setup for backup storage.</div>
+                    <div class="script-usage">sudo ./setup-backup-mount.sh</div>
+                </div>
+                <div class="script-card">
+                    <div class="script-name">maintenance/cleanup-logs-and-ephemeral-data.sh <span class="tag tag-auto">Auto</span></div>
+                    <div class="script-desc">Weekly cleanup of logs and ephemeral data. Supports --dry-run.</div>
+                    <div class="script-usage">sudo ./cleanup-logs-and-ephemeral-data.sh</div>
+                </div>
+                <div class="script-card">
+                    <div class="script-name">maintenance/setup-docker-log-rotation.sh <span class="tag tag-auto">Auto</span></div>
+                    <div class="script-desc">One-time Docker daemon log rotation configuration.</div>
+                    <div class="script-usage">sudo ./setup-docker-log-rotation.sh</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Tools (Automation) -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">🔍</span>
+                <span class="category-title">Analysis Tools</span>
+            </div>
+            <div class="scripts-grid">
+                <div class="script-card">
+                    <div class="script-name">find-project.py <span class="tag tag-python">Python</span></div>
+                    <div class="script-desc">Search for projects by name or pattern across the projects directory.</div>
+                    <div class="script-usage">python3 find-project.py &lt;pattern&gt;</div>
+                </div>
+                <div class="script-card">
+                    <div class="script-name">project-health-check.py <span class="tag tag-python">Python</span></div>
+                    <div class="script-desc">Assesses overall project health and completeness.</div>
+                    <div class="script-usage">python3 project-health-check.py</div>
+                </div>
+                <div class="script-card">
+                    <div class="script-name">cleanup-github-repos.sh <span class="tag tag-auto">Auto</span></div>
+                    <div class="script-desc">Remove sensitive data from Git history while keeping local copies.</div>
+                    <div class="script-usage">./cleanup-github-repos.sh</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Location:</strong> <code>/home/administrator/projects/devscripts/</code></p>
+            <p style="margin-top: 0.5rem;">
+                <a href="/infrastructure-docs/">Infrastructure Docs</a> |
+                <a href="/">Portal</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -24,6 +24,16 @@
             padding: 3rem;
         }
 
+        .back-link {
+            display: inline-block;
+            color: #4299e1;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
         h1 {
             font-size: 2.5rem;
             color: #1e3c72;
@@ -199,8 +209,21 @@
 </head>
 <body>
     <div class="container">
+        <a href="/" class="back-link">&larr; Back to Portal</a>
+
         <h1>🎯 Context Comparison</h1>
         <p class="subtitle">Human Learning vs AI Context Loading: A Side-by-Side View</p>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin: 1.5rem 0; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 10px;">
+            <a href="https://gitlab.ai-servicers.com/administrators/claude-code-config" target="_blank" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: rgba(252,109,38,0.2); border: 1px solid rgba(252,109,38,0.4); border-radius: 6px; color: #fc6d26; text-decoration: none; font-size: 0.85rem;">🦊 GitLab (Private)</a>
+            <a href="/claudecodecliconfig/" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: rgba(102,126,234,0.2); border: 1px solid rgba(102,126,234,0.4); border-radius: 6px; color: #a5b4fc; text-decoration: none; font-size: 0.85rem;">🛠️ CLI Config</a>
+            <a href="/llm-memory/" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: rgba(102,126,234,0.2); border: 1px solid rgba(102,126,234,0.4); border-radius: 6px; color: #a5b4fc; text-decoration: none; font-size: 0.85rem;">🧠 LLM Memory</a>
+            <a href="/mcp-architecture/" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: rgba(102,126,234,0.2); border: 1px solid rgba(102,126,234,0.4); border-radius: 6px; color: #a5b4fc; text-decoration: none; font-size: 0.85rem;">⚙️ MCP Architecture</a>
+            <a href="/user-level-skills/" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: rgba(102,126,234,0.2); border: 1px solid rgba(102,126,234,0.4); border-radius: 6px; color: #a5b4fc; text-decoration: none; font-size: 0.85rem;">🏷️ User Skills</a>
+            <a href="/project-skills/" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: rgba(102,126,234,0.2); border: 1px solid rgba(102,126,234,0.4); border-radius: 6px; color: #a5b4fc; text-decoration: none; font-size: 0.85rem;">🛠️ Project Skills</a>
+            <a href="/user-level-agents/" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: rgba(102,126,234,0.2); border: 1px solid rgba(102,126,234,0.4); border-radius: 6px; color: #a5b4fc; text-decoration: none; font-size: 0.85rem;">📋 User Agents</a>
+            <a href="/project-agents/" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: rgba(102,126,234,0.2); border: 1px solid rgba(102,126,234,0.4); border-radius: 6px; color: #a5b4fc; text-decoration: none; font-size: 0.85rem;">🔧 Project Agents</a>
+        </div>
 
         <div class="intro">
             <p><strong>Executive Summary:</strong> Creating expertise—whether human or artificial—requires the same fundamental approach: <strong>segmented context delivered in progressive layers</strong>. A new employee cannot be productive on day one with only general skills; they need company context, department standards, project knowledge, and task-specific details loaded sequentially. Similarly, an AI system cannot be effective with only base training; it needs user preferences, workspace standards, project documentation, and runtime tools loaded in order.</p>
@@ -217,7 +240,7 @@
 
             <div class="column-header">
                 <h2>🤖 AI Context Loading</h2>
-                <p><a href="/context-architecture/" style="color: white; text-decoration: underline;">Claude Code</a></p>
+                <p><a href="/claudecodecliconfig/" style="color: white; text-decoration: underline;">Claude Code</a></p>
             </div>
 
             <!-- LEVEL 0 -->
@@ -245,7 +268,7 @@
             <div class="level-box level-0">
                 <span class="level-badge">LEVEL 0: Baseline</span>
                 <h3>AI Model</h3>
-                <p class="context-type">General training (ChatGPT, Copilot)</p>
+                <p class="context-type">General training (<a href="https://www.anthropic.com/claude-code" target="_blank">Claude</a>, <a href="https://developers.openai.com/codex/cli" target="_blank">ChatGPT</a>, <a href="https://geminicli.com/" target="_blank">Gemini</a>, etc.)</p>
 
                 <div class="example">
                     <strong>What It Knows:</strong>
@@ -296,15 +319,15 @@
                     <strong>What It Loads:</strong>
                     <ul>
                         <li>User preferences (settings.json)</li>
-                        <li>6 general-purpose skills</li>
+                        <li>7 <a href="/user-level-skills/">user-level skills</a></li>
                         <li>Session history</li>
-                        <li>Default Claude Code agents</li>
+                        <li>1 <a href="/user-level-agents/">agent</a> (PM)</li>
                     </ul>
                 </div>
 
                 <div class="example">
                     <strong>Example:</strong>
-                    <p>User-level skills: architecture-diagram-creator, naming-validator, secrets-security, gitlab-integration.</p>
+                    <p>User-level skills: architecture-diagram-creator, naming-validator, secrets-security, gitlab-integration, skill-creator, openmemory, claudemd-generator.</p>
                 </div>
             </div>
 
@@ -340,16 +363,16 @@
                 <div class="example">
                     <strong>What It Loads:</strong>
                     <ul>
-                        <li>Infrastructure documentation (AINotes)</li>
-                        <li>9 infrastructure-specific skills</li>
-                        <li>4 custom agents (PM, Architect, Developer, Security)</li>
-                        <li>Network topology and security policies</li>
+                        <li><a href="/deployment-patterns/">Infrastructure documentation</a> (AINotes)</li>
+                        <li>8 <a href="/project-skills/">projects skills</a></li>
+                        <li>3 <a href="/project-agents/">agents</a> (Architect, Developer, Security)</li>
+                        <li><a href="/network-topology/">Network topology</a> and <a href="/security-auth/">security policies</a></li>
                     </ul>
                 </div>
 
                 <div class="example">
                     <strong>Example:</strong>
-                    <p>Infrastructure skills: keycloak-setup, postgres-integration, traefik-setup, service-deployment.</p>
+                    <p>Infrastructure skills: keycloak-setup, postgres-integration, traefik-setup, service-deployment, nginx-static-site, troubleshooting.</p>
                 </div>
             </div>
 
@@ -386,7 +409,7 @@
                     <strong>What It Loads:</strong>
                     <ul>
                         <li>Project documentation (CLAUDE.md)</li>
-                        <li>Service architecture and deployment</li>
+                        <li><a href="/infrastructure-docs/">Service architecture</a> and deployment</li>
                         <li>Configuration details</li>
                         <li>Recent changes and known issues</li>
                     </ul>
@@ -430,10 +453,10 @@
                 <div class="example">
                     <strong>What It Loads:</strong>
                     <ul>
-                        <li>mem0 queried (past lessons)</li>
-                        <li>MCP tools (postgres, filesystem, web)</li>
+                        <li><a href="/llm-memory/">mem0</a> queried (past lessons)</li>
+                        <li><a href="/mcp-architecture/">mcp-code-executioner</a> (postgres, filesystem, web)</li>
                         <li>Task-specific context</li>
-                        <li>Deployment procedures</li>
+                        <li><a href="/applications/">Application integration</a></li>
                     </ul>
                 </div>
 
@@ -458,7 +481,7 @@
             <p style="margin-top: 1rem; font-size: 0.9rem;">
                 📚 See also:
                 <a href="/new-hire-context/">Detailed New Hire Analogy</a> |
-                <a href="/context-architecture/">Technical Architecture</a> |
+                <a href="/claudecodecliconfig/">Technical Architecture</a> |
                 <a href="/">All Documentation</a>
             </p>
             <p style="margin-top: 1rem; color: #a0aec0; font-size: 0.85rem;">Created: 2025-11-07</p>

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Deployment Patterns - ai-servicers.com</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: #e2e8f0;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .back-link {
+            display: inline-block;
+            color: #a5b4fc;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #34d399, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle { color: #94a3b8; font-size: 1.1rem; }
+
+        .section {
+            margin: 2rem 0;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            color: #34d399;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid rgba(52,211,153,0.3);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1000px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card h3 {
+            color: #22d3ee;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .card ul { list-style: none; }
+
+        .card li {
+            padding: 0.4rem 0;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .card li:last-child { border-bottom: none; }
+
+        .card li::before {
+            content: ">";
+            color: #34d399;
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+
+        pre {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 1.25rem;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            color: #e2e8f0;
+        }
+
+        .code-comment { color: #64748b; }
+        .code-string { color: #34d399; }
+        .code-keyword { color: #f472b6; }
+        .code-var { color: #22d3ee; }
+        .code-flag { color: #fbbf24; }
+
+        .checklist {
+            list-style: none;
+            counter-reset: step;
+        }
+
+        .checklist li {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(52,211,153,0.1);
+            border-radius: 8px;
+            border-left: 4px solid #34d399;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .checklist li::before {
+            counter-increment: step;
+            content: counter(step);
+            background: #34d399;
+            color: #0f172a;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .network-pattern {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 0.5rem 0;
+        }
+
+        .network-badge {
+            padding: 0.3rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .net-traefik { background: rgba(251,146,60,0.2); color: #fdba74; border: 1px solid #fb923c; }
+        .net-keycloak { background: rgba(167,139,250,0.2); color: #c4b5fd; border: 1px solid #a78bfa; }
+        .net-data { background: rgba(52,211,153,0.2); color: #6ee7b7; border: 1px solid #34d399; }
+        .net-app { background: rgba(56,189,248,0.2); color: #7dd3fc; border: 1px solid #38bdf8; }
+
+        .pattern-box {
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .pattern-title {
+            color: #fbbf24;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .file-tree {
+            font-family: monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: #94a3b8;
+        }
+
+        .file-tree .folder { color: #22d3ee; }
+        .file-tree .file { color: #34d399; }
+        .file-tree .comment { color: #64748b; }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(52,211,153,0.1), rgba(34,211,238,0.1));
+            border: 1px solid rgba(52,211,153,0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .warning-box {
+            background: rgba(251,146,60,0.1);
+            border: 1px solid rgba(251,146,60,0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .warning-box h4 { color: #fbbf24; margin-bottom: 0.5rem; }
+
+        .label-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .label-table th, .label-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+        }
+
+        .label-table th {
+            color: #34d399;
+            font-weight: 600;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .label-table td:first-child {
+            font-family: monospace;
+            color: #22d3ee;
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        footer a { color: #34d399; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/infrastructure-docs/" class="back-link">&larr; Back to Infrastructure Documentation</a>
+
+        <header>
+            <h1>Service Deployment Patterns</h1>
+            <p class="subtitle">Standard patterns for deploying services on linuxserver.lan / ai-servicers.com</p>
+        </header>
+
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+            <a href="/" style="color: #34d399; text-decoration: none;">← Portal Home</a>
+            <a href="/infrastructure-docs/" style="color: #34d399; text-decoration: none;">🏢 Infrastructure Documentation</a>
+            <a href="/security-auth/" style="color: #34d399; text-decoration: none;">🔐 Security & Auth</a>
+            <a href="/network-topology/" style="color: #34d399; text-decoration: none;">🌐 Network Topology</a>
+        </div>
+
+        <!-- Project Structure -->
+        <div class="section">
+            <h2 class="section-title">Standard Project Structure</h2>
+            <div class="grid-2">
+                <div>
+                    <div class="file-tree">
+                        <span class="folder">/home/administrator/projects/[service]/</span><br>
+                        &nbsp;&nbsp;<span class="file">deploy.sh</span> <span class="comment"># Deployment script (required)</span><br>
+                        &nbsp;&nbsp;<span class="file">docker-compose.yml</span> <span class="comment"># Optional compose file</span><br>
+                        &nbsp;&nbsp;<span class="file">CLAUDE.md</span> <span class="comment"># AI context documentation</span><br>
+                        &nbsp;&nbsp;<span class="file">README.md</span> <span class="comment"># Human documentation</span><br>
+                        &nbsp;&nbsp;<span class="folder">configs/</span> <span class="comment"># Service-specific configs</span><br>
+                        <br>
+                        <span class="folder">/home/administrator/secrets/</span><br>
+                        &nbsp;&nbsp;<span class="file">[service].env</span> <span class="comment"># Environment variables</span><br>
+                        <br>
+                        <span class="folder">/home/administrator/projects/data/[service]/</span><br>
+                        &nbsp;&nbsp;<span class="comment"># Persistent data storage</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Key Principles</h3>
+                    <ul>
+                        <li>Secrets NEVER in project directory</li>
+                        <li>Data stored in centralized data/ folder</li>
+                        <li>Every service has a deploy.sh</li>
+                        <li>CLAUDE.md for AI context</li>
+                        <li>Consistent naming throughout</li>
+                        <li>Networks created in deploy.sh</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- deploy.sh Anatomy -->
+        <div class="section">
+            <h2 class="section-title">deploy.sh Anatomy</h2>
+            <pre><code><span class="code-comment">#!/bin/bash</span>
+<span class="code-keyword">set -e</span>  <span class="code-comment"># Exit on error</span>
+
+<span class="code-comment"># ===== Configuration =====</span>
+<span class="code-var">PROJECT_DIR</span>=<span class="code-string">"/home/administrator/projects/myservice"</span>
+<span class="code-var">SECRETS_FILE</span>=<span class="code-string">"$HOME/projects/secrets/myservice.env"</span>
+<span class="code-var">DATA_DIR</span>=<span class="code-string">"$HOME/projects/data/myservice"</span>
+
+<span class="code-comment"># ===== Validate Secrets =====</span>
+<span class="code-keyword">if</span> [ ! -f <span class="code-string">"$SECRETS_FILE"</span> ]; <span class="code-keyword">then</span>
+    <span class="code-keyword">echo</span> <span class="code-string">"ERROR: Secrets file not found"</span>
+    <span class="code-keyword">exit</span> 1
+<span class="code-keyword">fi</span>
+<span class="code-keyword">source</span> <span class="code-string">"$SECRETS_FILE"</span>
+
+<span class="code-comment"># ===== Create Directories =====</span>
+<span class="code-keyword">mkdir -p</span> <span class="code-string">"$DATA_DIR"</span>
+
+<span class="code-comment"># ===== Create Networks =====</span>
+<span class="code-keyword">docker network create</span> traefik-net <span class="code-flag">2>/dev/null</span> || <span class="code-keyword">true</span>
+<span class="code-keyword">docker network create</span> myservice-net <span class="code-flag">2>/dev/null</span> || <span class="code-keyword">true</span>
+
+<span class="code-comment"># ===== Stop Existing =====</span>
+<span class="code-keyword">docker stop</span> myservice <span class="code-flag">2>/dev/null</span> || <span class="code-keyword">true</span>
+<span class="code-keyword">docker rm</span> myservice <span class="code-flag">2>/dev/null</span> || <span class="code-keyword">true</span>
+
+<span class="code-comment"># ===== Deploy Container =====</span>
+<span class="code-keyword">docker run -d</span> \
+  <span class="code-flag">--name</span> myservice \
+  <span class="code-flag">--restart</span> unless-stopped \
+  <span class="code-flag">--network</span> traefik-net \
+  <span class="code-flag">-v</span> <span class="code-string">"$DATA_DIR:/data"</span> \
+  <span class="code-flag">-e</span> <span class="code-var">SECRET_KEY</span>=<span class="code-string">"$SECRET_KEY"</span> \
+  <span class="code-flag">--label</span> <span class="code-string">"traefik.enable=true"</span> \
+  <span class="code-flag">--label</span> <span class="code-string">"traefik.http.routers.myservice.rule=Host(\`myservice.ai-servicers.com\`)"</span> \
+  <span class="code-flag">--label</span> <span class="code-string">"traefik.http.routers.myservice.entrypoints=websecure"</span> \
+  <span class="code-flag">--label</span> <span class="code-string">"traefik.http.routers.myservice.tls.certresolver=letsencrypt"</span> \
+  <span class="code-flag">--label</span> <span class="code-string">"traefik.http.services.myservice.loadbalancer.server.port=8080"</span> \
+  myimage:latest
+
+<span class="code-comment"># ===== Connect Additional Networks =====</span>
+<span class="code-keyword">docker network connect</span> myservice-net myservice
+
+<span class="code-keyword">echo</span> <span class="code-string">"Deployed: https://myservice.ai-servicers.com"</span></code></pre>
+        </div>
+
+        <!-- Network Patterns -->
+        <div class="section">
+            <h2 class="section-title">Network Selection Patterns</h2>
+
+            <div class="grid-3">
+                <div class="pattern-box">
+                    <div class="pattern-title">3-Network Pattern (OAuth2 Protected)</div>
+                    <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1rem;">For services requiring SSO authentication</p>
+                    <div class="network-pattern">
+                        <span class="network-badge net-traefik">traefik-net</span>
+                        <span class="network-badge net-keycloak">keycloak-net</span>
+                        <span class="network-badge net-app">[service]-net</span>
+                    </div>
+                    <p style="color: #64748b; font-size: 0.85rem; margin-top: 1rem;">Examples: grafana, portainer, obsidian, dashy</p>
+                </div>
+
+                <div class="pattern-box">
+                    <div class="pattern-title">2-Network Pattern (Database Access)</div>
+                    <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1rem;">For services needing database connectivity</p>
+                    <div class="network-pattern">
+                        <span class="network-badge net-traefik">traefik-net</span>
+                        <span class="network-badge net-data">postgres-net</span>
+                    </div>
+                    <p style="color: #64748b; font-size: 0.85rem; margin-top: 1rem;">Examples: keycloak, nextcloud, openproject</p>
+                </div>
+
+                <div class="pattern-box">
+                    <div class="pattern-title">1-Network Pattern (Simple Service)</div>
+                    <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1rem;">For standalone web services</p>
+                    <div class="network-pattern">
+                        <span class="network-badge net-traefik">traefik-net</span>
+                    </div>
+                    <p style="color: #64748b; font-size: 0.85rem; margin-top: 1rem;">Examples: static sites, simple APIs, tools</p>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top: 1.5rem;">
+                <h4 style="color: #34d399; margin-bottom: 0.75rem;">Network Selection Decision Tree</h4>
+                <ul style="color: #cbd5e1; line-height: 1.8;">
+                    <li><strong>Does it need HTTPS?</strong> > Add to <code>traefik-net</code></li>
+                    <li><strong>Does it need SSO?</strong> > Add to <code>keycloak-net</code> + deploy OAuth2 proxy</li>
+                    <li><strong>Does it need PostgreSQL?</strong> > Add to <code>postgres-net</code></li>
+                    <li><strong>Does it need Redis?</strong> > Add to <code>redis-net</code></li>
+                    <li><strong>Does it need MongoDB?</strong> > Add to <code>mongodb-net</code></li>
+                    <li><strong>Is it part of MCP?</strong> > Add to <code>mcp-net</code></li>
+                    <li><strong>Create service-specific network</strong> for internal component isolation</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Traefik Labels -->
+        <div class="section">
+            <h2 class="section-title">Traefik Integration</h2>
+
+            <table class="label-table">
+                <tr>
+                    <th>Label</th>
+                    <th>Purpose</th>
+                    <th>Example Value</th>
+                </tr>
+                <tr>
+                    <td>traefik.enable</td>
+                    <td>Enable Traefik routing</td>
+                    <td>true</td>
+                </tr>
+                <tr>
+                    <td>traefik.http.routers.[name].rule</td>
+                    <td>Routing rule (hostname)</td>
+                    <td>Host(`service.ai-servicers.com`)</td>
+                </tr>
+                <tr>
+                    <td>traefik.http.routers.[name].entrypoints</td>
+                    <td>Entry point (HTTP/HTTPS)</td>
+                    <td>websecure</td>
+                </tr>
+                <tr>
+                    <td>traefik.http.routers.[name].tls.certresolver</td>
+                    <td>SSL certificate provider</td>
+                    <td>letsencrypt</td>
+                </tr>
+                <tr>
+                    <td>traefik.http.services.[name].loadbalancer.server.port</td>
+                    <td>Container port to route to</td>
+                    <td>8080</td>
+                </tr>
+                <tr>
+                    <td>traefik.docker.network</td>
+                    <td>Network for routing (when on multiple)</td>
+                    <td>traefik-net</td>
+                </tr>
+            </table>
+
+            <div class="warning-box">
+                <h4>Common Traefik Gotcha</h4>
+                <p style="color: #cbd5e1;">If your container is on multiple networks, you MUST specify <code>traefik.docker.network=traefik-net</code> or Traefik may pick the wrong network and fail to route.</p>
+            </div>
+        </div>
+
+        <!-- Secrets Management -->
+        <div class="section">
+            <h2 class="section-title">Secrets Management</h2>
+
+            <div class="grid-2">
+                <div>
+                    <h4 style="color: #22d3ee; margin-bottom: 1rem;">Environment File Pattern</h4>
+                    <pre><code><span class="code-comment"># /home/administrator/secrets/myservice.env</span>
+
+<span class="code-comment"># Container settings</span>
+<span class="code-var">PUID</span>=<span class="code-string">1000</span>
+<span class="code-var">PGID</span>=<span class="code-string">1000</span>
+<span class="code-var">TZ</span>=<span class="code-string">America/New_York</span>
+
+<span class="code-comment"># Application secrets</span>
+<span class="code-var">SECRET_KEY</span>=<span class="code-string">your-secret-here</span>
+<span class="code-var">DATABASE_URL</span>=<span class="code-string">postgres://user:pass@postgres:5432/db</span>
+
+<span class="code-comment"># OAuth2 (if protected)</span>
+<span class="code-var">OAUTH2_PROXY_CLIENT_ID</span>=<span class="code-string">myservice</span>
+<span class="code-var">OAUTH2_PROXY_CLIENT_SECRET</span>=<span class="code-string">keycloak-secret</span>
+<span class="code-var">OAUTH2_PROXY_COOKIE_SECRET</span>=<span class="code-string">32-byte-secret</span></code></pre>
+                </div>
+                <div class="card">
+                    <h3>Security Rules</h3>
+                    <ul>
+                        <li>NEVER store secrets in project directory</li>
+                        <li>NEVER commit secrets to git</li>
+                        <li>Always use $HOME/secrets/ or $HOME/projects/secrets/</li>
+                        <li>Load via: source "$SECRETS_FILE"</li>
+                        <li>Pass to container via -e flags</li>
+                        <li>Generate cookie secrets: python3 -c "import secrets; print(secrets.token_urlsafe(32))"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- OAuth2 Protection -->
+        <div class="section">
+            <h2 class="section-title">OAuth2 Protection (Quick Reference)</h2>
+
+            <p style="color: #94a3b8; margin-bottom: 1.5rem;">For full details, see <a href="/security-auth/" style="color: #34d399;">Security & Auth Documentation</a></p>
+
+            <div class="pattern-box">
+                <div class="pattern-title">OAuth2 Proxy Container Pattern</div>
+                <pre style="margin-top: 1rem;"><code><span class="code-keyword">docker run -d</span> \
+  <span class="code-flag">--name</span> myservice-auth-proxy \
+  <span class="code-flag">--network</span> traefik-net \
+  <span class="code-flag">--network</span> keycloak-net \
+  <span class="code-flag">-e</span> <span class="code-var">OAUTH2_PROXY_PROVIDER</span>=<span class="code-string">keycloak-oidc</span> \
+  <span class="code-flag">-e</span> <span class="code-var">OAUTH2_PROXY_CLIENT_ID</span>=<span class="code-string">"$CLIENT_ID"</span> \
+  <span class="code-flag">-e</span> <span class="code-var">OAUTH2_PROXY_CLIENT_SECRET</span>=<span class="code-string">"$CLIENT_SECRET"</span> \
+  <span class="code-flag">-e</span> <span class="code-var">OAUTH2_PROXY_COOKIE_SECRET</span>=<span class="code-string">"$COOKIE_SECRET"</span> \
+  <span class="code-flag">-e</span> <span class="code-var">OAUTH2_PROXY_UPSTREAMS</span>=<span class="code-string">"http://myservice:8080/"</span> \
+  <span class="code-flag">-e</span> <span class="code-var">OAUTH2_PROXY_SKIP_OIDC_DISCOVERY</span>=<span class="code-string">true</span> \
+  <span class="code-flag">-e</span> <span class="code-var">OAUTH2_PROXY_OIDC_ISSUER_URL</span>=<span class="code-string">"https://keycloak.ai-servicers.com/realms/master"</span> \
+  <span class="code-flag">-e</span> <span class="code-var">OAUTH2_PROXY_LOGIN_URL</span>=<span class="code-string">"https://keycloak.ai-servicers.com/realms/master/protocol/openid-connect/auth"</span> \
+  <span class="code-flag">-e</span> <span class="code-var">OAUTH2_PROXY_REDEEM_URL</span>=<span class="code-string">"http://keycloak:8080/realms/master/protocol/openid-connect/token"</span> \
+  <span class="code-flag">-e</span> <span class="code-var">OAUTH2_PROXY_OIDC_JWKS_URL</span>=<span class="code-string">"http://keycloak:8080/realms/master/protocol/openid-connect/certs"</span> \
+  <span class="code-flag">--label</span> <span class="code-string">"traefik.enable=true"</span> \
+  <span class="code-flag">--label</span> <span class="code-string">"traefik.http.routers.myservice.rule=Host(\`myservice.ai-servicers.com\`)"</span> \
+  quay.io/oauth2-proxy/oauth2-proxy:latest</code></pre>
+            </div>
+        </div>
+
+        <!-- Deployment Checklist -->
+        <div class="section">
+            <h2 class="section-title">Deployment Checklist</h2>
+
+            <ol class="checklist">
+                <li>
+                    <div>
+                        <strong style="color: #fff;">Create project directory</strong>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">mkdir -p /home/administrator/projects/[service]</p>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong style="color: #fff;">Create secrets file</strong>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">Create /home/administrator/secrets/[service].env with required variables</p>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong style="color: #fff;">Create data directory</strong>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">mkdir -p /home/administrator/projects/data/[service]</p>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong style="color: #fff;">Write deploy.sh</strong>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">Use the pattern above, customize for your service</p>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong style="color: #fff;">If OAuth2 protected: Create Keycloak client</strong>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">Create client in Keycloak, add secret to env file</p>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong style="color: #fff;">Deploy and verify</strong>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">./deploy.sh && docker logs [service] --tail 20</p>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong style="color: #fff;">Test external access</strong>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">curl -I https://[service].ai-servicers.com</p>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong style="color: #fff;">Create CLAUDE.md documentation</strong>
+                        <p style="color: #94a3b8; font-size: 0.9rem;">Document the service for AI context</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <!-- Common Commands -->
+        <div class="section">
+            <h2 class="section-title">Common Operations</h2>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Service Management</h3>
+                    <pre><code><span class="code-comment"># Deploy/redeploy</span>
+<span class="code-keyword">cd</span> /home/administrator/projects/[service]
+./deploy.sh
+
+<span class="code-comment"># Check status</span>
+<span class="code-keyword">docker ps</span> | grep [service]
+
+<span class="code-comment"># View logs</span>
+<span class="code-keyword">docker logs</span> [service] --tail 50 -f
+
+<span class="code-comment"># Restart</span>
+<span class="code-keyword">docker restart</span> [service]
+
+<span class="code-comment"># Stop and remove</span>
+<span class="code-keyword">docker stop</span> [service] && <span class="code-keyword">docker rm</span> [service]</code></pre>
+                </div>
+                <div class="card">
+                    <h3>Troubleshooting</h3>
+                    <pre><code><span class="code-comment"># Check container networks</span>
+<span class="code-keyword">docker inspect</span> [service] \
+  --format='{{range $k,$v:=.NetworkSettings.Networks}}{{$k}} {{end}}'
+
+<span class="code-comment"># Test internal connectivity</span>
+<span class="code-keyword">docker exec</span> [container] ping -c 1 [target]
+
+<span class="code-comment"># Check Traefik routing</span>
+<span class="code-keyword">curl</span> -I https://[service].ai-servicers.com
+
+<span class="code-comment"># View Traefik logs</span>
+<span class="code-keyword">docker logs</span> traefik --tail 50 | grep [service]</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Deployment Patterns</strong> | linuxserver.lan | ai-servicers.com</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="/">Portal</a> |
+                <a href="/infrastructure-docs/">Infrastructure</a> |
+                <a href="/security-auth/">Security & Auth</a> |
+                <a href="/network-topology/">Network Topology</a>
+            </p>
+            <p style="margin-top: 1rem; color: #475569;">
+                Last Updated: 2025-11-25
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

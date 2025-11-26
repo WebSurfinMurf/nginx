@@ -39,6 +39,16 @@
             padding: 2rem;
         }
 
+        .back-link {
+            display: inline-block;
+            color: #a5b4fc;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
         header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             padding: 3rem 0;
@@ -293,10 +303,13 @@
 </head>
 <body>
     <div class="container">
+        <a href="/context-compare/" class="back-link">&larr; Back to Context Comparison</a>
+
         <header>
             <h1>MCP Code Execution Architecture</h1>
             <p class="subtitle">Token-Efficient Multi-Tool Orchestration with Progressive Disclosure</p>
             <p class="meta">
+                <a href="https://github.com/WebSurfinMurf/mcp" target="_blank" class="badge" style="background: rgba(139, 148, 158, 0.3); color: #8b949e; text-decoration: none;">🐙 GitHub</a>
                 <span class="badge badge-success">Production Ready</span>
                 <span class="badge badge-info">Version 2.0</span>
                 <span class="badge badge-info">63 Tools</span>

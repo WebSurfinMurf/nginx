@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Memory - Claude Code Memory Systems</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1117 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #a5b4fc;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(111, 66, 193, 0.2), rgba(88, 166, 255, 0.1));
+            border-radius: 16px;
+            border: 1px solid rgba(111, 66, 193, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #6f42c1, #58a6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-size: 1.2em;
+        }
+
+        /* Navigation */
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .nav-link {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            color: #58a6ff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background: rgba(88, 166, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Two Memory Systems */
+        .memory-comparison {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 800px) {
+            .memory-comparison { grid-template-columns: 1fr; }
+        }
+
+        .memory-system {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            border: 2px solid;
+        }
+
+        .memory-system.files {
+            border-color: #58a6ff;
+        }
+
+        .memory-system.semantic {
+            border-color: #6f42c1;
+        }
+
+        .memory-system h2 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .memory-system.files h2 { color: #58a6ff; }
+        .memory-system.semantic h2 { color: #6f42c1; }
+
+        .memory-system .icon {
+            font-size: 1.5em;
+        }
+
+        .memory-system p {
+            color: #8b949e;
+            margin-bottom: 15px;
+        }
+
+        .memory-system ul {
+            margin-left: 20px;
+        }
+
+        .memory-system li {
+            margin: 8px 0;
+        }
+
+        /* Section Styles */
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #58a6ff;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(88, 166, 255, 0.3);
+        }
+
+        .section h3 {
+            color: #f0883e;
+            font-size: 1.2em;
+            margin: 20px 0 15px 0;
+        }
+
+        /* Hierarchy Diagram */
+        .hierarchy {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+
+        .hierarchy-level {
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .hierarchy-level.user {
+            background: rgba(40, 167, 69, 0.1);
+            border-left-color: #28a745;
+            margin-left: 0;
+        }
+
+        .hierarchy-level.project {
+            background: rgba(88, 166, 255, 0.1);
+            border-left-color: #58a6ff;
+            margin-left: 30px;
+        }
+
+        .hierarchy-level.subproject {
+            background: rgba(111, 66, 193, 0.1);
+            border-left-color: #6f42c1;
+            margin-left: 60px;
+        }
+
+        .hierarchy-path {
+            color: #7ee787;
+            font-weight: bold;
+        }
+
+        .hierarchy-desc {
+            color: #8b949e;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #161b22;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .code-block .comment { color: #8b949e; }
+        .code-block .key { color: #ff7b72; }
+        .code-block .value { color: #a5d6ff; }
+        .code-block .string { color: #7ee787; }
+        .code-block .cmd { color: #ffa657; }
+
+        /* Category Cards */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .category-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #6f42c1;
+        }
+
+        .category-name {
+            font-weight: bold;
+            color: #f0f6fc;
+            margin-bottom: 5px;
+        }
+
+        .category-desc {
+            color: #8b949e;
+            font-size: 0.85em;
+        }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .flow-box {
+            background: rgba(111, 66, 193, 0.2);
+            border: 2px solid #6f42c1;
+            border-radius: 10px;
+            padding: 12px 20px;
+            min-width: 140px;
+        }
+
+        .flow-box.input { border-color: #58a6ff; background: rgba(88, 166, 255, 0.2); }
+        .flow-box.process { border-color: #f0883e; background: rgba(240, 136, 62, 0.2); }
+        .flow-box.output { border-color: #28a745; background: rgba(40, 167, 69, 0.2); }
+
+        .flow-arrow {
+            color: #8b949e;
+            font-size: 1.3em;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .info-box.tip {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .info-box.warning {
+            background: rgba(240, 136, 62, 0.1);
+            border: 1px solid rgba(240, 136, 62, 0.3);
+        }
+
+        .info-box.note {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+        }
+
+        .info-icon {
+            font-size: 1.5em;
+            flex-shrink: 0;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-table th {
+            background: rgba(88, 166, 255, 0.1);
+            color: #58a6ff;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .yes { color: #28a745; }
+        .no { color: #dc3545; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #8b949e;
+        }
+
+        footer a { color: #58a6ff; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            .hierarchy-level.project { margin-left: 15px; }
+            .hierarchy-level.subproject { margin-left: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/context-compare/" class="back-link">&larr; Back to Context Comparison</a>
+
+        <header>
+            <h1>LLM Memory</h1>
+            <p class="subtitle">How Claude Code Remembers: CLAUDE.md Files & OpenMemory</p>
+        </header>
+
+        <nav class="nav-links">
+            <a href="/" class="nav-link">Portal Home</a>
+            <a href="/claudecodecliconfig/" class="nav-link">Claude CLI Config</a>
+            <a href="/context-architecture/" class="nav-link">Context Architecture</a>
+            <a href="/deployment-patterns/" class="nav-link">Deployment Patterns</a>
+        </nav>
+
+        <!-- Two Memory Systems Overview -->
+        <div class="memory-comparison">
+            <div class="memory-system files">
+                <h2><span class="icon">📄</span> File-Based Memory (CLAUDE.md)</h2>
+                <p>Authoritative documentation loaded at session start. Provides infrastructure knowledge, current state, and how-to guides.</p>
+                <ul>
+                    <li><strong>When loaded:</strong> Automatically at session start</li>
+                    <li><strong>Content:</strong> Current architecture, configs, workflows</li>
+                    <li><strong>Scope:</strong> Hierarchical (user -> project -> sub-project)</li>
+                    <li><strong>Update:</strong> Manual edits to files</li>
+                    <li><strong>Best for:</strong> Documentation, current state, procedures</li>
+                </ul>
+            </div>
+
+            <div class="memory-system semantic">
+                <h2><span class="icon">🧠</span> Semantic Memory (OpenMemory)</h2>
+                <p>AI-searchable memories stored via /cmemory command. Captures lessons learned, decisions, and gotchas discovered during work.</p>
+                <ul>
+                    <li><strong>When loaded:</strong> Searched on-demand by relevance</li>
+                    <li><strong>Content:</strong> Lessons, decisions, preferences, solutions</li>
+                    <li><strong>Scope:</strong> Global (searchable across all contexts)</li>
+                    <li><strong>Update:</strong> Via <code>/cmemory</code> command</li>
+                    <li><strong>Best for:</strong> Experience, "why we did it this way"</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CLAUDE.md Section -->
+        <section class="section">
+            <h2>CLAUDE.md: File-Based Context Memory</h2>
+            <p>CLAUDE.md files provide hierarchical context that Claude Code loads automatically. They should be kept up-to-date to ensure accurate infrastructure knowledge.</p>
+
+            <h3>Hierarchical Loading</h3>
+            <p>Context loads from general to specific, with each level adding more detail:</p>
+
+            <div class="hierarchy">
+                <div class="hierarchy-level user">
+                    <div class="hierarchy-path">~/.claude/CLAUDE.md</div>
+                    <div class="hierarchy-desc">User-level: Personal preferences, global settings, cross-project patterns</div>
+                </div>
+                <div class="hierarchy-level project">
+                    <div class="hierarchy-path">~/projects/CLAUDE.md</div>
+                    <div class="hierarchy-desc">Infrastructure-level: Server info, core services, naming conventions, network architecture</div>
+                </div>
+                <div class="hierarchy-level subproject">
+                    <div class="hierarchy-path">~/projects/{service}/CLAUDE.md</div>
+                    <div class="hierarchy-desc">Service-level: Specific deployment details, configs, troubleshooting for that service</div>
+                </div>
+            </div>
+
+            <h3>What Belongs in CLAUDE.md</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Include</th>
+                        <th>Exclude</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Current architecture and services</td>
+                        <td>Temporary states or WIP notes</td>
+                    </tr>
+                    <tr>
+                        <td>Network topology and ports</td>
+                        <td>Secrets or credentials</td>
+                    </tr>
+                    <tr>
+                        <td>Standard deployment procedures</td>
+                        <td>Session-specific context</td>
+                    </tr>
+                    <tr>
+                        <td>Naming conventions and standards</td>
+                        <td>Personal opinions (use OpenMemory)</td>
+                    </tr>
+                    <tr>
+                        <td>Common troubleshooting steps</td>
+                        <td>One-time fixes (use OpenMemory)</td>
+                    </tr>
+                    <tr>
+                        <td>Integration points and dependencies</td>
+                        <td>Historical changes (use git)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Keeping CLAUDE.md Updated</h3>
+            <div class="info-box tip">
+                <span class="info-icon">💡</span>
+                <div>
+                    <strong>Best Practice</strong><br>
+                    After deploying a new service or making significant changes, update the relevant CLAUDE.md file. This ensures future sessions have accurate context.
+                </div>
+            </div>
+
+            <div class="code-block">
+<span class="comment"># Example: Update project CLAUDE.md after deploying new service</span>
+
+<span class="comment"># 1. Add to ~/projects/CLAUDE.md if it's a core service</span>
+<span class="comment"># 2. Create ~/projects/{service}/CLAUDE.md for service-specific details</span>
+
+<span class="comment"># Standard sections for service CLAUDE.md:</span>
+## Project Overview
+<span class="comment"># What the service does, current status</span>
+
+## Architecture
+<span class="comment"># How it connects to other services</span>
+
+## Configuration
+<span class="comment"># Key settings, environment variables</span>
+
+## Common Operations
+<span class="comment"># Deploy, restart, check logs</span>
+
+## Troubleshooting
+<span class="comment"># Known issues and solutions</span>
+            </div>
+        </section>
+
+        <!-- /cmemory Section -->
+        <section class="section">
+            <h2>The /cmemory Command</h2>
+            <p>The <code>/cmemory</code> slash command saves proven facts and lessons learned to OpenMemory, an AI-powered semantic memory system.</p>
+
+            <h3>When to Use /cmemory</h3>
+            <div class="info-box note">
+                <span class="info-icon">📝</span>
+                <div>
+                    Use <code>/cmemory</code> after completing a task where you learned something valuable - a gotcha, a solution to a tricky problem, or a decision rationale that should be remembered.
+                </div>
+            </div>
+
+            <div class="code-block">
+<span class="comment"># Good times to run /cmemory:</span>
+
+<span class="comment"># After solving a tricky problem</span>
+User: "Finally fixed that postgres connection timeout. /cmemory"
+
+<span class="comment"># After discovering a gotcha</span>
+User: "Turns out the OAuth2 proxy needs keycloak-net. /cmemory"
+
+<span class="comment"># After making an important decision</span>
+User: "We chose Redis over Memcached for sessions. /cmemory"
+
+<span class="comment"># After a successful deployment with lessons</span>
+User: "Service deployed. Had to use --privileged flag. /cmemory"
+            </div>
+
+            <h3>What /cmemory Saves vs Skips</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th class="yes">SAVE (Experiential Knowledge)</th>
+                        <th class="no">SKIP (Belongs in Files)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Lessons from failures or mistakes</td>
+                        <td>Current IP addresses, hostnames</td>
+                    </tr>
+                    <tr>
+                        <td>Proven solutions to specific problems</td>
+                        <td>Standard deployment procedures</td>
+                    </tr>
+                    <tr>
+                        <td>User preferences discovered</td>
+                        <td>Information already in CLAUDE.md</td>
+                    </tr>
+                    <tr>
+                        <td>Gotchas and edge cases</td>
+                        <td>General documentation</td>
+                    </tr>
+                    <tr>
+                        <td>Decision rationale (the "why")</td>
+                        <td>Temporary states</td>
+                    </tr>
+                    <tr>
+                        <td>Performance lessons learned</td>
+                        <td>Config values (put in files)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Memory Categories</h3>
+            <p>Each memory is stored with a category for better organization and retrieval:</p>
+
+            <div class="categories-grid">
+                <div class="category-card">
+                    <div class="category-name">gotcha</div>
+                    <div class="category-desc">Things commonly forgotten or that trip people up</div>
+                </div>
+                <div class="category-card">
+                    <div class="category-name">lesson</div>
+                    <div class="category-desc">Knowledge gained from experience</div>
+                </div>
+                <div class="category-card">
+                    <div class="category-name">solution</div>
+                    <div class="category-desc">How we solved a specific problem</div>
+                </div>
+                <div class="category-card">
+                    <div class="category-name">decision</div>
+                    <div class="category-desc">Why we chose approach A over B</div>
+                </div>
+                <div class="category-card">
+                    <div class="category-name">preference</div>
+                    <div class="category-desc">User's preferred way of doing things</div>
+                </div>
+                <div class="category-card">
+                    <div class="category-name">fact</div>
+                    <div class="category-desc">Important factual information</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How OpenMemory Works -->
+        <section class="section">
+            <h2>How OpenMemory Works</h2>
+            <p>OpenMemory uses semantic search to find relevant memories even when exact words don't match.</p>
+
+            <h3>Storage Architecture</h3>
+            <div class="flow-diagram">
+                <div class="flow-row">
+                    <div class="flow-box input">Memory Text</div>
+                    <span class="flow-arrow">-></span>
+                    <div class="flow-box process">Gemini Embeddings</div>
+                    <span class="flow-arrow">-></span>
+                    <div class="flow-box output">768-dim Vector</div>
+                </div>
+                <div class="flow-row">
+                    <div class="flow-box output">Qdrant Vector DB</div>
+                    <span class="flow-arrow">+</span>
+                    <div class="flow-box output">PostgreSQL Metadata</div>
+                </div>
+            </div>
+
+            <h3>Data Elements Stored</h3>
+            <div class="code-block">
+<span class="comment"># Each memory contains:</span>
+{
+  <span class="key">"text"</span>: <span class="string">"[project] The actual lesson with full context"</span>,
+  <span class="key">"category"</span>: <span class="string">"gotcha | lesson | solution | decision | preference"</span>,
+  <span class="key">"metadata"</span>: {
+    <span class="key">"project"</span>: <span class="string">"service-name"</span>,
+    <span class="key">"timestamp"</span>: <span class="string">"2025-11-25T12:00:00Z"</span>,
+    <span class="key">"source"</span>: <span class="string">"claude-code"</span>,
+    <span class="key">"embedding_model"</span>: <span class="string">"text-embedding-004"</span>,
+    <span class="key">"embedding_dim"</span>: <span class="value">768</span>
+  }
+}
+            </div>
+
+            <h3>How Relevant Memories Are Found</h3>
+            <p>When Claude encounters a problem, it can search OpenMemory semantically:</p>
+
+            <div class="flow-diagram">
+                <div class="flow-row">
+                    <div class="flow-box input">Current Context</div>
+                    <span class="flow-arrow">-></span>
+                    <div class="flow-box process">Generate Query Embedding</div>
+                </div>
+                <div class="flow-row">
+                    <span class="flow-arrow">|</span>
+                </div>
+                <div class="flow-row">
+                    <div class="flow-box process">Vector Similarity Search</div>
+                    <span class="flow-arrow">-></span>
+                    <div class="flow-box output">Top N Relevant Memories</div>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <span class="info-icon">🔍</span>
+                <div>
+                    <strong>Semantic Search Power</strong><br>
+                    Searching for "postgres connection issues" will find memories about "database timeout errors" or "psql authentication failed" because the AI understands they're related concepts.
+                </div>
+            </div>
+
+            <h3>MCP Integration</h3>
+            <p>OpenMemory is accessible via MCP tools from any session:</p>
+
+            <div class="code-block">
+<span class="comment"># Available MCP operations:</span>
+
+<span class="cmd">add_memory</span>      <span class="comment"># Store new memory with category and metadata</span>
+<span class="cmd">search_memories</span> <span class="comment"># Semantic search by meaning</span>
+<span class="cmd">list_memories</span>   <span class="comment"># List with filtering and pagination</span>
+<span class="cmd">delete_memory</span>   <span class="comment"># Remove specific memory by ID</span>
+
+<span class="comment"># Access points:</span>
+<span class="comment"># - MCP Proxy: http://localhost:9090/openmemory/mcp</span>
+<span class="comment"># - Direct API: http://localhost:8765</span>
+<span class="comment"># - UI: https://openmemory.ai-servicers.com</span>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="section">
+            <h2>Best Practices Summary</h2>
+
+            <h3>For CLAUDE.md Files</h3>
+            <ul style="margin-left: 20px;">
+                <li><strong>Keep current:</strong> Update after significant changes to services</li>
+                <li><strong>Be specific:</strong> Include actual commands, ports, URLs</li>
+                <li><strong>Follow hierarchy:</strong> General info in project root, specifics in service directories</li>
+                <li><strong>Include troubleshooting:</strong> Document common issues and solutions</li>
+                <li><strong>Version control:</strong> CLAUDE.md files should be in git</li>
+            </ul>
+
+            <h3>For /cmemory Usage</h3>
+            <ul style="margin-left: 20px;">
+                <li><strong>Quality over quantity:</strong> Only save truly valuable lessons</li>
+                <li><strong>Be experiential:</strong> Save things learned from doing, not just reading</li>
+                <li><strong>Include context:</strong> Mention the project/service in the memory text</li>
+                <li><strong>Use after success:</strong> Run after solving problems or completing tasks</li>
+                <li><strong>Check for duplicates:</strong> The command searches before saving</li>
+            </ul>
+
+            <h3>The Two Systems Work Together</h3>
+            <div class="info-box note">
+                <span class="info-icon">🔄</span>
+                <div>
+                    <strong>CLAUDE.md</strong> tells Claude "what is" (current state, how things work)<br>
+                    <strong>OpenMemory</strong> tells Claude "what we learned" (lessons, gotchas, decisions)
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Reference -->
+        <section class="section">
+            <h2>Quick Reference</h2>
+
+            <h3>Key Paths</h3>
+            <div class="code-block">
+<span class="comment"># CLAUDE.md locations</span>
+~/.claude/CLAUDE.md                    <span class="comment"># User-level</span>
+~/projects/CLAUDE.md                   <span class="comment"># Infrastructure-level</span>
+~/projects/{service}/CLAUDE.md         <span class="comment"># Service-level</span>
+
+<span class="comment"># OpenMemory</span>
+/home/administrator/projects/openmemory/   <span class="comment"># OpenMemory project</span>
+https://openmemory.ai-servicers.com        <span class="comment"># Web UI</span>
+
+<span class="comment"># Command location</span>
+~/.claude/commands/cmemory.md          <span class="comment"># /cmemory command definition</span>
+            </div>
+
+            <h3>Common Commands</h3>
+            <div class="code-block">
+<span class="comment"># Save current session learnings</span>
+<span class="cmd">/cmemory</span>
+
+<span class="comment"># Search memories via API</span>
+curl -X POST 'http://localhost:8765/api/v1/memories/search' \
+  -H 'Content-Type: application/json' \
+  -d '{"query": "postgres connection", "limit": 5}'
+
+<span class="comment"># List recent memories</span>
+curl 'http://localhost:8765/api/v1/memories/?page=1&size=10'
+            </div>
+        </section>
+
+        <footer>
+            <p>Last Updated: 2025-11-25 | <a href="/">Nginx Portal</a> | <a href="/claudecodecliconfig/">Claude CLI Config</a></p>
+            <p style="margin-top: 10px; font-size: 0.9em;">linuxserver.lan - ai-servicers.com</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User-Level Skills - Claude Code Configuration</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            padding: 2rem;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 3rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #4299e1;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #1a365d;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .intro {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+
+        .intro p {
+            color: #2c5282;
+        }
+
+        .location-badge {
+            display: inline-block;
+            background: #1a365d;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .skill-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 5px solid #4299e1;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .skill-card.proactive {
+            border-left-color: #ed8936;
+            background: #fffaf0;
+        }
+
+        .skill-card.memory {
+            border-left-color: #9f7aea;
+            background: #faf5ff;
+        }
+
+        .skill-card.devops {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .skill-card.meta {
+            border-left-color: #ed64a6;
+            background: #fff5f7;
+        }
+
+        .skill-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-icon {
+            font-size: 2rem;
+        }
+
+        .skill-name {
+            font-size: 1.3rem;
+            color: #1a365d;
+            font-weight: bold;
+        }
+
+        .skill-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        .skill-type.proactive {
+            background: #feebc8;
+            color: #c05621;
+        }
+
+        .skill-type.on-demand {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+
+        .skill-description {
+            color: #4a5568;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .skill-triggers {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-triggers h4 {
+            color: #2d3748;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-triggers ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .skill-triggers li {
+            color: #718096;
+            font-size: 0.85rem;
+            padding: 0.25rem 0;
+        }
+
+        .skill-triggers li:before {
+            content: "→ ";
+            color: #4299e1;
+        }
+
+        .skill-resources {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .resource-tag {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: monospace;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #1a365d;
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #4299e1;
+        }
+
+        .workflow-box {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .workflow-box h3 {
+            color: #1a365d;
+            margin-bottom: 1rem;
+        }
+
+        .workflow-box ol {
+            margin-left: 1.5rem;
+            color: #4a5568;
+        }
+
+        .workflow-box li {
+            margin: 0.5rem 0;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #718096;
+        }
+
+        .footer a {
+            color: #4299e1;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .container { padding: 1.5rem; }
+            h1 { font-size: 1.8rem; }
+            .skills-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/context-compare/" class="back-link">&larr; Back to Context Comparison</a>
+
+        <h1>User-Level Skills</h1>
+        <p class="subtitle">Claude Code Skills loaded from ~/.claude/skills/</p>
+
+        <div style="text-align: center;">
+            <span class="location-badge">~/.claude/skills/</span>
+        </div>
+
+        <div class="intro">
+            <p><strong>User-level skills</strong> are loaded at session start and available across ALL projects. These skills provide general-purpose capabilities that aren't tied to specific infrastructure or projects. They represent personal preferences, cross-cutting utilities, and meta-tools for extending Claude Code itself.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">7</div>
+                <div class="stat-label">Total Skills</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">2</div>
+                <div class="stat-label">Proactive</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">5</div>
+                <div class="stat-label">On-Demand</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Boot Tokens</div>
+            </div>
+        </div>
+
+        <h2 class="section-title">Skill Catalog</h2>
+
+        <div class="skills-grid">
+            <!-- Naming Validator -->
+            <div class="skill-card proactive">
+                <div class="skill-header">
+                    <span class="skill-icon">🏷️</span>
+                    <span class="skill-name">naming-validator</span>
+                </div>
+                <span class="skill-type proactive">Proactive - CRITICAL</span>
+                <p class="skill-description">Validates resource names against established naming standards BEFORE creating any infrastructure resource. Ensures consistent lowercase formatting, proper hyphenation, and correct patterns across all services.</p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases:</h4>
+                    <ul>
+                        <li>"Install {anything}"</li>
+                        <li>"Deploy {service}"</li>
+                        <li>"Create a new project/service/database"</li>
+                        <li>"Set up {component}"</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">references/naming-standards.md</span>
+                    <span class="resource-tag">scripts/validate_name.py</span>
+                </div>
+            </div>
+
+            <!-- Secrets Security -->
+            <div class="skill-card proactive">
+                <div class="skill-header">
+                    <span class="skill-icon">🔐</span>
+                    <span class="skill-name">secrets-security</span>
+                </div>
+                <span class="skill-type proactive">Proactive</span>
+                <p class="skill-description">Secrets management, security hardening, access control, vulnerability management, and incident response. Essential for secure credential storage in Bitwarden and $HOME/secrets/, security audits, and maintaining infrastructure security posture.</p>
+                <div class="skill-triggers">
+                    <h4>When to Use:</h4>
+                    <ul>
+                        <li>Storing or rotating credentials</li>
+                        <li>Security audits and hardening</li>
+                        <li>Incident response procedures</li>
+                        <li>Access control configuration</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">references/secrets-management.md</span>
+                    <span class="resource-tag">references/security-hardening.md</span>
+                    <span class="resource-tag">scripts/security-audit.sh</span>
+                    <span class="resource-tag">scripts/rotate-credentials.sh</span>
+                </div>
+            </div>
+
+            <!-- OpenMemory -->
+            <div class="skill-card memory">
+                <div class="skill-header">
+                    <span class="skill-icon">🧠</span>
+                    <span class="skill-name">openmemory</span>
+                </div>
+                <span class="skill-type on-demand">On-Demand</span>
+                <p class="skill-description">Store and retrieve persistent facts across Claude Code sessions using mem0 AI memory with Gemini embeddings. Enables long-term memory for preferences, decisions, patterns, and lessons learned.</p>
+                <div class="skill-triggers">
+                    <h4>When to Use:</h4>
+                    <ul>
+                        <li>Important facts emerge during conversation</li>
+                        <li>User provides preferences to remember</li>
+                        <li>Technical decisions that should persist</li>
+                        <li>Patterns or workarounds discovered</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">API: localhost:8765</span>
+                    <span class="resource-tag">Gemini Flash + 768-dim embeddings</span>
+                </div>
+            </div>
+
+            <!-- GitLab Integration -->
+            <div class="skill-card devops">
+                <div class="skill-header">
+                    <span class="skill-icon">🦊</span>
+                    <span class="skill-name">gitlab-integration</span>
+                </div>
+                <span class="skill-type on-demand">On-Demand</span>
+                <p class="skill-description">GitLab repository management, issues, merge requests, and CI/CD operations for the self-hosted gitlab.ai-servicers.com instance. Provides API commands for all GitLab operations.</p>
+                <div class="skill-triggers">
+                    <h4>Operations:</h4>
+                    <ul>
+                        <li>Repository creation and management</li>
+                        <li>Issue and merge request workflows</li>
+                        <li>CI/CD pipeline operations</li>
+                        <li>Branch and user management</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">$HOME/secrets/gitlab.env</span>
+                    <span class="resource-tag">gitlab.ai-servicers.com API</span>
+                </div>
+            </div>
+
+            <!-- Architecture Diagram Creator -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">🏗️</span>
+                    <span class="skill-name">architecture-diagram-creator</span>
+                </div>
+                <span class="skill-type on-demand">On-Demand</span>
+                <p class="skill-description">Create comprehensive HTML architecture diagrams with SVG data flows, business objectives, features, technical architecture, and deployment documentation for any software project.</p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases:</h4>
+                    <ul>
+                        <li>"Create an architecture diagram for {project}"</li>
+                        <li>"Generate a high-level overview"</li>
+                        <li>"Document the system architecture"</li>
+                        <li>"Show me the data flow"</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">assets/templates/base_template.html</span>
+                    <span class="resource-tag">assets/templates/architecture_components.html</span>
+                    <span class="resource-tag">references/example_architecture.html</span>
+                </div>
+            </div>
+
+            <!-- CLAUDE.md Generator -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">📝</span>
+                    <span class="skill-name">claudemd-generator</span>
+                </div>
+                <span class="skill-type on-demand">On-Demand</span>
+                <p class="skill-description">Auto-generate CLAUDE.md project context files for services. Detects project type (Docker, Python, Node.js), scans configuration files, analyzes existing documentation, and creates appropriate templates.</p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases:</h4>
+                    <ul>
+                        <li>"Generate CLAUDE.md"</li>
+                        <li>"Create project context"</li>
+                        <li>"Add documentation to this project"</li>
+                        <li>Missing CLAUDE.md detection</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">Docker/Python/Node.js detection</span>
+                    <span class="resource-tag">Template library</span>
+                </div>
+            </div>
+
+            <!-- Skill Creator -->
+            <div class="skill-card meta">
+                <div class="skill-header">
+                    <span class="skill-icon">🛠️</span>
+                    <span class="skill-name">skill-creator</span>
+                </div>
+                <span class="skill-type on-demand">On-Demand - Meta</span>
+                <p class="skill-description">Guide for creating effective skills that extend Claude's capabilities. Provides the skill creation process, anatomy, progressive disclosure patterns, and packaging workflow.</p>
+                <div class="skill-triggers">
+                    <h4>When to Use:</h4>
+                    <ul>
+                        <li>"Create a new skill"</li>
+                        <li>"Update an existing skill"</li>
+                        <li>Extending Claude Code capabilities</li>
+                        <li>Packaging skills for distribution</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">scripts/init_skill.py</span>
+                    <span class="resource-tag">scripts/package_skill.py</span>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">Skill Anatomy</h2>
+
+        <div class="workflow-box">
+            <h3>Directory Structure</h3>
+            <div class="code-block">~/.claude/skills/
+├── architecture-diagram-creator/
+│   ├── SKILL.md
+│   ├── assets/templates/
+│   └── references/
+├── claudemd-generator/
+│   └── skill.md
+├── gitlab-integration/
+│   └── SKILL.md
+├── naming-validator/
+│   ├── SKILL.md
+│   ├── references/naming-standards.md
+│   └── scripts/validate_name.py
+├── openmemory/
+│   └── skill.md
+├── secrets-security/
+│   ├── SKILL.md
+│   ├── references/
+│   └── scripts/
+└── skill-creator/
+    ├── SKILL.md
+    └── scripts/</div>
+        </div>
+
+        <div class="workflow-box">
+            <h3>Progressive Disclosure</h3>
+            <ol>
+                <li><strong>Metadata (name + description)</strong> - Always in context (~100 words per skill)</li>
+                <li><strong>SKILL.md body</strong> - Loaded when skill triggers (&lt;5k words)</li>
+                <li><strong>Bundled resources</strong> - Loaded as needed by Claude (scripts, references, assets)</li>
+            </ol>
+            <p style="margin-top: 1rem; color: #718096;"><strong>Result:</strong> 0 tokens at boot, only loaded when invoked</p>
+        </div>
+
+        <h2 class="section-title">Comparison: User vs Project Skills</h2>
+
+        <div class="workflow-box">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #e2e8f0;">
+                        <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #cbd5e0;">Aspect</th>
+                        <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #cbd5e0;">User-Level (~/.claude/)</th>
+                        <th style="padding: 0.75rem; text-align: left; border-bottom: 2px solid #cbd5e0;">Project-Level (~/projects/.claude/)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;"><strong>Scope</strong></td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">All projects, all sessions</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">Infrastructure projects only</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;"><strong>Count</strong></td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">7 skills</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">8 skills</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;"><strong>Purpose</strong></td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">General utilities, personal preferences, meta-tools</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">Infrastructure deployment, service configuration</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;"><strong>Examples</strong></td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">naming-validator, openmemory, skill-creator</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">keycloak-setup, postgres-integration, traefik-setup</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p><strong>User-Level Skills Documentation</strong></p>
+            <p style="margin-top: 0.5rem;">Part of the Claude Code Context Loading Architecture</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                <a href="/context-compare/">Context Comparison</a> |
+                <a href="/claudecodecliconfig/">Claude CLI Configuration</a> |
+                <a href="/llm-memory/">LLM Memory</a> |
+                <a href="/">All Documentation</a>
+            </p>
+            <p style="margin-top: 1rem; color: #a0aec0; font-size: 0.85rem;">Created: 2025-11-26</p>
+        </div>
+    </div>
+</body>
+</html>

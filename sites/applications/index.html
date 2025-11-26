@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hosted Applications - ai-servicers.com</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 3px solid #0f3460;
+        }
+
+        .header h1 {
+            color: #e94560;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #a0a0a0;
+            font-size: 1.1em;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 20px 30px;
+            background: #16213e;
+            border-radius: 10px;
+            border: 1px solid #0f3460;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #e94560;
+        }
+
+        .stat-label {
+            color: #a0a0a0;
+            font-size: 0.9em;
+        }
+
+        .category {
+            margin-bottom: 50px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #0f3460;
+        }
+
+        .category-icon {
+            font-size: 2em;
+            margin-right: 15px;
+        }
+
+        .category-title {
+            color: #e94560;
+            font-size: 1.5em;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .app-card {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #0f3460;
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-3px);
+            border-color: #e94560;
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.1);
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .app-icon {
+            font-size: 1.8em;
+            margin-right: 12px;
+        }
+
+        .app-name {
+            color: #ffffff;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .app-description {
+            color: #b0b0b0;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .app-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: #0f3460;
+            color: #a0a0a0;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+
+        .tag.hosted {
+            background: #1e5128;
+            color: #4ecca3;
+        }
+
+        .tag.client {
+            background: #5c2a2a;
+            color: #e94560;
+        }
+
+        .tag.sso {
+            background: #2a3f5c;
+            color: #60a5fa;
+        }
+
+        .repo-link {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 0.8em;
+            margin-left: auto;
+        }
+
+        .repo-link:hover {
+            color: #e94560;
+            text-decoration: underline;
+        }
+
+        .app-url {
+            display: block;
+            margin-top: 12px;
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 0.85em;
+            word-break: break-all;
+        }
+
+        .app-url:hover {
+            color: #e94560;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #a5b4fc;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid #0f3460;
+            color: #666;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-bar {
+                gap: 15px;
+            }
+            .stat {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/infrastructure-docs/" class="back-link">&larr; Back to Infrastructure Documentation</a>
+
+        <div class="header">
+            <h1>Hosted Applications</h1>
+            <p>Self-hosted services and applications on ai-servicers.com infrastructure</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value">62+</div>
+                <div class="stat-label">Running Containers</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">35+</div>
+                <div class="stat-label">User Applications</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">16</div>
+                <div class="stat-label">SSO Protected</div>
+            </div>
+        </div>
+
+        <!-- Portal & Navigation -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">🏠</span>
+                <h2 class="category-title">Portal & Navigation</h2>
+            </div>
+            <div class="apps-grid">
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🎯</span>
+                        <span class="app-name">Dashy</span>
+                        <a href="https://github.com/WebSurfinMurf/dashy" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Personal dashboard and portal serving as the central hub for all hosted applications. Features 7 organized pages with 100+ service links, custom theming, and quick-access bookmarks.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://dashy.ai-servicers.com" class="app-url">dashy.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🔧</span>
+                        <span class="app-name">Portainer</span>
+                        <a href="https://github.com/WebSurfinMurf/portainer" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Docker container management UI providing visual interface for managing all 62+ containers, networks, volumes, and images. Essential for infrastructure administration.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://portainer.ai-servicers.com" class="app-url">portainer.ai-servicers.com</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productivity & Collaboration -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">📋</span>
+                <h2 class="category-title">Productivity & Collaboration</h2>
+            </div>
+            <div class="apps-grid">
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📁</span>
+                        <span class="app-name">Nextcloud</span>
+                        <a href="https://github.com/WebSurfinMurf/nextcloud" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Self-hosted file storage, calendar, contacts, and email platform. Full office suite with collaborative editing, file sync across devices, and Keycloak OIDC integration.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://nextcloud.ai-servicers.com" class="app-url">nextcloud.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📊</span>
+                        <span class="app-name">OpenProject</span>
+                        <a href="https://github.com/WebSurfinMurf/openproject" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Project management platform with kanban boards for tracking work. Community Edition with 95+ work packages across 4 users and 3 active projects. Ideal for task organization and sprint planning.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">PostgreSQL</span>
+                    </div>
+                    <a href="https://openproject.ai-servicers.com" class="app-url">openproject.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📝</span>
+                        <span class="app-name">Obsidian LiveSync</span>
+                        <a href="https://github.com/WebSurfinMurf/obsidian" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Real-time synchronization server for Obsidian notes using CouchDB. Enables seamless note sync across all devices with conflict resolution and offline support.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">CouchDB</span>
+                    </div>
+                    <a href="https://obsidian.ai-servicers.com" class="app-url">obsidian.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">💬</span>
+                        <span class="app-name">Matrix Synapse + Element</span>
+                        <a href="https://github.com/WebSurfinMurf/matrix" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Decentralized communication platform for multi-agent collaboration. Hosts AIChatRoom for agent communication with full message history and federation support.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://element.ai-servicers.com" class="app-url">element.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📧</span>
+                        <span class="app-name">Docker-Mailserver</span>
+                        <a href="https://github.com/WebSurfinMurf/docker-mailserver" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Full-featured mail server for ai-servicers.com domain. Supports IMAP/SMTP with SSL/TLS, integrated with Nextcloud Mail. Handles all domain email with proper SPF/DKIM/DMARC.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">IMAP/SMTP</span>
+                    </div>
+                    <a href="https://mail.ai-servicers.com" class="app-url">mail.ai-servicers.com</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Development & DevOps -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">💻</span>
+                <h2 class="category-title">Development & DevOps</h2>
+            </div>
+            <div class="apps-grid">
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🦊</span>
+                        <span class="app-name">GitLab</span>
+                        <a href="https://github.com/WebSurfinMurf/gitlab" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Self-hosted Git repository with CI/CD pipelines, issue tracking, and code review. Central source control for all infrastructure and application code.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://gitlab.ai-servicers.com" class="app-url">gitlab.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🖥️</span>
+                        <span class="app-name">Guacamole</span>
+                        <a href="https://github.com/WebSurfinMurf/guacamole" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Clientless remote desktop gateway supporting RDP, VNC, and SSH. Access any machine through the browser without installing client software.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://guacamole.ai-servicers.com" class="app-url">guacamole.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📋</span>
+                        <span class="app-name">MicroBin</span>
+                        <a href="https://github.com/WebSurfinMurf/microbin" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Lightweight pastebin for quick copy-paste between machines. Share code snippets, text, and files with expiring links and syntax highlighting.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://microbin.ai-servicers.com" class="app-url">microbin.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📐</span>
+                        <span class="app-name">Draw.io</span>
+                        <a href="https://github.com/WebSurfinMurf/drawio" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Diagramming tool for creating architecture diagrams, flowcharts, and technical documentation from text. Supports export to multiple formats and integrates with Nextcloud.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://drawio.ai-servicers.com" class="app-url">drawio.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📱</span>
+                        <span class="app-name">Termius</span>
+                    </div>
+                    <p class="app-description">Cross-platform SSH client application (not self-hosted) for terminal connections across laptop, phone, and tablet. Syncs server credentials and connection history across all devices.</p>
+                    <div class="app-meta">
+                        <span class="tag client">Client App</span>
+                        <span class="tag">SSH/SFTP</span>
+                    </div>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🎭</span>
+                        <span class="app-name">Playwright</span>
+                        <a href="https://github.com/WebSurfinMurf/playwright" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Browser automation service with web interface and MCP integration. Automated testing, web scraping, and browser control accessible via Claude Code through MCP server.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">MCP Server</span>
+                    </div>
+                    <a href="https://playwright.ai-servicers.com" class="app-url">playwright.ai-servicers.com</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI & Automation -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">🤖</span>
+                <h2 class="category-title">AI & Automation</h2>
+            </div>
+            <div class="apps-grid">
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">💭</span>
+                        <span class="app-name">Open WebUI</span>
+                        <a href="https://github.com/WebSurfinMurf/open-webui" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">ChatGPT-style interface for interacting with local and remote LLMs. Supports multiple models via LiteLLM proxy with conversation history and custom prompts.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://open-webui.ai-servicers.com" class="app-url">open-webui.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🔄</span>
+                        <span class="app-name">n8n</span>
+                        <a href="https://github.com/WebSurfinMurf/n8n" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Workflow automation platform connecting apps and services. Create complex automations with visual editor, webhooks, and 400+ integrations without coding.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://n8n.ai-servicers.com" class="app-url">n8n.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🧠</span>
+                        <span class="app-name">OpenMemory</span>
+                        <a href="https://github.com/WebSurfinMurf/openmemory" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Semantic memory system for AI assistants using Gemini embeddings and Qdrant vector database. Powers the /cmemory command for storing lessons learned.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">Qdrant + PostgreSQL</span>
+                    </div>
+                    <a href="https://openmemory.ai-servicers.com" class="app-url">openmemory.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🔗</span>
+                        <span class="app-name">LangChain Services</span>
+                        <a href="https://github.com/WebSurfinMurf/langchain" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">LangServe endpoints for AI chains and agents. Provides API access to RAG pipelines, document processing, and custom AI workflows.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">LangServe</span>
+                    </div>
+                    <a href="https://langchain.ai-servicers.com" class="app-url">langchain.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🔀</span>
+                        <span class="app-name">LiteLLM</span>
+                        <a href="https://github.com/WebSurfinMurf/litellm" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Unified LLM gateway providing access to OpenAI, Anthropic, and Google models through a single OpenAI-compatible API. Central proxy for all AI model access with usage tracking.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">OpenAI API</span>
+                    </div>
+                    <a href="https://litellm.ai-servicers.com" class="app-url">litellm.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🎙️</span>
+                        <span class="app-name">Obsidian API</span>
+                        <a href="https://github.com/WebSurfinMurf/obsidian-api" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">REST API gateway enabling ChatGPT to interact with Obsidian vault via voice mode and custom GPT actions. Search, create, and manage notes through natural language.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">FastAPI</span>
+                    </div>
+                    <a href="https://obsidian-api.ai-servicers.com" class="app-url">obsidian-api.ai-servicers.com</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitoring & Observability -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">📊</span>
+                <h2 class="category-title">Monitoring & Observability</h2>
+            </div>
+            <div class="apps-grid">
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📈</span>
+                        <span class="app-name">Grafana</span>
+                        <a href="https://github.com/WebSurfinMurf/grafana" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Visualization and analytics platform with dashboards for logs (Loki), metrics (Prometheus), and time-series data (TimescaleDB). Central monitoring hub for all services.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://grafana.ai-servicers.com" class="app-url">grafana.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🖥️</span>
+                        <span class="app-name">Netdata</span>
+                        <a href="https://github.com/WebSurfinMurf/netdata" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Real-time system monitoring with per-second metrics. Tracks CPU, memory, disk, network, and container performance with automatic anomaly detection.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://netdata.ai-servicers.com" class="app-url">netdata.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📜</span>
+                        <span class="app-name">Dozzle</span>
+                        <a href="https://github.com/WebSurfinMurf/dozzle" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Real-time Docker log viewer in the browser. Stream and search logs from all containers without SSH access. Lightweight alternative to full logging stacks.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://dozzle.ai-servicers.com" class="app-url">dozzle.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🌐</span>
+                        <span class="app-name">Traefik Dashboard</span>
+                        <a href="https://github.com/WebSurfinMurf/traefik" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Reverse proxy dashboard showing all routes, middlewares, and SSL certificates. Monitor incoming traffic and troubleshoot routing issues.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://traefik.ai-servicers.com" class="app-url">traefik.ai-servicers.com</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Utilities & Tools -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">🛠️</span>
+                <h2 class="category-title">Utilities & Tools</h2>
+            </div>
+            <div class="apps-grid">
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📄</span>
+                        <span class="app-name">Stirling PDF</span>
+                        <a href="https://github.com/WebSurfinMurf/stirling-pdf" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Comprehensive PDF manipulation tool with 100+ operations. Merge, split, compress, convert, OCR, and secure PDF documents entirely self-hosted.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://stirling-pdf.ai-servicers.com" class="app-url">stirling-pdf.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🔐</span>
+                        <span class="app-name">Bitwarden</span>
+                        <a href="https://github.com/WebSurfinMurf/bitwarden" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Self-hosted password manager (Vaultwarden) for secure credential storage. Sync passwords across all devices with browser extensions and mobile apps.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                    </div>
+                    <a href="https://bitwarden.ai-servicers.com" class="app-url">bitwarden.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🗄️</span>
+                        <span class="app-name">MinIO</span>
+                        <a href="https://github.com/WebSurfinMurf/minio" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">S3-compatible object storage for files, backups, and application data. High-performance storage with web console for bucket management.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">S3 API</span>
+                    </div>
+                    <a href="https://minio.ai-servicers.com" class="app-url">minio.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🗃️</span>
+                        <span class="app-name">pgAdmin</span>
+                    </div>
+                    <p class="app-description">Web-based PostgreSQL administration tool. Manage databases, run queries, view table structures, and monitor database performance.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://pgadmin.ai-servicers.com" class="app-url">pgadmin.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📂</span>
+                        <span class="app-name">AList</span>
+                        <a href="https://github.com/WebSurfinMurf/alist" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Powerful file list program supporting multiple storage providers. Browse and manage files from various sources through a unified web interface with Keycloak SSO authentication.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://alist.ai-servicers.com" class="app-url">alist.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🖨️</span>
+                        <span class="app-name">CUPS AirPrint</span>
+                    </div>
+                    <p class="app-description">Network printing service with AirPrint support. Print from any device on the network including iOS/macOS via AirPrint. Supports Brother MFC-J615W printer.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">IPP/AirPrint</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trading & Finance -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">📈</span>
+                <h2 class="category-title">Trading & Finance</h2>
+            </div>
+            <div class="apps-grid">
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">💹</span>
+                        <span class="app-name">IB Gateway</span>
+                        <a href="https://github.com/WebSurfinMurf/ibgateway" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Interactive Brokers API gateway enabling robotic trading. Provides programmatic access to market data, order execution, and account management for automated trading strategies.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">TWS API</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Databases -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">🗄️</span>
+                <h2 class="category-title">Databases</h2>
+            </div>
+            <div class="apps-grid">
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🔷</span>
+                        <span class="app-name">ArangoDB</span>
+                        <a href="https://github.com/WebSurfinMurf/arangodb" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Multi-model database (document, graph, key-value) configured as AI memory/context store. Web UI for querying, graph visualization, and database administration.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://arangodb.ai-servicers.com" class="app-url">arangodb.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🔶</span>
+                        <span class="app-name">Qdrant</span>
+                        <a href="https://github.com/WebSurfinMurf/qdrant" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">High-performance vector database for AI applications. Powers semantic search, RAG systems, and mem0 memory storage. Dashboard for collection management and search testing.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://qdrant.ai-servicers.com" class="app-url">qdrant.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🔴</span>
+                        <span class="app-name">Redis Commander</span>
+                        <a href="https://github.com/WebSurfinMurf/redis" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Web UI for Redis cache/session store administration. Browse keys, view data structures, monitor memory usage, and execute commands on the central Redis instance.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://redis.ai-servicers.com" class="app-url">redis.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🍃</span>
+                        <span class="app-name">Mongo Express</span>
+                        <a href="https://github.com/WebSurfinMurf/mongodb" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Web UI for MongoDB document database administration. Browse collections, query documents, and manage indexes on the central MongoDB instance.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag sso">Keycloak SSO</span>
+                    </div>
+                    <a href="https://mongodb.ai-servicers.com" class="app-url">mongodb.ai-servicers.com</a>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">📊</span>
+                        <span class="app-name">TimescaleDB</span>
+                        <a href="https://github.com/WebSurfinMurf/timescaledb" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Time-series database built on PostgreSQL with automatic partitioning and compression. Stores metrics, sensor data, and time-series analytics. Managed via pgAdmin.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">PostgreSQL 16</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security & Authentication -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-icon">🔒</span>
+                <h2 class="category-title">Security & Authentication</h2>
+            </div>
+            <div class="apps-grid">
+                <div class="app-card">
+                    <div class="app-header">
+                        <span class="app-icon">🔑</span>
+                        <span class="app-name">Keycloak</span>
+                        <a href="https://github.com/WebSurfinMurf/keycloak" target="_blank" class="repo-link">github</a>
+                    </div>
+                    <p class="app-description">Identity and access management providing SSO for all services. Central authentication with OAuth2/OIDC, user federation, and fine-grained authorization.</p>
+                    <div class="app-meta">
+                        <span class="tag hosted">Hosted</span>
+                        <span class="tag">OAuth2/OIDC</span>
+                    </div>
+                    <a href="https://keycloak.ai-servicers.com" class="app-url">keycloak.ai-servicers.com</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>Infrastructure: linuxserver.lan | Domain: ai-servicers.com</p>
+        <p style="margin-top: 10px; color: #555;">Last Updated: 2025-11-25</p>
+    </div>
+</body>
+</html>
