@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code CLI Boot Sequence</title>
+    <style>
+        :root {
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --accent: #e94560;
+            --accent-light: #ff6b6b;
+            --text: #eee;
+            --text-muted: #888;
+            --success: #4ecca3;
+            --warning: #ffc107;
+            --info: #00d9ff;
+            --border: #0f3460;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.2em;
+        }
+
+        h2 {
+            color: var(--accent-light);
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h3 {
+            color: var(--info);
+            margin: 20px 0 10px;
+        }
+
+        .section {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .boot-sequence {
+            position: relative;
+        }
+
+        .boot-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-left: 4px solid var(--accent);
+            position: relative;
+        }
+
+        .boot-item.loaded {
+            border-left-color: var(--success);
+        }
+
+        .boot-item.not-loaded {
+            border-left-color: var(--warning);
+            opacity: 0.8;
+        }
+
+        .boot-item.child {
+            margin-left: 40px;
+            border-left-color: var(--info);
+        }
+
+        .boot-item.grandchild {
+            margin-left: 80px;
+            border-left-color: #9b59b6;
+        }
+
+        .boot-item .order {
+            position: absolute;
+            left: -35px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .boot-item.loaded .order {
+            background: var(--success);
+        }
+
+        .boot-item.not-loaded .order {
+            background: var(--warning);
+            color: #333;
+        }
+
+        .file-path {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--info);
+            word-break: break-all;
+        }
+
+        .file-desc {
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .status.loaded {
+            background: var(--success);
+            color: #000;
+        }
+
+        .status.not-loaded {
+            background: var(--warning);
+            color: #000;
+        }
+
+        .status.on-demand {
+            background: var(--info);
+            color: #000;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(0,0,0,0.3);
+            color: var(--accent-light);
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .arrow {
+            text-align: center;
+            color: var(--accent);
+            font-size: 1.5em;
+            margin: 10px 0;
+        }
+
+        .note {
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .note.warning {
+            background: rgba(255, 193, 7, 0.1);
+            border-color: var(--warning);
+        }
+
+        .note.info {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: var(--info);
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .tree {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.8;
+        }
+
+        .tree .loaded { color: var(--success); }
+        .tree .not-loaded { color: var(--warning); }
+        .tree .on-demand { color: var(--info); }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .boot-item.child { margin-left: 20px; }
+            .boot-item.grandchild { margin-left: 40px; }
+            .legend { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Claude Code CLI Boot Sequence</h1>
+            <p class="subtitle">Documentation of files loaded during Claude Code initialization on linuxserver.lan</p>
+        </header>
+
+        <div class="section">
+            <h2>Legend</h2>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--success);"></div>
+                    <span>Loaded at Boot</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--warning);"></div>
+                    <span>NOT Loaded (Gap)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--info);"></div>
+                    <span>On-Demand (Agent Invocation)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--accent);"></div>
+                    <span>Parent File</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9b59b6;"></div>
+                    <span>Child/Referenced File</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Auto-Loaded from ~/.claude/ (Built-in Behavior)</h2>
+            <div class="note info">
+                <p><strong>Claude Code automatically scans and loads these files from <code>~/.claude/</code> at startup:</strong></p>
+            </div>
+            <table>
+                <tr>
+                    <th>File/Directory</th>
+                    <th>Auto-Loaded</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td><code>~/.claude/settings.json</code></td>
+                    <td><span class="status loaded">YES</span></td>
+                    <td>Global configuration (permissions, hooks, MCP servers)</td>
+                </tr>
+                <tr>
+                    <td><code>~/.claude/CLAUDE.md</code></td>
+                    <td><span class="status loaded">YES</span></td>
+                    <td>User-level memory/context (imports agent-docs, skills)</td>
+                </tr>
+                <tr>
+                    <td><code>~/.claude/agents/*.md</code></td>
+                    <td><span class="status on-demand">METADATA</span></td>
+                    <td>Agent definitions - names/descriptions at boot, full content on invoke</td>
+                </tr>
+                <tr>
+                    <td><code>~/.claude/skills/*/SKILL.md</code></td>
+                    <td><span class="status on-demand">METADATA</span></td>
+                    <td>Skill definitions - names/descriptions at boot, full content on invoke</td>
+                </tr>
+                <tr>
+                    <td><code>~/.claude/commands/*.md</code></td>
+                    <td><span class="status loaded">YES</span></td>
+                    <td>Slash commands - available immediately when typing /</td>
+                </tr>
+                <tr>
+                    <td><code>~/.claude/docs/**</code></td>
+                    <td><span class="status not-loaded">NO</span></td>
+                    <td>Subdirectory CLAUDE.md files NOT auto-loaded</td>
+                </tr>
+            </table>
+            <div class="note info" style="margin-top: 15px;">
+                <p><strong>Note:</strong> <code>~/.claude/CLAUDE.md</code> imports subdirectory files via <code>@.claude/docs/...</code> syntax, allowing hierarchical organization while maintaining auto-loading.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Visual Boot Sequence Tree</h2>
+            <div class="tree"><span class="loaded">BOOT START</span>
+│
+├─<span class="loaded">[0] ~/.claude/settings.json</span> (Global Settings - Auto-loaded)
+│
+├─<span class="loaded">[0.5] ~/.claude/CLAUDE.md</span> (User Memory - Auto-loaded)
+│   │
+│   ├─<span class="loaded">@.claude/docs/agent-docs/CLAUDE.md</span> (PM Agent Context)
+│   │
+│   ├─<span class="loaded">@.claude/docs/agent-docs/inter-agent-protocol.md</span> (Inter-Agent Protocol)
+│   │
+│   └─<span class="loaded">@.claude/skills/CLAUDE.md</span> (User Skills Summary)
+│
+├─<span class="loaded">[1] $HOME/projects/CLAUDE.md</span> (Project Root - Auto-loaded)
+│   │
+│   ├─<span class="loaded">[2] @home/projects/.claude/docs/agent-docs/CLAUDE.md</span> (Specialist Agents)
+│   │
+│   ├─<span class="loaded">[3] @home/projects/.claude/skills/CLAUDE.md</span> (Project Skills Summary)
+│   │
+│   ├─<span class="loaded">[4] @home/projects/AINotes/SYSTEM-OVERVIEW.md</span> (System Overview)
+│   │
+│   └─<span class="loaded">[5] @home/projects/AINotes/directives.md</span> (User Directives)
+│
+├─<span class="on-demand">AINotes On-Demand: network.md, security.md, logging.md (via skills)</span>
+│
+├─<span class="on-demand">Agents: 4 discovered (pm, architect, developer, security)</span>
+│
+├─<span class="on-demand">Skills: 15 discovered (7 user + 8 project)</span>
+│
+└─<span class="loaded">Commands: 6 slash commands available</span></div>
+        </div>
+
+        <div class="section">
+            <h2>Detailed Boot Sequence</h2>
+
+            <h3>Phase 1: Infrastructure Root (Auto-loaded by Claude Code)</h3>
+            <div class="boot-sequence">
+                <div class="boot-item loaded">
+                    <span class="order">1</span>
+                    <div class="file-path">$HOME/projects/CLAUDE.md</div>
+                    <span class="status loaded">LOADED</span>
+                    <div class="file-desc">Infrastructure-wide context. Auto-loaded for any project under /home/administrator/projects/</div>
+                </div>
+            </div>
+
+            <div class="arrow">&#8595;</div>
+
+            <h3>Phase 2: Agent Context (Referenced from CLAUDE.md)</h3>
+            <div class="boot-sequence">
+                <div class="boot-item loaded child">
+                    <span class="order">2</span>
+                    <div class="file-path">$HOME/.claude/docs/agent-docs/CLAUDE.md</div>
+                    <span class="status loaded">LOADED</span>
+                    <div class="file-desc">PM Agent context - role, responsibilities, when to invoke specialist agents</div>
+                </div>
+
+                <div class="boot-item loaded child">
+                    <span class="order">3</span>
+                    <div class="file-path">$HOME/.claude/docs/agent-docs/inter-agent-protocol.md</div>
+                    <span class="status loaded">LOADED</span>
+                    <div class="file-desc">Shared inter-agent communication protocol (workspaces, escalation, file patterns)</div>
+                </div>
+            </div>
+
+            <div class="arrow">&#8595;</div>
+
+            <h3>Phase 3: AINotes Infrastructure Documentation</h3>
+            <div class="boot-sequence">
+                <div class="boot-item loaded child">
+                    <span class="order">4</span>
+                    <div class="file-path">$HOME/projects/AINotes/SYSTEM-OVERVIEW.md</div>
+                    <span class="status loaded">LOADED</span>
+                    <div class="file-desc">Current infrastructure state (62 containers, services, architecture)</div>
+                </div>
+
+                <div class="boot-item loaded child">
+                    <span class="order">5</span>
+                    <div class="file-path">$HOME/projects/AINotes/directives.md</div>
+                    <span class="status loaded">LOADED</span>
+                    <div class="file-desc">User directives - skill/agent invocation rules, secrets management, naming</div>
+                </div>
+            </div>
+
+            <h3>Phase 4: On-Demand Reference Documentation (via Skills)</h3>
+            <div class="boot-sequence">
+                <div class="boot-item child" style="border-left-color: var(--info);">
+                    <div class="file-path">$HOME/projects/AINotes/network.md</div>
+                    <span class="status on-demand">ON-DEMAND</span>
+                    <div class="file-desc">Network topology, DNS, Docker networks - loaded by network-config, troubleshooting, service-deployment skills</div>
+                </div>
+
+                <div class="boot-item child" style="border-left-color: var(--info);">
+                    <div class="file-path">$HOME/projects/AINotes/security.md</div>
+                    <span class="status on-demand">ON-DEMAND</span>
+                    <div class="file-desc">Security policies, Keycloak SSO, OAuth2 - loaded by keycloak-setup, secrets-security, traefik-setup skills</div>
+                </div>
+
+                <div class="boot-item child" style="border-left-color: var(--info);">
+                    <div class="file-path">$HOME/projects/AINotes/logging.md</div>
+                    <span class="status on-demand">ON-DEMAND</span>
+                    <div class="file-desc">Observability stack configuration - loaded by logging-observability skill</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Design Decisions</h2>
+
+            <div class="note info">
+                <h3>Progressive Disclosure Pattern</h3>
+                <p>The boot sequence follows Anthropic's progressive disclosure pattern:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Boot:</strong> Load minimal essential context (SYSTEM-OVERVIEW, directives)</li>
+                    <li><strong>On-Demand:</strong> Load detailed reference docs when skills are invoked</li>
+                    <li><strong>Result:</strong> Faster boot, smaller initial context, relevant info when needed</li>
+                </ul>
+            </div>
+
+            <div class="note info" style="margin-top: 15px;">
+                <h3>On-Demand Reference Files</h3>
+                <p>These AINotes files are loaded by their respective skills, not at boot:</p>
+                <table style="margin-top: 10px;">
+                    <tr>
+                        <th>File</th>
+                        <th>Loaded By Skills</th>
+                    </tr>
+                    <tr>
+                        <td><code>network.md</code></td>
+                        <td>network-config, troubleshooting, service-deployment</td>
+                    </tr>
+                    <tr>
+                        <td><code>security.md</code></td>
+                        <td>keycloak-setup, secrets-security, traefik-setup</td>
+                    </tr>
+                    <tr>
+                        <td><code>logging.md</code></td>
+                        <td>logging-observability</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>On-Demand Loading (Not at Boot)</h2>
+
+            <h3>Agent Definitions (Loaded when agent invoked via Task tool)</h3>
+            <table>
+                <tr>
+                    <th>Agent</th>
+                    <th>Definition File</th>
+                    <th>Reads Context From</th>
+                </tr>
+                <tr>
+                    <td>PM</td>
+                    <td><code>$HOME/.claude/agents/pm.md</code></td>
+                    <td><code>$HOME/.claude/docs/agent-docs/CLAUDE.md</code></td>
+                </tr>
+                <tr>
+                    <td>Architect</td>
+                    <td><code>$HOME/projects/.claude/agents/architect.md</code></td>
+                    <td><code>$HOME/projects/.claude/docs/agent-docs/CLAUDE.md</code></td>
+                </tr>
+                <tr>
+                    <td>Developer</td>
+                    <td><code>$HOME/projects/.claude/agents/developer.md</code></td>
+                    <td><code>$HOME/projects/.claude/docs/agent-docs/CLAUDE.md</code></td>
+                </tr>
+                <tr>
+                    <td>Security</td>
+                    <td><code>$HOME/projects/.claude/agents/security.md</code></td>
+                    <td><code>$HOME/projects/.claude/docs/agent-docs/CLAUDE.md</code></td>
+                </tr>
+            </table>
+
+            <h3>Skills (Loaded when skill invoked via Skill tool)</h3>
+            <table>
+                <tr>
+                    <th>Location</th>
+                    <th>Skills</th>
+                    <th>Load Pattern</th>
+                </tr>
+                <tr>
+                    <td><code>$HOME/.claude/skills/</code></td>
+                    <td>naming-validator, secrets-security, skill-creator, gitlab-integration, architecture-diagram-creator</td>
+                    <td>Metadata at boot, full SKILL.md on invocation</td>
+                </tr>
+                <tr>
+                    <td><code>$HOME/projects/.claude/skills/</code></td>
+                    <td>service-deployment, keycloak-setup, traefik-setup, postgres-integration, network-config, logging-observability, troubleshooting, nginx-static-site</td>
+                    <td>Metadata at boot, full SKILL.md on invocation</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>File Reference Matrix</h2>
+            <table>
+                <tr>
+                    <th>File</th>
+                    <th>References / Imports</th>
+                    <th>Boot Status</th>
+                </tr>
+                <tr>
+                    <td><code>~/.claude/CLAUDE.md</code></td>
+                    <td>
+                        &rarr; @.claude/docs/agent-docs/CLAUDE.md<br>
+                        &rarr; @.claude/docs/agent-docs/inter-agent-protocol.md<br>
+                        &rarr; @.claude/skills/CLAUDE.md
+                    </td>
+                    <td><span class="status loaded">USER ROOT</span></td>
+                </tr>
+                <tr>
+                    <td><code>$HOME/projects/CLAUDE.md</code></td>
+                    <td>
+                        &rarr; @home/projects/.claude/docs/agent-docs/CLAUDE.md<br>
+                        &rarr; @home/projects/.claude/skills/CLAUDE.md<br>
+                        &rarr; @home/projects/AINotes/SYSTEM-OVERVIEW.md<br>
+                        &rarr; @home/projects/AINotes/directives.md
+                    </td>
+                    <td><span class="status loaded">PROJECT ROOT</span></td>
+                </tr>
+                <tr>
+                    <td><code>$HOME/.claude/docs/agent-docs/CLAUDE.md</code></td>
+                    <td>PM Agent context (references inter-agent-protocol.md)</td>
+                    <td><span class="status loaded">LOADED</span></td>
+                </tr>
+                <tr>
+                    <td><code>$HOME/projects/.claude/docs/agent-docs/CLAUDE.md</code></td>
+                    <td>Specialist Agents (Architect, Developer, Security)</td>
+                    <td><span class="status loaded">LOADED</span></td>
+                </tr>
+                <tr>
+                    <td><code>$HOME/projects/AINotes/SYSTEM-OVERVIEW.md</code></td>
+                    <td>Infrastructure state (62 containers, architecture)</td>
+                    <td><span class="status loaded">LOADED</span></td>
+                </tr>
+                <tr>
+                    <td><code>$HOME/projects/AINotes/directives.md</code></td>
+                    <td>User directives, invocation rules</td>
+                    <td><span class="status loaded">LOADED</span></td>
+                </tr>
+                <tr>
+                    <td><code>$HOME/projects/AINotes/network.md</code></td>
+                    <td>Network topology, DNS, Docker networks</td>
+                    <td><span class="status on-demand">ON-DEMAND</span></td>
+                </tr>
+                <tr>
+                    <td><code>$HOME/projects/AINotes/security.md</code></td>
+                    <td>Security policies, Keycloak, OAuth2</td>
+                    <td><span class="status on-demand">ON-DEMAND</span></td>
+                </tr>
+                <tr>
+                    <td><code>$HOME/projects/AINotes/logging.md</code></td>
+                    <td>Observability stack configuration</td>
+                    <td><span class="status on-demand">ON-DEMAND</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Additional Working Directories</h2>
+            <div class="note info">
+                <p><strong>What are "Additional Working Directories"?</strong></p>
+                <p style="margin-top: 10px;">These are configured via CLI, not files in ~/.claude/:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>CLI flag: <code>claude --add-dir /path/to/dir</code></li>
+                    <li>Slash command: <code>/add-dir /path/to/dir</code></li>
+                    <li>settings.json: <code>"additionalWorkingDirectories": ["/path"]</code></li>
+                </ul>
+            </div>
+            <table>
+                <tr>
+                    <th>Configured Path</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td><code>/home/administrator/.claude/agent-docs</code></td>
+                    <td><span class="status not-loaded">STALE</span></td>
+                    <td>Old path - moved to .claude/docs/agent-docs/</td>
+                </tr>
+                <tr>
+                    <td><code>/home/administrator/projects/.claude/docs/agent-docs</code></td>
+                    <td><span class="status loaded">EXISTS</span></td>
+                    <td>Contains specialist agents CLAUDE.md</td>
+                </tr>
+                <tr>
+                    <td><code>/home/administrator/.claude/docs</code></td>
+                    <td><span class="status loaded">EXISTS</span></td>
+                    <td>Parent of agent-docs</td>
+                </tr>
+                <tr>
+                    <td><code>/home/administrator/.claude/agents</code></td>
+                    <td><span class="status loaded">EXISTS</span></td>
+                    <td>Contains pm.md agent definition</td>
+                </tr>
+            </table>
+            <div class="note warning" style="margin-top: 15px;">
+                <p><strong>Known Issue:</strong> CLAUDE.md files in additional working directories may NOT auto-load (documented bug).</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Boot Statistics</h2>
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>At Boot</th>
+                    <th>On-Demand</th>
+                </tr>
+                <tr>
+                    <td>CLAUDE.md Files</td>
+                    <td>2 (user + project root)</td>
+                    <td>Per-project CLAUDE.md</td>
+                </tr>
+                <tr>
+                    <td>Agent Context Files</td>
+                    <td>3 (PM, Specialist, Protocol)</td>
+                    <td>Full agent definitions</td>
+                </tr>
+                <tr>
+                    <td>Skill Summaries</td>
+                    <td>2 (user + project)</td>
+                    <td>Full SKILL.md content</td>
+                </tr>
+                <tr>
+                    <td>AINotes Files</td>
+                    <td>2 (SYSTEM-OVERVIEW, directives)</td>
+                    <td>3 (network, security, logging)</td>
+                </tr>
+                <tr>
+                    <td>Agents Discovered</td>
+                    <td>4 (pm, architect, developer, security)</td>
+                    <td>Full content on invoke</td>
+                </tr>
+                <tr>
+                    <td>Skills Discovered</td>
+                    <td>15 (7 user + 8 project)</td>
+                    <td>Full content on invoke</td>
+                </tr>
+                <tr>
+                    <td>Commands Available</td>
+                    <td>6 slash commands</td>
+                    <td>-</td>
+                </tr>
+            </table>
+        </div>
+
+        <footer>
+            <p><strong>Last Updated:</strong> 2025-11-27</p>
+            <p><strong>Server:</strong> linuxserver.lan | <strong>Domain:</strong> ai-servicers.com</p>
+            <p><a href="/" style="color: var(--accent);">&larr; Back to Portal</a></p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -21,6 +21,7 @@ These links appear at the top of the page for easy access to all referenced docu
 
 | Icon | Label | URL |
 |------|-------|-----|
+| 🚀 | Boot Sequence | `/claude-boot-sequence/` |
 | 🛠️ | CLI Config | `/claudecodecliconfig/` |
 | 🧠 | LLM Memory | `/llm-memory/` |
 | ⚙️ | MCP Architecture | `/mcp-architecture/` |
@@ -48,6 +49,7 @@ These links appear at the top of the page for easy access to all referenced docu
 ### Level 1: User Level Context (~/.claude/)
 | Link Text | URL | Type | Description |
 |-----------|-----|------|-------------|
+| Boot sequence | `/claude-boot-sequence/` | Internal | Boot sequence documentation |
 | user-level skills | `/user-level-skills/` | Internal | 7 user-level skills documentation |
 | agent | `/user-level-agents/` | Internal | PM agent documentation |
 
@@ -84,6 +86,7 @@ These links appear at the top of the page for easy access to all referenced docu
 ## Link Summary
 
 ### Internal Links (Relative - nginx.ai-servicers.com)
+- `/claude-boot-sequence/` - Boot Sequence Documentation
 - `/claudecodecliconfig/` - Claude CLI Configuration
 - `/user-level-skills/` - User-Level Skills (7)
 - `/user-level-agents/` - User-Level Agents (PM)
@@ -116,7 +119,7 @@ These links appear at the top of the page for easy access to all referenced docu
 ### Level 1: User Level Context
 - **Title**: User Level Context
 - **Context Type**: ~/.claude/
-- **What It Loads**: User preferences, 7 user-level skills, Session history, 1 agent (PM)
+- **What It Loads**: Boot sequence (with nested: User preferences, 7 user-level skills, 1 agent PM)
 
 ### Level 2: Project Level Common Context
 - **Title**: Project Level Common Context

@@ -26,6 +26,8 @@ All static sites are now served under **nginx.ai-servicers.com** using path-base
 
 #### Sub-Pages (accessed via Context Comparison)
 These pages are NOT listed on the main portal - they are accessed via quick-access nav bar on `/context-compare/`:
+- **Claude Boot Sequence** - /claude-boot-sequence/
+  - Complete documentation of Claude Code CLI boot sequence, files loaded at startup, progressive disclosure
 - **Claude Code CLI Config** - /claudecodecliconfig/
   - Executive summary of Claude Code CLI configuration
 - **LLM Memory** - /llm-memory/
@@ -58,6 +60,7 @@ These pages are NOT listed on the main portal - they are accessed via nav button
 ```
 Main Portal (3 sites)
 ├── /context-compare/  (quick-access nav bar to Claude Code docs)
+│   ├── /claude-boot-sequence/  ← Boot sequence documentation
 │   ├── /claudecodecliconfig/
 │   ├── /llm-memory/
 │   ├── /mcp-architecture/
