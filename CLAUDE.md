@@ -13,7 +13,7 @@ NGINX serves as the main reverse proxy and static site host:
 ### Static Sites Hosted (Path-Based on nginx.ai-servicers.com)
 All static sites are now served under **nginx.ai-servicers.com** using path-based routing.
 
-#### Main Portal Sites (3 sites on landing page)
+#### Main Portal Sites (5 sites on landing page)
 - **Landing Page** - https://nginx.ai-servicers.com/
   - Portal with index of top-level documentation
 - **Context Comparison** - /context-compare/ *(has sub-pages)*
@@ -23,6 +23,11 @@ All static sites are now served under **nginx.ai-servicers.com** using path-base
   - Complete architecture diagram and system documentation
 - **MCP Architecture Guide** - /mcp-architecture/
   - Token-efficient MCP architecture documentation
+- **Infrastructure Backlog** - /backlog/
+  - Dynamic backlog viewer - fetches AINotes/backlog.md at runtime
+  - Collapsible sections by priority, no build step needed
+- **Flat Cap History** - /flat-cap-history/
+  - History of the Irish flat cap / Paddy cap
 
 #### Sub-Pages (accessed via Context Comparison)
 These pages are NOT listed on the main portal - they are accessed via quick-access nav bar on `/context-compare/`:
@@ -58,7 +63,7 @@ These pages are NOT listed on the main portal - they are accessed via nav button
 
 #### Sub-Page Hierarchy
 ```
-Main Portal (3 sites)
+Main Portal (5 sites)
 ├── /context-compare/  (quick-access nav bar to Claude Code docs)
 │   ├── /claude-boot-sequence/  ← Boot sequence documentation
 │   ├── /claudecodecliconfig/
@@ -77,7 +82,9 @@ Main Portal (3 sites)
 │   ├── /network-topology/
 │   └── /devscripts/
 │
-└── /mcp-architecture/
+├── /mcp-architecture/
+├── /backlog/  ← Dynamic (fetches AINotes/backlog.md)
+└── /flat-cap-history/
 ```
 **Note**: When adding/removing sub-pages, update both the parent page nav AND ensure back-links exist on sub-pages.
 
@@ -551,5 +558,41 @@ ls -ld /home/administrator/projects/nginx/sites/[site-name]/
 
 **All site directories must have `755` permissions for nginx to access them.**
 
+### Session: 2025-12-07 (Flat Cap History - AI Generated Images)
+- **Updated Flat Cap History Site**: Replaced stock photos with AI-generated images
+  - **URL**: https://nginx.ai-servicers.com/flat-cap-history/
+  - **Problem Solved**: Stock photos showed wrong content (baseball caps, Jack Daniels, non-Irish imagery)
+  - **Solution**: Used new `gemini-image` MCP server to generate culturally-accurate Irish imagery
+  - **Images Generated** (7 total, stored in `sites/flat-cap-history/images/`):
+    - Hero: Vintage classical Irish flat cap on dark oak
+    - Donegal countryside with rolling green hills
+    - Traditional Irish pub interior
+    - Donegal tweed fabric texture (herringbone weave)
+    - Cliffs of Moher / Wild Atlantic Way
+    - Traditional wool weaving loom
+  - **MCP Integration**: Images generated via `mcp-image` npm package (Google Gemini / Nano Banana Pro)
+  - **Note**: Images stored locally under site directory, not in shared generated-images folder
+
+### Session: 2025-12-07 (Infrastructure Backlog Site)
+- **Created Infrastructure Backlog Site**: Dynamic viewer for AINotes/backlog.md
+  - **URL**: https://nginx.ai-servicers.com/backlog/
+  - **Design**: Dark theme with purple accents, collapsible priority sections
+  - **Dynamic Fetching**: Page fetches backlog.md at runtime via JavaScript
+    - No build step required - changes to backlog.md appear immediately
+    - Uses `fetch('backlog.md', { cache: 'no-store' })` for fresh content
+  - **Volume Mount Added**: AINotes directory mounted in nginx container
+    - `deploy.sh` updated: `-v /home/administrator/projects/AINotes:/usr/share/nginx/AINotes:ro`
+  - **nginx-portal.conf locations added**:
+    ```nginx
+    location /backlog/ { alias /usr/share/nginx/sites/backlog/; }
+    location /backlog/backlog.md { alias /usr/share/nginx/AINotes/backlog.md; }
+    ```
+  - **Features**:
+    - Parses markdown sections by priority (Critical, High, Planned, Medium, Low, Completed)
+    - Click item headers to expand/collapse details
+    - Shows effort badges, item numbers, stats in header
+    - Renders code blocks, tables, checklists from markdown
+  - **Added to nginx-portal landing page** (5 sites total)
+
 ---
-*Last Updated: 2025-11-07 by Claude*
+*Last Updated: 2025-12-07 by Claude*

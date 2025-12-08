@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infrastructure Backlog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #1e1e2e;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1em;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: rgba(255,255,255,0.15);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .content {
+            padding: 20px 30px;
+        }
+
+        .priority-section {
+            margin-bottom: 30px;
+        }
+
+        .priority-header {
+            font-size: 1.3em;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .priority-critical { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; }
+        .priority-high { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+        .priority-medium { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
+        .priority-low { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white; }
+        .priority-planned { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; }
+        .priority-completed { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+
+        .backlog-item {
+            background: #2a2a3e;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            border: 1px solid #3a3a4e;
+            transition: all 0.2s ease;
+        }
+
+        .backlog-item:hover {
+            border-color: #7c3aed;
+        }
+
+        .item-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .item-header:hover {
+            background: #3a3a4e;
+        }
+
+        .item-title {
+            font-weight: 600;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-number {
+            background: #7c3aed;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .item-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #a0a0a0;
+        }
+
+        .effort-badge {
+            background: #3a3a4e;
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+
+        .toggle-icon {
+            transition: transform 0.2s ease;
+            color: #7c3aed;
+            font-size: 1.2em;
+        }
+
+        .toggle-icon.open {
+            transform: rotate(90deg);
+        }
+
+        .item-details {
+            display: none;
+            padding: 0 20px 20px 20px;
+            border-top: 1px solid #3a3a4e;
+            background: #252535;
+        }
+
+        .item-details.open {
+            display: block;
+        }
+
+        .item-details h4 {
+            color: #a78bfa;
+            margin: 15px 0 8px 0;
+            font-size: 0.95em;
+        }
+
+        .item-details p, .item-details li {
+            color: #c0c0c0;
+            line-height: 1.6;
+            font-size: 0.9em;
+        }
+
+        .item-details ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .item-details li {
+            margin-bottom: 5px;
+        }
+
+        .item-details code {
+            background: #1a1a2e;
+            color: #10b981;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+
+        .item-details pre {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-size: 0.85em;
+        }
+
+        .item-details pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .item-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 0.85em;
+        }
+
+        .item-details th, .item-details td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid #3a3a4e;
+        }
+
+        .item-details th {
+            background: #3a3a4e;
+            color: #e0e0e0;
+        }
+
+        .footer {
+            background: #1a1a2e;
+            padding: 20px;
+            text-align: center;
+            color: #808080;
+            font-size: 0.85em;
+            border-top: 1px solid #3a3a4e;
+        }
+
+        .footer a {
+            color: #7c3aed;
+            text-decoration: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #808080;
+        }
+
+        .check { color: #10b981; }
+        .pending { color: #f59e0b; }
+
+        .refresh-info {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Infrastructure Backlog</h1>
+            <p>linuxserver.lan improvement tracker</p>
+            <div class="stats">
+                <span class="stat" id="stat-total">Loading...</span>
+                <span class="stat" id="stat-completed">Loading...</span>
+                <span class="stat" id="stat-updated">Loading...</span>
+            </div>
+        </div>
+
+        <div class="content" id="content">
+            <div class="loading">Loading backlog...</div>
+        </div>
+
+        <div class="footer">
+            <p>Source: <a href="#">/home/administrator/projects/AINotes/backlog.md</a></p>
+            <p class="refresh-info">Auto-fetches latest version on each page load</p>
+            <p style="margin-top: 10px;">Click any item to expand details</p>
+        </div>
+    </div>
+
+    <script>
+        function parseMarkdown(md) {
+            const sections = {
+                critical: { title: 'Critical Priority', icon: '🔥', items: [] },
+                high: { title: 'High Priority', icon: '⭐', items: [] },
+                medium: { title: 'Medium Priority', icon: '📌', items: [] },
+                low: { title: 'Low Priority', icon: '💡', items: [] },
+                planned: { title: 'Planned', icon: '🎯', items: [] },
+                completed: { title: 'Completed', icon: '✅', items: [] }
+            };
+
+            // Extract items using regex
+            const itemRegex = /###\s*(\d+)\.\s*(.+?)\s*\(#\d+\)\s*\n([\s\S]*?)(?=###\s*\d+\.|## |---|$)/g;
+            const completedRegex = /###\s*✅\s*(.+?)\s*\(Completed[^)]*\)\s*\n([\s\S]*?)(?=###\s*✅|## |---|\*\*Last|$)/g;
+
+            let match;
+
+            // Parse regular items
+            while ((match = itemRegex.exec(md)) !== null) {
+                const number = match[1];
+                const title = match[2].trim();
+                const content = match[3].trim();
+
+                // Determine priority
+                let priority = 'medium';
+                if (content.includes('🔥 Critical') || content.includes('Priority**: 🔥')) priority = 'critical';
+                else if (content.includes('⭐ High') || content.includes('Priority**: ⭐')) priority = 'high';
+                else if (content.includes('📌 Medium') || content.includes('Priority**: 📌')) priority = 'medium';
+                else if (content.includes('💡 Low') || content.includes('Priority**: 💡')) priority = 'low';
+
+                // Check if it's in the Planned section
+                const beforeMatch = md.substring(0, match.index);
+                if (beforeMatch.includes('## 🎯 Planned')) priority = 'planned';
+
+                // Extract effort
+                const effortMatch = content.match(/\*\*Effort\*\*:\s*([^\n]+)/);
+                const effort = effortMatch ? effortMatch[1].trim() : '';
+
+                // Extract value
+                const valueMatch = content.match(/\*\*Value\*\*:\s*([^\n]+)/);
+                const value = valueMatch ? valueMatch[1].trim() : '';
+
+                sections[priority].items.push({
+                    number,
+                    title,
+                    effort,
+                    value,
+                    content: formatContent(content)
+                });
+            }
+
+            // Parse completed items
+            while ((match = completedRegex.exec(md)) !== null) {
+                const title = match[1].trim();
+                const content = match[2].trim();
+
+                sections.completed.items.push({
+                    number: '✓',
+                    title,
+                    effort: '',
+                    value: '',
+                    content: formatContent(content)
+                });
+            }
+
+            // Extract stats
+            const totalMatch = md.match(/Items in Backlog\*\*:\s*(\d+)/);
+            const updatedMatch = md.match(/Last Updated\*\*:\s*([^\n]+)/);
+
+            return {
+                sections,
+                stats: {
+                    total: totalMatch ? totalMatch[1] : '?',
+                    completed: sections.completed.items.length,
+                    updated: updatedMatch ? updatedMatch[1].trim() : 'Unknown'
+                }
+            };
+        }
+
+        function formatContent(content) {
+            // Convert markdown to HTML (basic conversion)
+            let html = content
+                // Headers
+                .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
+                // Bold
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                // Code blocks
+                .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+                // Inline code
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                // Tables (basic)
+                .replace(/\|(.+)\|/g, (match) => {
+                    if (match.includes('---')) return '';
+                    const cells = match.split('|').filter(c => c.trim());
+                    const isHeader = match.includes('Priority') || match.includes('Service') || match.includes('Complexity');
+                    const tag = isHeader ? 'th' : 'td';
+                    return `<tr>${cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('')}</tr>`;
+                })
+                // Checkboxes
+                .replace(/- \[x\] (.+)/g, '<li><span class="check">✓</span> $1</li>')
+                .replace(/- \[ \] (.+)/g, '<li><span class="pending">○</span> $1</li>')
+                // List items
+                .replace(/^- (.+)$/gm, '<li>$1</li>')
+                .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+                // Paragraphs
+                .replace(/\n\n/g, '</p><p>')
+                // Line breaks
+                .replace(/\n/g, '<br>');
+
+            // Wrap lists
+            html = html.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
+
+            // Wrap tables
+            if (html.includes('<tr>')) {
+                html = html.replace(/(<tr>.*<\/tr>)+/gs, '<table>$&</table>');
+            }
+
+            return `<p>${html}</p>`;
+        }
+
+        function renderBacklog(data) {
+            const container = document.getElementById('content');
+            let html = '';
+
+            const priorityOrder = ['critical', 'high', 'planned', 'medium', 'low', 'completed'];
+
+            for (const key of priorityOrder) {
+                const section = data.sections[key];
+                if (section.items.length === 0) continue;
+
+                html += `
+                    <div class="priority-section">
+                        <div class="priority-header priority-${key}">
+                            <span>${section.icon}</span>
+                            <span>${section.title}</span>
+                            <span style="margin-left: auto; font-size: 0.8em; opacity: 0.8;">${section.items.length} items</span>
+                        </div>
+                `;
+
+                for (const item of section.items) {
+                    const itemId = `item-${key}-${item.number}`;
+                    html += `
+                        <div class="backlog-item">
+                            <div class="item-header" onclick="toggleItem('${itemId}')">
+                                <div class="item-title">
+                                    <span class="item-number">#${item.number}</span>
+                                    <span>${item.title}</span>
+                                </div>
+                                <div class="item-meta">
+                                    ${item.effort ? `<span class="effort-badge">${item.effort}</span>` : ''}
+                                    <span class="toggle-icon" id="icon-${itemId}">▶</span>
+                                </div>
+                            </div>
+                            <div class="item-details" id="${itemId}">
+                                ${item.value ? `<p><strong>Value:</strong> ${item.value}</p>` : ''}
+                                ${item.content}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+
+            // Update stats
+            document.getElementById('stat-total').textContent = `${data.stats.total} Items`;
+            document.getElementById('stat-completed').textContent = `${data.stats.completed} Completed`;
+            document.getElementById('stat-updated').textContent = `Updated: ${data.stats.updated}`;
+        }
+
+        function toggleItem(id) {
+            const details = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+
+            if (details.classList.contains('open')) {
+                details.classList.remove('open');
+                icon.classList.remove('open');
+            } else {
+                details.classList.add('open');
+                icon.classList.add('open');
+            }
+        }
+
+        // Fetch and render
+        async function loadBacklog() {
+            try {
+                const response = await fetch('backlog.md', { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const md = await response.text();
+                const data = parseMarkdown(md);
+                renderBacklog(data);
+            } catch (e) {
+                document.getElementById('content').innerHTML = `
+                    <div class="loading">Error loading backlog: ${e.message}</div>
+                `;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadBacklog);
+    </script>
+</body>
+</html>
