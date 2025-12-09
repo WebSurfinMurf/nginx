@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Swarm Dispatch Flow | linuxserver.lan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-elevated: #1a1a24;
+            --border-subtle: #2a2a3a;
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --text-muted: #55556a;
+            --accent-blue: #4299e1;
+            --accent-purple: #9f7aea;
+            --accent-green: #48bb78;
+            --accent-orange: #ed8936;
+            --accent-cyan: #38b2ac;
+        }
+
+        body {
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #38b2ac, #319795);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back:hover { color: var(--accent-cyan); }
+
+        .section { margin-bottom: 3rem; }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-subtle);
+        }
+
+        .diagram-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .diagram-container svg {
+            width: 100%;
+            height: auto;
+            display: block;
+            min-width: 1000px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .feature-card:hover { border-color: var(--accent-cyan); }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--accent-cyan);
+        }
+
+        .feature-card ul {
+            list-style: none;
+            color: var(--text-secondary);
+        }
+
+        .feature-card ul li {
+            padding: 0.35rem 0;
+            padding-left: 1.25rem;
+            position: relative;
+        }
+
+        .feature-card ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.7rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+        }
+
+        .code-block {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .code-block .comment { color: var(--text-muted); }
+        .code-block .keyword { color: var(--accent-purple); }
+        .code-block .string { color: var(--accent-green); }
+        .code-block .function { color: var(--accent-cyan); }
+        .code-block .number { color: var(--accent-orange); }
+
+        .step-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: stretch;
+        }
+
+        .step-line {
+            width: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #38b2ac, #319795);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        .step-connector {
+            flex: 1;
+            width: 2px;
+            background: var(--border-subtle);
+            margin: 4px 0;
+        }
+
+        .step-content {
+            flex: 1;
+            padding: 0.5rem 1rem 1.5rem;
+        }
+
+        .step-content h4 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .endpoint-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .method {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .method-post { background: rgba(72, 187, 120, 0.2); color: var(--accent-green); }
+        .method-get { background: rgba(66, 153, 225, 0.2); color: var(--accent-blue); }
+
+        .endpoint-path {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .endpoint-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            .container { padding: 1rem; }
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <h1>MCP Swarm Dispatch Flow</h1>
+        <p class="subtitle">Real-Time Multi-Model Consultation via Model Context Protocol</p>
+    </header>
+
+    <main class="container">
+        <a href="/ai-swarm-architecture/" class="nav-back">Back to AI Swarm Architecture</a>
+
+        <!-- Request/Response Flow Diagram -->
+        <section class="section">
+            <h2 class="section-title">Request/Response Flow</h2>
+            <div class="diagram-container">
+                <svg viewBox="0 0 1100 550" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="flow-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#38b2ac"/>
+                        </marker>
+                        <marker id="response-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#48bb78"/>
+                        </marker>
+                        <linearGradient id="cli-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#667eea"/>
+                            <stop offset="100%" style="stop-color:#764ba2"/>
+                        </linearGradient>
+                        <linearGradient id="mcp-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#38b2ac"/>
+                            <stop offset="100%" style="stop-color:#319795"/>
+                        </linearGradient>
+                    </defs>
+
+                    <rect x="0" y="0" width="1100" height="550" fill="#12121a"/>
+
+                    <!-- Claude Code CLI -->
+                    <rect x="50" y="200" width="180" height="120" rx="12" fill="url(#cli-grad)" stroke="#9f7aea" stroke-width="2"/>
+                    <text x="140" y="240" text-anchor="middle" fill="white" font-size="14" font-weight="600">Claude Code CLI</text>
+                    <text x="140" y="260" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">Opus 4.5</text>
+                    <text x="140" y="285" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">dispatch_to_swarm()</text>
+                    <text x="140" y="300" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">swarm_health()</text>
+
+                    <!-- MCP Server -->
+                    <rect x="320" y="180" width="200" height="160" rx="12" fill="url(#mcp-grad)" stroke="#319795" stroke-width="2"/>
+                    <text x="420" y="215" text-anchor="middle" fill="white" font-size="14" font-weight="600">MCP Code Executor</text>
+                    <text x="420" y="235" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">localhost:9091</text>
+                    <rect x="340" y="250" width="160" height="30" rx="6" fill="rgba(0,0,0,0.3)"/>
+                    <text x="420" y="270" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="10">/swarm/dispatch</text>
+                    <rect x="340" y="285" width="160" height="30" rx="6" fill="rgba(0,0,0,0.3)"/>
+                    <text x="420" y="305" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="10">/swarm/health</text>
+
+                    <!-- Docker Network -->
+                    <rect x="590" y="120" width="460" height="350" rx="15" fill="#1a1a24" stroke="#2a2a3a" stroke-width="2"/>
+                    <text x="820" y="150" text-anchor="middle" fill="#f0f0f5" font-size="13" font-weight="600">mcp-net (Docker Network)</text>
+
+                    <!-- Swarm Nodes -->
+                    <rect x="620" y="180" width="130" height="100" rx="10" fill="#1a1a24" stroke="#4299e1" stroke-width="2"/>
+                    <text x="685" y="210" text-anchor="middle" fill="#4299e1" font-size="12" font-weight="600">swarm-gemini</text>
+                    <text x="685" y="230" text-anchor="middle" fill="#8888a0" font-size="9">Gemini 2.5 Flash</text>
+                    <text x="685" y="250" text-anchor="middle" fill="#55556a" font-size="9">:8080/execute</text>
+                    <text x="685" y="265" text-anchor="middle" fill="#48bb78" font-size="8">PRIMARY</text>
+
+                    <rect x="770" y="180" width="130" height="100" rx="10" fill="#1a1a24" stroke="#48bb78" stroke-width="2"/>
+                    <text x="835" y="210" text-anchor="middle" fill="#48bb78" font-size="12" font-weight="600">swarm-codex</text>
+                    <text x="835" y="230" text-anchor="middle" fill="#8888a0" font-size="9">OpenAI ChatGPT</text>
+                    <text x="835" y="250" text-anchor="middle" fill="#55556a" font-size="9">:8080/execute</text>
+                    <text x="835" y="265" text-anchor="middle" fill="#ed8936" font-size="8">ALTERNATE</text>
+
+                    <rect x="920" y="180" width="130" height="100" rx="10" fill="#1a1a24" stroke="#9f7aea" stroke-width="2"/>
+                    <text x="985" y="210" text-anchor="middle" fill="#9f7aea" font-size="12" font-weight="600">swarm-claude</text>
+                    <text x="985" y="230" text-anchor="middle" fill="#8888a0" font-size="9">Claude Sonnet 4.5</text>
+                    <text x="985" y="250" text-anchor="middle" fill="#55556a" font-size="9">:8080/execute</text>
+                    <text x="985" y="265" text-anchor="middle" fill="#38b2ac" font-size="8">DEEP ANALYSIS</text>
+
+                    <!-- FastAPI Adapters -->
+                    <rect x="620" y="300" width="430" height="60" rx="8" fill="#12121a" stroke="#2a2a3a" stroke-width="1"/>
+                    <text x="835" y="325" text-anchor="middle" fill="#f0f0f5" font-size="11" font-weight="600">FastAPI HTTP Adapters</text>
+                    <text x="835" y="345" text-anchor="middle" fill="#8888a0" font-size="9">Wraps CLI tools (gemini, codex, claude) as HTTP services</text>
+
+                    <!-- Workspace Volume -->
+                    <rect x="620" y="380" width="430" height="70" rx="8" fill="#12121a" stroke="#ed8936" stroke-width="1"/>
+                    <text x="835" y="405" text-anchor="middle" fill="#ed8936" font-size="11" font-weight="600">/workspace (Read-Only Volume)</text>
+                    <text x="835" y="425" text-anchor="middle" fill="#8888a0" font-size="9">Mounted from: $HOME/projects</text>
+                    <text x="835" y="440" text-anchor="middle" fill="#55556a" font-size="9">All nodes can read project files but cannot modify</text>
+
+                    <!-- Request Flow -->
+                    <path d="M 230 260 L 320 260" stroke="#38b2ac" stroke-width="2.5" marker-end="url(#flow-arrow)"/>
+                    <text x="275" y="250" text-anchor="middle" fill="#38b2ac" font-size="9">1. MCP Request</text>
+
+                    <path d="M 520 230 L 620 210" stroke="#38b2ac" stroke-width="2" marker-end="url(#flow-arrow)"/>
+                    <path d="M 520 260 L 770 230" stroke="#38b2ac" stroke-width="2" marker-end="url(#flow-arrow)" stroke-dasharray="5,5" opacity="0.5"/>
+                    <path d="M 520 290 L 920 230" stroke="#38b2ac" stroke-width="2" marker-end="url(#flow-arrow)" stroke-dasharray="5,5" opacity="0.5"/>
+                    <text x="565" y="200" fill="#38b2ac" font-size="9">2. HTTP POST</text>
+
+                    <!-- Response Flow -->
+                    <path d="M 620 250 L 520 270" stroke="#48bb78" stroke-width="2" marker-end="url(#response-arrow)"/>
+                    <text x="565" y="275" fill="#48bb78" font-size="9">3. JSON Response</text>
+
+                    <path d="M 320 280 L 230 280" stroke="#48bb78" stroke-width="2" marker-end="url(#response-arrow)"/>
+                    <text x="275" y="295" fill="#48bb78" font-size="9">4. MCP Response</text>
+
+                    <!-- Legend -->
+                    <rect x="50" y="380" width="200" height="100" rx="8" fill="#1a1a24" stroke="#2a2a3a" stroke-width="1"/>
+                    <text x="150" y="405" text-anchor="middle" fill="#f0f0f5" font-size="11" font-weight="600">Flow Legend</text>
+                    <line x1="70" y1="425" x2="110" y2="425" stroke="#38b2ac" stroke-width="2"/>
+                    <text x="120" y="428" fill="#8888a0" font-size="9">Request flow</text>
+                    <line x1="70" y1="445" x2="110" y2="445" stroke="#48bb78" stroke-width="2"/>
+                    <text x="120" y="448" fill="#8888a0" font-size="9">Response flow</text>
+                    <line x1="70" y1="465" x2="110" y2="465" stroke="#38b2ac" stroke-width="2" stroke-dasharray="5,5" opacity="0.5"/>
+                    <text x="120" y="468" fill="#8888a0" font-size="9">Alternative target</text>
+
+                    <!-- Timeout indicator -->
+                    <rect x="50" y="50" width="180" height="70" rx="8" fill="#1a1a24" stroke="#ed8936" stroke-width="1"/>
+                    <text x="140" y="75" text-anchor="middle" fill="#ed8936" font-size="11" font-weight="600">Default Timeout</text>
+                    <text x="140" y="95" text-anchor="middle" fill="#f0f0f5" font-size="18" font-weight="700">15 minutes</text>
+                    <text x="140" y="110" text-anchor="middle" fill="#8888a0" font-size="9">900 seconds</text>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Step by Step Flow -->
+        <section class="section">
+            <h2 class="section-title">Dispatch Sequence</h2>
+            <div class="step-flow">
+                <div class="step-item">
+                    <div class="step-line">
+                        <div class="step-number">1</div>
+                        <div class="step-connector"></div>
+                    </div>
+                    <div class="step-content">
+                        <h4>Claude Code Invokes MCP Tool</h4>
+                        <p>User asks Claude a question. Claude decides to consult an external AI and calls <code>dispatch_to_swarm</code> with a prompt and target.</p>
+                        <div class="code-block">
+<span class="function">mcp__code-executor__dispatch_to_swarm</span>({
+  <span class="string">"prompt"</span>: <span class="string">"Review /workspace/aiswarm/server.py for security issues"</span>,
+  <span class="string">"target"</span>: <span class="string">"gemini"</span>,
+  <span class="string">"timeout"</span>: <span class="number">900</span>
+})
+                        </div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-line">
+                        <div class="step-number">2</div>
+                        <div class="step-connector"></div>
+                    </div>
+                    <div class="step-content">
+                        <h4>MCP Server Receives Request</h4>
+                        <p>The MCP code-executor server (localhost:9091) receives the request via stdio transport and parses the JSON parameters.</p>
+                        <div class="code-block">
+<span class="comment">// executor.ts - /swarm/dispatch endpoint</span>
+<span class="keyword">const</span> SWARM_NODES = {
+  gemini: <span class="string">'http://swarm-gemini:8080'</span>,
+  codex: <span class="string">'http://swarm-codex:8080'</span>,
+  claude: <span class="string">'http://swarm-claude:8080'</span>
+};
+                        </div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-line">
+                        <div class="step-number">3</div>
+                        <div class="step-connector"></div>
+                    </div>
+                    <div class="step-content">
+                        <h4>HTTP POST to Swarm Node</h4>
+                        <p>MCP server sends HTTP POST to the target container via Docker's internal DNS (mcp-net network).</p>
+                        <div class="code-block">
+<span class="keyword">POST</span> http://swarm-gemini:8080/execute
+Content-Type: application/json
+
+{
+  <span class="string">"prompt"</span>: <span class="string">"Review /workspace/aiswarm/server.py..."</span>,
+  <span class="string">"working_dir"</span>: <span class="string">"/workspace"</span>
+}
+                        </div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-line">
+                        <div class="step-number">4</div>
+                        <div class="step-connector"></div>
+                    </div>
+                    <div class="step-content">
+                        <h4>FastAPI Adapter Executes CLI</h4>
+                        <p>The FastAPI adapter inside the container spawns the CLI tool (gemini/codex/claude) with the prompt and captures output.</p>
+                        <div class="code-block">
+<span class="comment"># adapter.py - gemini example</span>
+proc = <span class="keyword">await</span> asyncio.create_subprocess_exec(
+    <span class="string">"gemini"</span>, <span class="string">"-p"</span>, prompt,
+    stdout=asyncio.subprocess.PIPE,
+    stderr=asyncio.subprocess.PIPE,
+    cwd=working_dir
+)
+stdout, stderr = <span class="keyword">await</span> proc.communicate()
+                        </div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-line">
+                        <div class="step-number">5</div>
+                        <div class="step-connector"></div>
+                    </div>
+                    <div class="step-content">
+                        <h4>AI Reads Files & Responds</h4>
+                        <p>The AI model reads files from /workspace (if requested), processes the prompt, and generates a response. The adapter captures the output.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-line">
+                        <div class="step-number">6</div>
+                        <div class="step-connector"></div>
+                    </div>
+                    <div class="step-content">
+                        <h4>JSON Response Returned</h4>
+                        <p>The response flows back through the chain: Adapter -> MCP Server -> Claude Code CLI. Claude presents the result to the user.</p>
+                        <div class="code-block">
+{
+  <span class="string">"target"</span>: <span class="string">"gemini"</span>,
+  <span class="string">"success"</span>: <span class="keyword">true</span>,
+  <span class="string">"result"</span>: <span class="string">"After reviewing server.py, I found the following..."</span>,
+  <span class="string">"metrics"</span>: {
+    <span class="string">"executionTime"</span>: <span class="number">12500</span>,
+    <span class="string">"model"</span>: <span class="string">"gemini-2.5-flash"</span>
+  }
+}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Endpoints -->
+        <section class="section">
+            <h2 class="section-title">MCP API Endpoints</h2>
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-path">/swarm/dispatch</span>
+                </div>
+                <p class="endpoint-desc">Dispatch a prompt to an AI swarm node for execution.</p>
+                <div class="code-block">
+<span class="comment">// Request Body</span>
+{
+  <span class="string">"prompt"</span>: <span class="keyword">string</span>,     <span class="comment">// The task/question to send</span>
+  <span class="string">"target"</span>: <span class="string">"gemini"</span> | <span class="string">"codex"</span> | <span class="string">"claude"</span>,
+  <span class="string">"timeout"</span>: <span class="keyword">number</span>,    <span class="comment">// Seconds (default: 900)</span>
+  <span class="string">"working_dir"</span>: <span class="keyword">string</span> <span class="comment">// Default: /workspace</span>
+}
+
+<span class="comment">// Response</span>
+{
+  <span class="string">"success"</span>: <span class="keyword">boolean</span>,
+  <span class="string">"result"</span>: <span class="keyword">string</span>,
+  <span class="string">"error"</span>: <span class="keyword">string</span> | <span class="keyword">null</span>,
+  <span class="string">"metrics"</span>: { <span class="string">"executionTime"</span>, <span class="string">"model"</span> }
+}
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-path">/swarm/health</span>
+                </div>
+                <p class="endpoint-desc">Check health status of all swarm nodes.</p>
+                <div class="code-block">
+<span class="comment">// Response</span>
+{
+  <span class="string">"swarm"</span>: {
+    <span class="string">"gemini"</span>: { <span class="string">"status"</span>: <span class="string">"healthy"</span>, <span class="string">"node_type"</span>: <span class="string">"gemini"</span> },
+    <span class="string">"codex"</span>: { <span class="string">"status"</span>: <span class="string">"healthy"</span>, <span class="string">"node_type"</span>: <span class="string">"codex"</span> },
+    <span class="string">"claude"</span>: { <span class="string">"status"</span>: <span class="string">"healthy"</span>, <span class="string">"node_type"</span>: <span class="string">"claude"</span> }
+  },
+  <span class="string">"healthyNodes"</span>: <span class="number">3</span>,
+  <span class="string">"totalNodes"</span>: <span class="number">3</span>
+}
+                </div>
+            </div>
+        </section>
+
+        <!-- Usage Patterns -->
+        <section class="section">
+            <h2 class="section-title">Usage Patterns</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Code Review</h3>
+                    <div class="code-block">
+<span class="comment">// Ask Gemini to review code</span>
+dispatch_to_swarm({
+  prompt: <span class="string">"Review the code in /workspace/myproject/src/ for security issues. Read the files first."</span>,
+  target: <span class="string">"gemini"</span>
+})
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>Second Opinion</h3>
+                    <div class="code-block">
+<span class="comment">// Get alternate perspective</span>
+dispatch_to_swarm({
+  prompt: <span class="string">"Gemini suggested using Redis. What's your perspective on Redis vs PostgreSQL for session storage?"</span>,
+  target: <span class="string">"codex"</span>
+})
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>Internet Research</h3>
+                    <div class="code-block">
+<span class="comment">// Gemini has web access</span>
+dispatch_to_swarm({
+  prompt: <span class="string">"Search for the latest Docker security best practices in 2025"</span>,
+  target: <span class="string">"gemini"</span>
+})
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>Deep Analysis</h3>
+                    <div class="code-block">
+<span class="comment">// Complex reasoning with Claude</span>
+dispatch_to_swarm({
+  prompt: <span class="string">"Analyze the architecture in /workspace/aiswarm and suggest improvements for scalability"</span>,
+  target: <span class="string">"claude"</span>
+})
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Decision Tree -->
+        <section class="section">
+            <h2 class="section-title">Which Node to Use?</h2>
+            <div class="diagram-container">
+                <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0" y="0" width="800" height="400" fill="#12121a"/>
+
+                    <!-- Start -->
+                    <rect x="300" y="20" width="200" height="50" rx="25" fill="#9f7aea" stroke="#764ba2" stroke-width="2"/>
+                    <text x="400" y="50" text-anchor="middle" fill="white" font-size="13" font-weight="600">Need External Opinion?</text>
+
+                    <!-- Decision 1: Internet needed? -->
+                    <rect x="50" y="120" width="200" height="50" rx="8" fill="#1a1a24" stroke="#38b2ac" stroke-width="2"/>
+                    <text x="150" y="150" text-anchor="middle" fill="#38b2ac" font-size="12">Need internet search?</text>
+
+                    <!-- Decision 2: Previous answer ok? -->
+                    <rect x="300" y="120" width="200" height="50" rx="8" fill="#1a1a24" stroke="#38b2ac" stroke-width="2"/>
+                    <text x="400" y="150" text-anchor="middle" fill="#38b2ac" font-size="12">Gemini answer satisfactory?</text>
+
+                    <!-- Decision 3: Complex reasoning? -->
+                    <rect x="550" y="120" width="200" height="50" rx="8" fill="#1a1a24" stroke="#38b2ac" stroke-width="2"/>
+                    <text x="650" y="150" text-anchor="middle" fill="#38b2ac" font-size="12">Need complex reasoning?</text>
+
+                    <!-- Outcomes -->
+                    <rect x="50" y="230" width="150" height="80" rx="10" fill="#4299e1" stroke="#3182ce" stroke-width="2"/>
+                    <text x="125" y="260" text-anchor="middle" fill="white" font-size="13" font-weight="600">Use Gemini</text>
+                    <text x="125" y="280" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Primary consultant</text>
+                    <text x="125" y="295" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">+ Internet access</text>
+
+                    <rect x="250" y="230" width="150" height="80" rx="10" fill="#4299e1" stroke="#3182ce" stroke-width="2"/>
+                    <text x="325" y="260" text-anchor="middle" fill="white" font-size="13" font-weight="600">Use Gemini</text>
+                    <text x="325" y="280" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Code review</text>
+                    <text x="325" y="295" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Second opinion</text>
+
+                    <rect x="450" y="230" width="150" height="80" rx="10" fill="#48bb78" stroke="#38a169" stroke-width="2"/>
+                    <text x="525" y="260" text-anchor="middle" fill="white" font-size="13" font-weight="600">Use Codex</text>
+                    <text x="525" y="280" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Alternate view</text>
+                    <text x="525" y="295" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">3rd opinion</text>
+
+                    <rect x="650" y="230" width="130" height="80" rx="10" fill="#9f7aea" stroke="#764ba2" stroke-width="2"/>
+                    <text x="715" y="260" text-anchor="middle" fill="white" font-size="13" font-weight="600">Use Claude</text>
+                    <text x="715" y="280" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Deep analysis</text>
+                    <text x="715" y="295" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Architecture</text>
+
+                    <!-- Arrows -->
+                    <path d="M 300 45 L 150 120" stroke="#8888a0" stroke-width="1.5"/>
+                    <path d="M 400 70 L 400 120" stroke="#8888a0" stroke-width="1.5"/>
+                    <path d="M 500 45 L 650 120" stroke="#8888a0" stroke-width="1.5"/>
+
+                    <path d="M 150 170 L 125 230" stroke="#4299e1" stroke-width="2"/>
+                    <text x="110" y="200" fill="#48bb78" font-size="9">Yes</text>
+
+                    <path d="M 350 170 L 325 230" stroke="#4299e1" stroke-width="2"/>
+                    <text x="310" y="200" fill="#48bb78" font-size="9">Yes</text>
+
+                    <path d="M 450 170 L 525 230" stroke="#48bb78" stroke-width="2"/>
+                    <text x="470" y="200" fill="#ed8936" font-size="9">No</text>
+
+                    <path d="M 650 170 L 715 230" stroke="#9f7aea" stroke-width="2"/>
+                    <text x="680" y="200" fill="#48bb78" font-size="9">Yes</text>
+
+                    <!-- Flow summary -->
+                    <rect x="50" y="340" width="700" height="45" rx="8" fill="#1a1a24" stroke="#2a2a3a" stroke-width="1"/>
+                    <text x="400" y="368" text-anchor="middle" fill="#f0f0f5" font-size="11" font-weight="600">Pattern: Gemini first -> If unsatisfactory, try Gemini again -> If still stuck, ask Codex -> Claude for deep analysis</text>
+                </svg>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <strong>MCP Swarm Dispatch Flow v1.0</strong><br>
+        Generated: 2025-12-08 | linuxserver.lan<br>
+        <a href="/ai-swarm-architecture/">AI Swarm Architecture</a> |
+        <a href="/inter-agent-protocol/">Inter-Agent Protocol</a> |
+        <a href="/">Portal Home</a>
+    </footer>
+</body>
+</html>

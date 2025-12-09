@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Swarm Architecture | linuxserver.lan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-elevated: #1a1a24;
+            --border-subtle: #2a2a3a;
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --text-muted: #55556a;
+            --accent-blue: #4299e1;
+            --accent-purple: #9f7aea;
+            --accent-green: #48bb78;
+            --accent-orange: #ed8936;
+            --accent-cyan: #38b2ac;
+            --accent-pink: #ed64a6;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        body {
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .hero {
+            background: var(--gradient-dark);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, #a0aec0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .metrics-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            transition: color 0.2s;
+        }
+
+        .nav-back:hover {
+            color: var(--accent-purple);
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-subtle);
+            margin-left: 1rem;
+        }
+
+        /* Diagram Container */
+        .diagram-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 2rem;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .diagram-container svg {
+            width: 100%;
+            height: auto;
+            display: block;
+            min-width: 1000px;
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-purple);
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--accent-purple);
+        }
+
+        .feature-card ul {
+            list-style: none;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .feature-card ul li {
+            padding: 0.35rem 0;
+            padding-left: 1.25rem;
+            position: relative;
+        }
+
+        .feature-card ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.7rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .code-block .comment {
+            color: var(--text-muted);
+        }
+
+        .code-block .keyword {
+            color: var(--accent-purple);
+        }
+
+        .code-block .string {
+            color: var(--accent-green);
+        }
+
+        .code-block .function {
+            color: var(--accent-blue);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        /* Flow Steps */
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            transition: border-color 0.2s;
+        }
+
+        .flow-step:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Agent comparison table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .comparison-table th {
+            background: var(--bg-elevated);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .comparison-table td {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .comparison-table tr:hover td {
+            background: var(--bg-elevated);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-blue { background: rgba(66, 153, 225, 0.2); color: var(--accent-blue); }
+        .badge-green { background: rgba(72, 187, 120, 0.2); color: var(--accent-green); }
+        .badge-orange { background: rgba(237, 137, 54, 0.2); color: var(--accent-orange); }
+        .badge-purple { background: rgba(159, 122, 234, 0.2); color: var(--accent-purple); }
+
+        /* Footer */
+        footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent-purple);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .metrics-bar { gap: 1rem; }
+            .metric-value { font-size: 1.5rem; }
+            .container { padding: 1rem; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .comparison-table { font-size: 0.85rem; }
+            .comparison-table th, .comparison-table td { padding: 0.75rem 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-content">
+            <h1>AI Swarm Architecture</h1>
+            <p class="subtitle">Multi-Model Inter-Agent Communication System for linuxserver.lan</p>
+            <div class="metrics-bar">
+                <div class="metric">
+                    <div class="metric-value">4</div>
+                    <div class="metric-label">Claude Agents</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">3</div>
+                    <div class="metric-label">Swarm Nodes</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">2</div>
+                    <div class="metric-label">Communication Protocols</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">64+</div>
+                    <div class="metric-label">MCP Tools</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <a href="/" class="nav-back">Back to Portal</a>
+
+        <!-- System Overview -->
+        <section class="section">
+            <h2 class="section-title">System Overview</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Claude Agent System (File-Based)</h3>
+                    <ul>
+                        <li>4 specialized Claude agents: PM, Architect, Security, Developer</li>
+                        <li>File-based asynchronous coordination</li>
+                        <li>Persistent context across sessions</li>
+                        <li>Clear audit trail of all decisions</li>
+                        <li>Task delegation and escalation protocols</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>AI Swarm System (MCP-Based)</h3>
+                    <ul>
+                        <li>3 AI nodes: Gemini, Codex (ChatGPT), Claude</li>
+                        <li>Real-time dispatch via MCP protocol</li>
+                        <li>Read-only access to /workspace (projects)</li>
+                        <li>Subscription-based auth (Gemini, Claude)</li>
+                        <li>Second opinions, code reviews, research</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>Use Case Differentiation</h3>
+                    <ul>
+                        <li><strong>Claude Agents:</strong> Complex multi-phase projects</li>
+                        <li><strong>AI Swarm:</strong> Quick consultations, validations</li>
+                        <li><strong>Combined:</strong> Agent escalates to swarm for second opinion</li>
+                        <li>Gemini: Primary for external validation + internet search</li>
+                        <li>Codex: Alternate when Gemini's answer unsatisfactory</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Architecture Diagram -->
+        <section class="section">
+            <h2 class="section-title">Communication Architecture</h2>
+            <div class="diagram-container">
+                <svg viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#8888a0"/>
+                        </marker>
+                        <marker id="arrowhead-purple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#9f7aea"/>
+                        </marker>
+                        <marker id="arrowhead-cyan" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#38b2ac"/>
+                        </marker>
+                        <linearGradient id="grad-purple" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="grad-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4299e1;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#3182ce;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="grad-green" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#48bb78;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#38a169;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="grad-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ed8936;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#dd6b20;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="grad-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#38b2ac;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#319795;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Background sections -->
+                    <rect x="30" y="30" width="400" height="640" rx="20" fill="#1a1a2e" stroke="#2a2a3a" stroke-width="2"/>
+                    <text x="230" y="65" text-anchor="middle" fill="#9f7aea" font-size="16" font-weight="600">Claude Agent System (File-Based)</text>
+
+                    <rect x="470" y="30" width="300" height="640" rx="20" fill="#16213e" stroke="#2a2a3a" stroke-width="2"/>
+                    <text x="620" y="65" text-anchor="middle" fill="#38b2ac" font-size="16" font-weight="600">MCP Code Executor</text>
+
+                    <rect x="810" y="30" width="360" height="640" rx="20" fill="#1a1a2e" stroke="#2a2a3a" stroke-width="2"/>
+                    <text x="990" y="65" text-anchor="middle" fill="#ed8936" font-size="16" font-weight="600">AI Swarm Nodes (Docker)</text>
+
+                    <!-- User/Claude Code CLI -->
+                    <rect x="490" y="100" width="260" height="80" rx="12" fill="url(#grad-purple)" stroke="#9f7aea" stroke-width="2"/>
+                    <text x="620" y="135" text-anchor="middle" fill="white" font-size="14" font-weight="600">Claude Code CLI</text>
+                    <text x="620" y="155" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">(Opus 4.5 - Main Orchestrator)</text>
+
+                    <!-- PM Agent -->
+                    <rect x="60" y="100" width="160" height="100" rx="10" fill="url(#grad-purple)" stroke="#764ba2" stroke-width="2"/>
+                    <text x="140" y="130" text-anchor="middle" fill="white" font-size="13" font-weight="600">PM Agent</text>
+                    <text x="140" y="150" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Orchestration</text>
+                    <text x="140" y="165" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Task Delegation</text>
+                    <text x="140" y="180" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Progress Reports</text>
+
+                    <!-- Architect Agent -->
+                    <rect x="240" y="100" width="160" height="100" rx="10" fill="url(#grad-blue)" stroke="#3182ce" stroke-width="2"/>
+                    <text x="320" y="130" text-anchor="middle" fill="white" font-size="13" font-weight="600">Architect Agent</text>
+                    <text x="320" y="150" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">System Design</text>
+                    <text x="320" y="165" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Tech Evaluation</text>
+                    <text x="320" y="180" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">ADRs</text>
+
+                    <!-- Security Agent -->
+                    <rect x="60" y="220" width="160" height="100" rx="10" fill="url(#grad-orange)" stroke="#dd6b20" stroke-width="2"/>
+                    <text x="140" y="250" text-anchor="middle" fill="white" font-size="13" font-weight="600">Security Agent</text>
+                    <text x="140" y="270" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Network/Traefik</text>
+                    <text x="140" y="285" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Keycloak/OAuth2</text>
+                    <text x="140" y="300" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Security Audit</text>
+
+                    <!-- Developer Agent -->
+                    <rect x="240" y="220" width="160" height="100" rx="10" fill="url(#grad-green)" stroke="#38a169" stroke-width="2"/>
+                    <text x="320" y="250" text-anchor="middle" fill="white" font-size="13" font-weight="600">Developer Agent</text>
+                    <text x="320" y="270" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Implementation</text>
+                    <text x="320" y="285" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Deployment</text>
+                    <text x="320" y="300" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Debugging</text>
+
+                    <!-- File-based workspace -->
+                    <rect x="60" y="350" width="340" height="130" rx="10" fill="#12121a" stroke="#2a2a3a" stroke-width="2"/>
+                    <text x="230" y="375" text-anchor="middle" fill="#f0f0f5" font-size="12" font-weight="600">File-Based Workspace</text>
+                    <text x="230" y="395" text-anchor="middle" fill="#8888a0" font-size="10">$HOME/projects/data/claudeagents/</text>
+                    <text x="100" y="420" fill="#8888a0" font-size="10">pm/tasks/</text>
+                    <text x="100" y="435" fill="#8888a0" font-size="10">architect/decisions/</text>
+                    <text x="100" y="450" fill="#8888a0" font-size="10">security/decisions/</text>
+                    <text x="100" y="465" fill="#8888a0" font-size="10">developer/notes/</text>
+                    <text x="260" y="420" fill="#55556a" font-size="10">Task breakdowns</text>
+                    <text x="260" y="435" fill="#55556a" font-size="10">ADRs, designs</text>
+                    <text x="260" y="450" fill="#55556a" font-size="10">Network configs</text>
+                    <text x="260" y="465" fill="#55556a" font-size="10">Implementation logs</text>
+
+                    <!-- Escalation paths -->
+                    <rect x="60" y="500" width="340" height="80" rx="10" fill="#12121a" stroke="#9f7aea" stroke-width="2" stroke-dasharray="5,5"/>
+                    <text x="230" y="525" text-anchor="middle" fill="#9f7aea" font-size="12" font-weight="600">Escalation Protocol</text>
+                    <text x="230" y="545" text-anchor="middle" fill="#8888a0" font-size="10">escalations/{target-agent}/{project}/request-{topic}.md</text>
+                    <text x="230" y="565" text-anchor="middle" fill="#55556a" font-size="10">Asynchronous handoffs between agents</text>
+
+                    <!-- MCP Server -->
+                    <rect x="500" y="220" width="240" height="120" rx="12" fill="url(#grad-cyan)" stroke="#319795" stroke-width="2"/>
+                    <text x="620" y="255" text-anchor="middle" fill="white" font-size="14" font-weight="600">MCP Code Executor</text>
+                    <text x="620" y="275" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">localhost:9091</text>
+                    <text x="620" y="300" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">/swarm/dispatch</text>
+                    <text x="620" y="315" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">/swarm/health</text>
+
+                    <!-- MCP Tools -->
+                    <rect x="500" y="360" width="240" height="100" rx="10" fill="#12121a" stroke="#38b2ac" stroke-width="2"/>
+                    <text x="620" y="385" text-anchor="middle" fill="#38b2ac" font-size="12" font-weight="600">MCP Tools (64+)</text>
+                    <text x="540" y="410" fill="#8888a0" font-size="10">dispatch_to_swarm</text>
+                    <text x="540" y="425" fill="#8888a0" font-size="10">swarm_health</text>
+                    <text x="540" y="440" fill="#8888a0" font-size="10">execute_code</text>
+                    <text x="680" y="410" fill="#55556a" font-size="10">15min timeout</text>
+                    <text x="680" y="425" fill="#55556a" font-size="10">All 3 nodes</text>
+                    <text x="680" y="440" fill="#55556a" font-size="10">TypeScript</text>
+
+                    <!-- Docker Network -->
+                    <rect x="500" y="480" width="240" height="70" rx="10" fill="#12121a" stroke="#2a2a3a" stroke-width="2"/>
+                    <text x="620" y="505" text-anchor="middle" fill="#f0f0f5" font-size="12" font-weight="600">mcp-net (Docker Network)</text>
+                    <text x="620" y="525" text-anchor="middle" fill="#8888a0" font-size="10">Container-to-container communication</text>
+                    <text x="620" y="540" text-anchor="middle" fill="#55556a" font-size="10">Internal DNS resolution</text>
+
+                    <!-- Swarm Nodes -->
+                    <!-- Gemini -->
+                    <rect x="840" y="100" width="150" height="130" rx="10" fill="url(#grad-blue)" stroke="#3182ce" stroke-width="2"/>
+                    <text x="915" y="125" text-anchor="middle" fill="white" font-size="13" font-weight="600">swarm-gemini</text>
+                    <text x="915" y="145" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Gemini 2.5 Flash</text>
+                    <text x="915" y="165" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Primary consultant</text>
+                    <text x="915" y="180" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Internet search</text>
+                    <text x="915" y="195" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Code reviews</text>
+                    <text x="915" y="210" text-anchor="middle" fill="#48bb78" font-size="9">$20/mo subscription</text>
+
+                    <!-- Codex -->
+                    <rect x="1000" y="100" width="150" height="130" rx="10" fill="url(#grad-green)" stroke="#38a169" stroke-width="2"/>
+                    <text x="1075" y="125" text-anchor="middle" fill="white" font-size="13" font-weight="600">swarm-codex</text>
+                    <text x="1075" y="145" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">OpenAI ChatGPT</text>
+                    <text x="1075" y="165" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Alternate opinion</text>
+                    <text x="1075" y="180" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">When Gemini unsatisfactory</text>
+                    <text x="1075" y="195" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Debugging assist</text>
+                    <text x="1075" y="210" text-anchor="middle" fill="#ed8936" font-size="9">API Key auth</text>
+
+                    <!-- Claude -->
+                    <rect x="920" y="250" width="150" height="130" rx="10" fill="url(#grad-purple)" stroke="#764ba2" stroke-width="2"/>
+                    <text x="995" y="275" text-anchor="middle" fill="white" font-size="13" font-weight="600">swarm-claude</text>
+                    <text x="995" y="295" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Claude Sonnet 4.5</text>
+                    <text x="995" y="315" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Deep analysis</text>
+                    <text x="995" y="330" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Complex reasoning</text>
+                    <text x="995" y="345" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Architecture review</text>
+                    <text x="995" y="360" text-anchor="middle" fill="#48bb78" font-size="9">$200/mo Max sub</text>
+
+                    <!-- Shared Workspace -->
+                    <rect x="840" y="410" width="310" height="100" rx="10" fill="#12121a" stroke="#2a2a3a" stroke-width="2"/>
+                    <text x="995" y="435" text-anchor="middle" fill="#f0f0f5" font-size="12" font-weight="600">/workspace (Read-Only)</text>
+                    <text x="995" y="455" text-anchor="middle" fill="#8888a0" font-size="10">Mounted: $HOME/projects</text>
+                    <text x="880" y="480" fill="#8888a0" font-size="10">Can read:</text>
+                    <text x="880" y="495" fill="#55556a" font-size="10">All project code, configs, docs</text>
+                    <text x="1040" y="480" fill="#ed8936" font-size="10">Cannot:</text>
+                    <text x="1040" y="495" fill="#55556a" font-size="10">Modify any files</text>
+
+                    <!-- Auth Volumes -->
+                    <rect x="840" y="530" width="310" height="70" rx="10" fill="#12121a" stroke="#9f7aea" stroke-width="2"/>
+                    <text x="995" y="555" text-anchor="middle" fill="#9f7aea" font-size="12" font-weight="600">Persistent Auth Volumes</text>
+                    <text x="880" y="580" fill="#8888a0" font-size="9">aiswarm-gemini-auth</text>
+                    <text x="995" y="580" fill="#8888a0" font-size="9">aiswarm-codex-auth</text>
+                    <text x="1100" y="580" fill="#8888a0" font-size="9">aiswarm-claude-auth</text>
+
+                    <!-- Connections -->
+                    <!-- Claude Code to PM -->
+                    <path d="M 490 140 L 220 150" stroke="#9f7aea" stroke-width="2" marker-end="url(#arrowhead-purple)"/>
+
+                    <!-- Claude Code to MCP -->
+                    <path d="M 620 180 L 620 220" stroke="#38b2ac" stroke-width="2" marker-end="url(#arrowhead-cyan)"/>
+
+                    <!-- MCP to Swarm nodes -->
+                    <path d="M 740 260 L 840 180" stroke="#38b2ac" stroke-width="2" marker-end="url(#arrowhead-cyan)"/>
+                    <path d="M 740 280 L 840 300" stroke="#38b2ac" stroke-width="2" marker-end="url(#arrowhead-cyan)"/>
+                    <path d="M 740 260 L 1000 140" stroke="#38b2ac" stroke-width="2" marker-end="url(#arrowhead-cyan)"/>
+
+                    <!-- Agent interconnections (file-based) -->
+                    <path d="M 140 200 L 140 220" stroke="#8888a0" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrowhead)"/>
+                    <path d="M 320 200 L 320 220" stroke="#8888a0" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrowhead)"/>
+                    <path d="M 220 150 L 240 150" stroke="#8888a0" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrowhead)"/>
+                    <path d="M 140 320 L 230 350" stroke="#8888a0" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrowhead)"/>
+                    <path d="M 320 320 L 230 350" stroke="#8888a0" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrowhead)"/>
+
+                    <!-- MCP to tools -->
+                    <path d="M 620 340 L 620 360" stroke="#38b2ac" stroke-width="1.5" marker-end="url(#arrowhead-cyan)"/>
+
+                    <!-- Swarm to workspace -->
+                    <path d="M 915 230 L 995 410" stroke="#8888a0" stroke-width="1.5" stroke-dasharray="4,4"/>
+                    <path d="M 1075 230 L 995 410" stroke="#8888a0" stroke-width="1.5" stroke-dasharray="4,4"/>
+                    <path d="M 995 380 L 995 410" stroke="#8888a0" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+                    <!-- Labels on connections -->
+                    <text x="350" y="130" fill="#9f7aea" font-size="9" font-weight="500">Task tool</text>
+                    <text x="650" y="205" fill="#38b2ac" font-size="9" font-weight="500">MCP Protocol</text>
+                    <text x="780" y="200" fill="#38b2ac" font-size="9" font-weight="500">HTTP/JSON</text>
+
+                    <!-- Flow indicator -->
+                    <rect x="60" y="610" width="340" height="50" rx="8" fill="#12121a" stroke="#48bb78" stroke-width="2"/>
+                    <text x="230" y="640" text-anchor="middle" fill="#48bb78" font-size="11" font-weight="600">Typical Flow: PM -> Architect -> Security -> Developer</text>
+                </svg>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-box" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div>
+                    <span>PM / Main Orchestrator</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box" style="background: linear-gradient(135deg, #4299e1, #3182ce);"></div>
+                    <span>Architect / Gemini</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box" style="background: linear-gradient(135deg, #ed8936, #dd6b20);"></div>
+                    <span>Security</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box" style="background: linear-gradient(135deg, #48bb78, #38a169);"></div>
+                    <span>Developer / Codex</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box" style="background: linear-gradient(135deg, #38b2ac, #319795);"></div>
+                    <span>MCP Code Executor</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Claude Agent Communication Flow -->
+        <section class="section">
+            <h2 class="section-title">Claude Agent Communication Flow</h2>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>PM Receives Request</h4>
+                        <p>User request comes through Claude Code CLI. PM agent breaks down the task and creates task-breakdown.md with assignments for each specialist agent.</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Architect Designs Solution</h4>
+                        <p>Reads PM's task assignment, evaluates technologies, and writes Architecture Decision Records (ADRs) in decisions/{project}/architecture.md</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Security Configures Infrastructure</h4>
+                        <p>Reads architect's design, configures network topology, Traefik routing, Keycloak clients. Writes decisions in decisions/{project}/network.md</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Developer Implements</h4>
+                        <p>Reads architect and security specs, implements the solution, deploys, and documents in notes/{project}/deployment.md</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>PM Synthesizes Report</h4>
+                        <p>Reads all agent outputs, compiles progress report, and provides final summary to user.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Swarm Consultation -->
+        <section class="section">
+            <h2 class="section-title">AI Swarm Consultation Pattern</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>When to Use Gemini (Primary)</h3>
+                    <ul>
+                        <li>Second opinions before major decisions</li>
+                        <li>Code reviews for quality and patterns</li>
+                        <li>Pair programming / debugging sessions</li>
+                        <li>Project plan feedback and validation</li>
+                        <li>Internet search for current docs/solutions</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>When to Use Codex (Alternate)</h3>
+                    <ul>
+                        <li>Gemini's response doesn't seem right</li>
+                        <li>Debugging takes multiple attempts</li>
+                        <li>Complex issues needing multiple perspectives</li>
+                        <li>Validating or challenging Gemini's answer</li>
+                        <li>Third opinion after asking Gemini twice</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>When to Use Claude (Swarm)</h3>
+                    <ul>
+                        <li>Deep analysis requiring complex reasoning</li>
+                        <li>Architecture reviews needing nuance</li>
+                        <li>Cross-referencing with main Claude instance</li>
+                        <li>Long-form documentation generation</li>
+                        <li>When Sonnet perspective complements Opus</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="code-block">
+<span class="comment">// Example: Dispatch to Gemini for code review</span>
+<span class="function">mcp__code-executor__dispatch_to_swarm</span>({
+  <span class="string">"prompt"</span>: <span class="string">"Review the code in /workspace/aiswarm/shared/server.py for security issues and best practices. Read the file first."</span>,
+  <span class="string">"target"</span>: <span class="string">"gemini"</span>,
+  <span class="string">"timeout"</span>: <span class="keyword">900</span>  <span class="comment">// 15 minutes</span>
+})
+
+<span class="comment">// Example: Get alternate opinion from Codex</span>
+<span class="function">mcp__code-executor__dispatch_to_swarm</span>({
+  <span class="string">"prompt"</span>: <span class="string">"Gemini suggested using Redis for session storage. What's your perspective? Pros/cons vs PostgreSQL?"</span>,
+  <span class="string">"target"</span>: <span class="string">"codex"</span>,
+  <span class="string">"timeout"</span>: <span class="keyword">900</span>
+})
+            </div>
+        </section>
+
+        <!-- Node Comparison -->
+        <section class="section">
+            <h2 class="section-title">Swarm Node Comparison</h2>
+            <div class="diagram-container">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Node</th>
+                            <th>Model</th>
+                            <th>Authentication</th>
+                            <th>Primary Use Cases</th>
+                            <th>Unique Capability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-blue">swarm-gemini</span></td>
+                            <td>Gemini 2.5 Flash</td>
+                            <td>$20/mo Google subscription (OAuth)</td>
+                            <td>Second opinions, code reviews, research</td>
+                            <td>Internet search access</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-green">swarm-codex</span></td>
+                            <td>OpenAI ChatGPT</td>
+                            <td>API Key (sk-proj-*)</td>
+                            <td>Alternate perspective, debugging assist</td>
+                            <td>Different training approach</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-purple">swarm-claude</span></td>
+                            <td>Claude Sonnet 4.5</td>
+                            <td>$200/mo Max subscription (OAuth)</td>
+                            <td>Deep analysis, complex reasoning</td>
+                            <td>Same family as orchestrator</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Technical Details -->
+        <section class="section">
+            <h2 class="section-title">Technical Implementation</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Docker Architecture</h3>
+                    <ul>
+                        <li>Each swarm node runs in isolated container</li>
+                        <li>FastAPI HTTP adapter wraps CLI tools</li>
+                        <li>Non-root 'swarm' user for security</li>
+                        <li>Shared mcp-net Docker network</li>
+                        <li>Health checks every 30 seconds</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>MCP Integration</h3>
+                    <ul>
+                        <li>MCP server on localhost:9091</li>
+                        <li>dispatch_to_swarm tool with 15min timeout</li>
+                        <li>swarm_health checks all 3 nodes</li>
+                        <li>Stdio transport for Claude Code CLI</li>
+                        <li>JSON responses with metrics</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>File Workspace</h3>
+                    <ul>
+                        <li>/workspace mounted read-only to all nodes</li>
+                        <li>Maps to $HOME/projects on host</li>
+                        <li>Swarm can analyze but not modify</li>
+                        <li>All changes made by main Claude instance</li>
+                        <li>Auth persisted in named volumes</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>Agent Workspace</h3>
+                    <ul>
+                        <li>$HOME/projects/data/claudeagents/ base</li>
+                        <li>Mirrored project paths in workspace</li>
+                        <li>tasks/, decisions/, notes/, reports/</li>
+                        <li>escalations/ for cross-agent handoffs</li>
+                        <li>Persistent across sessions</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Reference -->
+        <section class="section">
+            <h2 class="section-title">Quick Reference</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Check Swarm Health</h3>
+                    <div class="code-block">
+<span class="function">mcp__code-executor__swarm_health</span>()
+<span class="comment">// Returns status of all 3 nodes</span>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>Deploy/Redeploy Swarm</h3>
+                    <div class="code-block">
+<span class="keyword">cd</span> /home/administrator/projects/aiswarm
+./deploy.sh
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>Authenticate Nodes</h3>
+                    <div class="code-block">
+<span class="comment"># Gemini (Google OAuth)</span>
+docker exec -it swarm-gemini gemini
+
+<span class="comment"># Claude (Anthropic OAuth)</span>
+docker exec -it swarm-claude claude setup-token
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>View Container Logs</h3>
+                    <div class="code-block">
+docker logs swarm-gemini -f
+docker logs swarm-codex -f
+docker logs swarm-claude -f
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <strong>AI Swarm Architecture v1.0</strong><br>
+        Generated: 2025-12-08 | linuxserver.lan<br>
+        <a href="/infrastructure-docs/">Infrastructure Docs</a> |
+        <a href="/context-compare/">Claude Context</a> |
+        <a href="/">Portal Home</a>
+    </footer>
+</body>
+</html>

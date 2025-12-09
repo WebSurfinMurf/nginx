@@ -479,16 +479,110 @@
             <p style="margin-top: 1.5rem; font-size: 1.1rem; opacity: 0.95;">This pattern applies to humans, AI systems, and any entity that needs to become productive in a specialized domain. Context organization is what transforms capability into expertise.</p>
         </div>
 
+        <!-- LEVEL 5: Context Sharing Beyond Individual -->
+        <div style="margin-top: 3rem;">
+            <div class="arrow-down">↓</div>
+            <h2 style="text-align: center; color: #1e3c72; font-size: 2rem; margin: 1.5rem 0;">🌐 Beyond Individual Context</h2>
+            <p style="text-align: center; color: #718096; font-size: 1.1rem; margin-bottom: 2rem;">Sharing expertise across teams and getting diverse perspectives</p>
+        </div>
+
+        <div class="columns-container">
+            <!-- Human Side: Cross-Team Collaboration -->
+            <div class="level-box" style="border-left-color: #38b2ac; background: linear-gradient(135deg, #e6fffa 0%, #f0fff4 100%);">
+                <span class="level-badge" style="background: #38b2ac;">LEVEL 5: Collaboration</span>
+                <h3>Cross-Team Knowledge Sharing</h3>
+                <p class="context-type">Enterprise-wide • Multi-team coordination</p>
+
+                <div class="example">
+                    <strong>Sharing With Peers (Same Company):</strong>
+                    <ul>
+                        <li>Architecture Review Boards document decisions</li>
+                        <li>Shared wikis and Confluence spaces</li>
+                        <li>Cross-team Slack channels (#platform-eng)</li>
+                        <li>Architecture Decision Records (ADRs) for other teams</li>
+                    </ul>
+                </div>
+
+                <div class="example">
+                    <strong>Consulting External Experts:</strong>
+                    <ul>
+                        <li>Hire a security consultant for audit</li>
+                        <li>Engage AWS solutions architect</li>
+                        <li>Stack Overflow for community wisdom</li>
+                        <li>Conference talks and industry peers</li>
+                    </ul>
+                </div>
+
+                <div class="example" style="background: #f0fff4; border-color: #48bb78;">
+                    <strong>Why Multiple Perspectives Matter:</strong>
+                    <p>Different experts bring different training, biases, and experiences. A security expert sees risks a developer might miss. An external consultant spots patterns your team is blind to.</p>
+                </div>
+            </div>
+
+            <!-- AI Side: AI Swarm -->
+            <div class="level-box" style="border-left-color: #38b2ac; background: linear-gradient(135deg, #e6fffa 0%, #f0fff4 100%);">
+                <span class="level-badge" style="background: #38b2ac;">LEVEL 5: Collaboration</span>
+                <h3><a href="/ai-swarm-architecture/" style="color: #1e3c72; text-decoration: underline;">AI Swarm Architecture</a></h3>
+                <p class="context-type">Multi-agent • Multi-model coordination</p>
+
+                <div class="example">
+                    <strong>Sharing With Peer Agents (<a href="/inter-agent-protocol/" style="color: #4299e1;">File-Based Protocol</a>):</strong>
+                    <ul>
+                        <li><strong>PM Agent:</strong> Orchestrates tasks, writes breakdowns</li>
+                        <li><strong>Architect Agent:</strong> Writes ADRs, design specs</li>
+                        <li><strong>Security Agent:</strong> Documents network, auth configs</li>
+                        <li><strong>Developer Agent:</strong> Reads specs, writes deployment notes</li>
+                    </ul>
+                    <p style="margin-top: 0.75rem; color: #718096; font-size: 0.9rem;">Agents share context via <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 3px;">$HOME/projects/data/claudeagents/</code> directories</p>
+                </div>
+
+                <div class="example">
+                    <strong>Consulting Different Models (<a href="/mcp-swarm-flow/" style="color: #4299e1;">MCP Swarm Dispatch</a>):</strong>
+                    <ul>
+                        <li><strong>Gemini:</strong> Primary consultant, has internet search</li>
+                        <li><strong>Codex (ChatGPT):</strong> Alternate perspective when needed</li>
+                        <li><strong>Claude (Sonnet):</strong> Deep analysis, architecture review</li>
+                    </ul>
+                    <p style="margin-top: 0.75rem; color: #718096; font-size: 0.9rem;">All nodes have read-only access to <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 3px;">/workspace</code> (projects)</p>
+                </div>
+
+                <div class="example" style="background: #f0fff4; border-color: #48bb78;">
+                    <strong>Why Multiple Models Matter:</strong>
+                    <p>Each AI has different training data, reasoning patterns, and blind spots. Gemini can search the web. ChatGPT has different coding style preferences. Getting multiple perspectives catches errors a single model might miss.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collaboration Insight -->
+        <div style="background: linear-gradient(135deg, #38b2ac 0%, #319795 100%); color: white; padding: 2.5rem; border-radius: 12px; margin: 2rem 0; text-align: center;">
+            <h2 style="font-size: 1.8rem; margin-bottom: 1rem;">🤝 The Collaboration Pattern</h2>
+            <p style="font-size: 1.15rem; line-height: 1.8; max-width: 900px; margin: 0 auto;">
+                Just as senior engineers share knowledge through documentation and consult external experts for fresh perspectives,
+                AI systems can share context through file-based protocols and consult different models for diverse viewpoints.
+            </p>
+            <p style="margin-top: 1.5rem; font-size: 1.1rem; opacity: 0.95;">
+                <strong>File-based sharing</strong> enables asynchronous coordination across sessions.<br>
+                <strong>Multi-model consultation</strong> catches blind spots through diverse "training backgrounds."
+            </p>
+            <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <a href="/ai-swarm-architecture/" style="display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: 500;">🤖 AI Swarm Architecture</a>
+                <a href="/inter-agent-protocol/" style="display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: 500;">📋 Inter-Agent Protocol</a>
+                <a href="/mcp-swarm-flow/" style="display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: 500;">⚡ MCP Swarm Flow</a>
+            </div>
+        </div>
+
         <div class="footer">
             <p><strong>Context Comparison</strong></p>
-            <p style="margin-top: 0.5rem;">Understanding Layered Learning and Context Loading</p>
+            <p style="margin-top: 0.5rem;">Understanding Layered Learning, Context Loading, and Multi-Agent Collaboration</p>
             <p style="margin-top: 1rem; font-size: 0.9rem;">
                 📚 See also:
-                <a href="/new-hire-context/">Detailed New Hire Analogy</a> |
+                <a href="/ai-swarm-architecture/">AI Swarm Architecture</a> |
+                <a href="/inter-agent-protocol/">Inter-Agent Protocol</a> |
+                <a href="/mcp-swarm-flow/">MCP Swarm Flow</a> |
                 <a href="/claudecodecliconfig/">Technical Architecture</a> |
                 <a href="/">All Documentation</a>
             </p>
-            <p style="margin-top: 1rem; color: #a0aec0; font-size: 0.85rem;">Created: 2025-11-07</p>
+            <p style="margin-top: 1rem; color: #a0aec0; font-size: 0.85rem;">Created: 2025-11-07 | Updated: 2025-12-08</p>
         </div>
     </div>
 </body>
