@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Options Finder | Multi-Source Strategy Search</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-white: #ffffff;
+            --bg-light: #f8fafc;
+            --bg-subtle: #f1f5f9;
+            --accent-emerald: #10b981;
+            --accent-emerald-dark: #059669;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f97316;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --accent-yellow: #eab308;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-light: #e2e8f0;
+            --border-medium: #cbd5e1;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 50%, #fefce8 100%);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--accent-emerald); }
+
+        .nav-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--accent-emerald-dark);
+        }
+
+        .hero {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan));
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-emerald-dark) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Key Value Prop */
+        .value-prop {
+            max-width: 1400px;
+            margin: 0 auto 3rem;
+            padding: 0 2rem;
+        }
+
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .value-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            text-align: center;
+        }
+
+        .value-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .value-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .value-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Architecture Section */
+        .architecture-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .arch-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            overflow-x: auto;
+        }
+
+        .arch-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            min-width: 1000px;
+        }
+
+        .arch-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .arch-box {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            min-width: 140px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .arch-box.client {
+            background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+            border: 2px solid var(--accent-blue);
+            color: #1e40af;
+        }
+
+        .arch-box.api {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            border: 2px solid var(--accent-emerald);
+            color: #065f46;
+            min-width: 320px;
+        }
+
+        .arch-box.engine {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid var(--accent-yellow);
+            color: #92400e;
+        }
+
+        .arch-box.provider {
+            background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+            border: 2px solid var(--accent-purple);
+            color: #5b21b6;
+        }
+
+        .arch-box.storage {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border: 2px solid var(--accent-red);
+            color: #991b1b;
+        }
+
+        .arch-box.external {
+            background: linear-gradient(135deg, #cffafe, #a5f3fc);
+            border: 2px solid var(--accent-cyan);
+            color: #0e7490;
+        }
+
+        .arch-box .subtitle {
+            font-size: 0.75rem;
+            font-weight: 400;
+            opacity: 0.8;
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        .arch-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .arch-arrow .arrow-icon { font-size: 1.5rem; line-height: 1; }
+
+        .arch-arrow .arrow-label {
+            background: var(--bg-subtle);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .provider-group {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--bg-subtle);
+            border-radius: var(--radius-md);
+            border: 2px dashed var(--border-medium);
+            position: relative;
+        }
+
+        .group-label {
+            position: absolute;
+            top: -0.75rem;
+            left: 1rem;
+            background: white;
+            padding: 0 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .storage-group {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: #fff5f5;
+            border-radius: var(--radius-md);
+            border: 2px dashed #fca5a5;
+            position: relative;
+        }
+
+        /* Data Sources Section */
+        .sources-section {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 2rem;
+        }
+
+        .source-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .source-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .source-header {
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .source-header.ib { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+        .source-header.tv { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .source-header.fidelity { background: linear-gradient(135deg, #059669, #047857); }
+        .source-header.yahoo { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+
+        .source-header .icon { font-size: 2rem; }
+        .source-header h3 { color: white; font-size: 1.1rem; }
+        .source-header .badge {
+            margin-left: auto;
+            padding: 0.25rem 0.75rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .source-body {
+            padding: 1.25rem;
+        }
+
+        .source-body ul {
+            list-style: none;
+        }
+
+        .source-body li {
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .source-body li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.75rem;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-emerald);
+            border-radius: 50%;
+        }
+
+        /* Flow Section */
+        .flow-section {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 2rem;
+        }
+
+        .flow-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+        }
+
+        .flow-scenario {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 2px solid var(--accent-emerald);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .flow-scenario h3 {
+            color: var(--accent-emerald-dark);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .flow-scenario p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .flow-scenario .highlight {
+            background: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            color: var(--accent-emerald-dark);
+        }
+
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .flow-step {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 1.5rem;
+            position: relative;
+        }
+
+        .flow-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 29px;
+            top: 60px;
+            bottom: -20px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-emerald), var(--accent-blue));
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-content {
+            padding-bottom: 2rem;
+        }
+
+        .step-content h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .step-detail {
+            background: var(--bg-subtle);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            overflow-x: auto;
+        }
+
+        .step-detail pre { margin: 0; white-space: pre-wrap; }
+        .step-detail .label { color: var(--accent-purple); font-weight: 600; }
+        .step-detail .value { color: var(--accent-emerald-dark); }
+        .step-detail .comment { color: var(--text-muted); }
+
+        .step-sources {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .source-tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .source-tag.ib { background: #fee2e2; color: #991b1b; }
+        .source-tag.tv { background: #dbeafe; color: #1e40af; }
+        .source-tag.redis { background: #fef3c7; color: #92400e; }
+        .source-tag.timescale { background: #ede9fe; color: #5b21b6; }
+
+        /* Storage Section */
+        .storage-section {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 2rem;
+        }
+
+        .storage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .storage-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .storage-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .storage-card .ttl {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            background: var(--bg-subtle);
+            border-radius: 4px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .storage-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .storage-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .storage-item {
+            padding: 0.35rem 0.75rem;
+            background: var(--bg-subtle);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Results Section */
+        .results-section {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 2rem;
+        }
+
+        .results-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            border: 2px solid var(--accent-emerald);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .result-rank {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .rank-badge {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+        }
+
+        .result-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+        .result-type { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .result-score { text-align: right; }
+        .score-value { font-size: 1.5rem; font-weight: 800; color: var(--accent-emerald-dark); }
+        .score-label { font-size: 0.75rem; color: var(--text-muted); }
+
+        .result-legs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .leg {
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .leg .action { font-weight: 700; }
+        .leg .action.buy { color: var(--accent-emerald); }
+        .leg .action.sell { color: var(--accent-red); }
+
+        .result-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .result-metric {
+            background: white;
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            text-align: center;
+        }
+
+        .result-metric .value { font-size: 1.1rem; font-weight: 700; }
+        .result-metric .value.green { color: var(--accent-emerald); }
+        .result-metric .value.red { color: var(--accent-red); }
+        .result-metric .label { font-size: 0.75rem; color: var(--text-muted); }
+
+        .enrichment-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #dbeafe;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            color: #1e40af;
+            margin-top: 1rem;
+        }
+
+        footer {
+            max-width: 1400px;
+            margin: 3rem auto 0;
+            padding: 2rem;
+            border-top: 2px solid var(--border-light);
+            text-align: center;
+            background: white;
+        }
+
+        .footer-meta { color: var(--text-muted); font-size: 0.85rem; }
+
+        @media (max-width: 768px) {
+            .arch-container, .flow-container { padding: 1rem; }
+            .flow-step { grid-template-columns: 50px 1fr; gap: 1rem; }
+            .step-number { width: 50px; height: 50px; font-size: 1rem; }
+            .flow-step:not(:last-child)::after { left: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-inner">
+            <a href="/" class="back-link"><span>&larr;</span> Back to Portal</a>
+            <span class="nav-title">Options Finder API</span>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-badge">Abstraction Layer Architecture</div>
+        <h1>Options Strategy Finder</h1>
+        <p class="hero-subtitle">A unified abstraction layer that aggregates options data from Interactive Brokers, TradingView, and other sources to find optimal strategies while persisting analysis for historical tracking.</p>
+    </header>
+
+    <!-- Value Proposition -->
+    <section class="value-prop">
+        <div class="value-grid">
+            <div class="value-card">
+                <div class="icon">&#x1F517;</div>
+                <h3>Multi-Source Aggregation</h3>
+                <p>Pull data from IB, TradingView, Yahoo - use the best source available with automatic fallback</p>
+            </div>
+            <div class="value-card">
+                <div class="icon">&#x1F4BE;</div>
+                <h3>Persistent Storage</h3>
+                <p>Store chains in Redis, IV history in TimescaleDB, track strategy performance over time</p>
+            </div>
+            <div class="value-card">
+                <div class="icon">&#x1F916;</div>
+                <h3>AI Integration</h3>
+                <p>Query via Claude Code with natural language - "Find me a bull call spread on NVDA for March"</p>
+            </div>
+            <div class="value-card">
+                <div class="icon">&#x26A1;</div>
+                <h3>Automated Analysis</h3>
+                <p>No more clicking through TWS - automate searches and get alerts when opportunities appear</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Diagram -->
+    <section class="architecture-section">
+        <div class="section-header">
+            <h2>System Architecture</h2>
+            <p>Abstraction layer over existing tools with persistent storage</p>
+        </div>
+
+        <div class="arch-container">
+            <div class="arch-diagram">
+                <!-- Client Layer -->
+                <div class="arch-row">
+                    <div class="arch-box client">Claude Code<span class="subtitle">MCP Tools</span></div>
+                    <div class="arch-box client">Open WebUI<span class="subtitle">Chat Interface</span></div>
+                    <div class="arch-box client">Trading Dashboard<span class="subtitle">Web App</span></div>
+                </div>
+
+                <div class="arch-arrow"><span class="arrow-icon">&darr;</span><span class="arrow-label">HTTP / REST / MCP</span></div>
+
+                <!-- API Layer -->
+                <div class="arch-row">
+                    <div class="arch-box api">
+                        Options Search API (FastAPI)
+                        <span class="subtitle">optionsearch-api.ai-servicers.com</span>
+                    </div>
+                </div>
+
+                <div class="arch-arrow"><span class="arrow-icon">&darr;</span><span class="arrow-label">Internal</span></div>
+
+                <!-- Engine + Aggregator -->
+                <div class="arch-row" style="gap: 2rem;">
+                    <div class="arch-box engine" style="min-width: 200px;">
+                        Strategy Engine
+                        <span class="subtitle">Generator, Calculator, Ranker</span>
+                    </div>
+                    <div class="arch-box engine" style="min-width: 200px;">
+                        Data Aggregator
+                        <span class="subtitle">Provider Router + Normalizer</span>
+                    </div>
+                </div>
+
+                <div class="arch-arrow"><span class="arrow-icon">&darr;</span><span class="arrow-label">Provider Interface</span></div>
+
+                <!-- Data Providers -->
+                <div class="arch-row">
+                    <div class="provider-group">
+                        <span class="group-label">Data Providers (Priority Order)</span>
+                        <div class="arch-box provider">
+                            Interactive Brokers
+                            <span class="subtitle">Primary - Port 4004</span>
+                        </div>
+                        <div class="arch-box provider">
+                            TradingView
+                            <span class="subtitle">Enrichment - Port 8000</span>
+                        </div>
+                        <div class="arch-box provider">
+                            Yahoo Finance
+                            <span class="subtitle">Fallback - yfinance</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arch-arrow"><span class="arrow-icon">&darr;</span><span class="arrow-label">Cache + Persist</span></div>
+
+                <!-- Storage Layer -->
+                <div class="arch-row">
+                    <div class="storage-group">
+                        <span class="group-label">Persistence Layer</span>
+                        <div class="arch-box storage">
+                            Redis
+                            <span class="subtitle">Tiered Cache (5s/5m/24h)</span>
+                        </div>
+                        <div class="arch-box storage">
+                            PostgreSQL + TimescaleDB
+                            <span class="subtitle">Single Instance</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Sources -->
+    <section class="sources-section">
+        <div class="section-header">
+            <h2>Your Existing Data Sources</h2>
+            <p>Leverage the tools you already pay for</p>
+        </div>
+
+        <div class="source-grid">
+            <div class="source-card">
+                <div class="source-header ib">
+                    <span class="icon">&#x1F4CA;</span>
+                    <h3>Interactive Brokers</h3>
+                    <span class="badge">PRIMARY</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li>Real-time options chains with Greeks</li>
+                        <li>Accurate bid/ask spreads</li>
+                        <li>Volume and open interest</li>
+                        <li>Option Strategy Lab reference</li>
+                        <li>Paper trading execution (future)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-header tv">
+                    <span class="icon">&#x1F4C8;</span>
+                    <h3>TradingView</h3>
+                    <span class="badge">ENRICHMENT</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li>IV Rank and IV Percentile</li>
+                        <li>Technical indicators (RSI, MACD)</li>
+                        <li>Buy/Sell/Neutral recommendations</li>
+                        <li>Historical volatility data</li>
+                        <li>Already integrated via existing API</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-header fidelity">
+                    <span class="icon">&#x1F3E6;</span>
+                    <h3>Fidelity</h3>
+                    <span class="badge">REFERENCE</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li>Active Trader Pro strategy ideas</li>
+                        <li>Strategy Screener reference</li>
+                        <li>Research and analysis</li>
+                        <li>Manual verification source</li>
+                        <li>Future API integration possible</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-header yahoo">
+                    <span class="icon">&#x1F310;</span>
+                    <h3>Yahoo Finance</h3>
+                    <span class="badge">FALLBACK</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li>Free delayed options data</li>
+                        <li>Basic chain information</li>
+                        <li>Used when IB unavailable</li>
+                        <li>yfinance Python library</li>
+                        <li>Good for testing/development</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flow Example -->
+    <section class="flow-section">
+        <div class="section-header">
+            <h2>Example Flow: Multi-Source Analysis</h2>
+            <p>How data flows through the abstraction layer</p>
+        </div>
+
+        <div class="flow-container">
+            <div class="flow-scenario">
+                <h3>Scenario</h3>
+                <p>
+                    You ask Claude: "Find me the best options strategy for <span class="highlight">NVDA</span> to hit
+                    <span class="highlight">$155</span> by <span class="highlight">March</span>. I want defined risk."
+                </p>
+            </div>
+
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>MCP Request Received</h4>
+                        <p>Claude Code invokes the search_strategies MCP tool</p>
+                        <div class="step-detail">
+<pre><span class="label">Tool:</span> <span class="value">search_strategies</span>
+<span class="label">Symbol:</span> <span class="value">NVDA</span>
+<span class="label">Target:</span> <span class="value">$155 (+10%)</span>
+<span class="label">Timeline:</span> <span class="value">~90 days (March expiry)</span>
+<span class="label">Constraint:</span> <span class="value">defined_risk: true</span></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Check Redis Cache</h4>
+                        <p>Look for recently cached chain data</p>
+                        <div class="step-detail">
+<pre><span class="label">Key:</span> <span class="value">chains:NVDA:2025-03-21</span>
+<span class="label">Result:</span> <span class="comment">MISS (cache expired)</span>
+<span class="label">Action:</span> <span class="value">Fetch from providers</span></pre>
+                        </div>
+                        <div class="step-sources">
+                            <span class="source-tag redis">Redis</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Fetch from Interactive Brokers</h4>
+                        <p>Primary provider returns full options chain</p>
+                        <div class="step-detail">
+<pre><span class="comment"># ib_insync fetches via IB Gateway</span>
+<span class="label">Expiration:</span> <span class="value">2025-03-21</span>
+<span class="label">Calls:</span> <span class="value">45 contracts</span>
+<span class="label">Puts:</span> <span class="value">45 contracts</span>
+<span class="label">Greeks:</span> <span class="value">Delta, Gamma, Theta, Vega</span>
+<span class="label">Liquidity:</span> <span class="value">Volume, Open Interest, Spread</span></pre>
+                        </div>
+                        <div class="step-sources">
+                            <span class="source-tag ib">Interactive Brokers</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Enrich with TradingView</h4>
+                        <p>Add technical analysis and IV metrics</p>
+                        <div class="step-detail">
+<pre><span class="comment"># TradingView API enrichment</span>
+<span class="label">IV Rank:</span> <span class="value">62</span> <span class="comment">(above average)</span>
+<span class="label">IV Percentile:</span> <span class="value">71</span>
+<span class="label">RSI (14):</span> <span class="value">54.2</span>
+<span class="label">MACD Signal:</span> <span class="value">BULLISH</span>
+<span class="label">Recommendation:</span> <span class="value">BUY</span></pre>
+                        </div>
+                        <div class="step-sources">
+                            <span class="source-tag tv">TradingView</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Cache & Persist</h4>
+                        <p>Store for reuse and historical tracking</p>
+                        <div class="step-detail">
+<pre><span class="comment"># Hot cache for repeated queries</span>
+<span class="label">Redis:</span> <span class="value">chains:NVDA:2025-03-21</span> <span class="comment">TTL: 60s</span>
+
+<span class="comment"># Historical tracking</span>
+<span class="label">TimescaleDB:</span> <span class="value">iv_history</span> <span class="comment">(symbol, iv_rank, timestamp)</span></pre>
+                        </div>
+                        <div class="step-sources">
+                            <span class="source-tag redis">Redis</span>
+                            <span class="source-tag timescale">TimescaleDB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>Generate & Score Strategies</h4>
+                        <p>Filter for defined risk, calculate metrics, rank by target alignment</p>
+                        <div class="step-detail">
+<pre><span class="comment"># Strategy engine processing</span>
+<span class="label">Filter:</span> <span class="value">defined_risk=true</span> <span class="comment">→ Spreads only</span>
+<span class="label">Generated:</span> <span class="value">312 vertical spreads</span>
+<span class="label">Calculated:</span> <span class="value">P&L at $155, PoP, Greeks</span>
+<span class="label">Ranked:</span> <span class="value">Top 20 by score</span></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-number">7</div>
+                    <div class="step-content">
+                        <h4>Return Enriched Results</h4>
+                        <p>Claude presents the top strategies with full context</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Storage -->
+    <section class="storage-section">
+        <div class="section-header">
+            <h2>Data Persistence</h2>
+            <p>Tiered caching + unified database</p>
+        </div>
+
+        <div class="storage-grid">
+            <div class="storage-card">
+                <h3>&#x26A1; Redis - Fast Data <span class="ttl">5-10s TTL</span></h3>
+                <p>Quotes and Greeks change rapidly - short cache prevents stale execution data</p>
+                <div class="storage-items">
+                    <span class="storage-item">quotes:{symbol}</span>
+                    <span class="storage-item">greeks:{symbol}:{strike}</span>
+                </div>
+            </div>
+
+            <div class="storage-card">
+                <h3>&#x26A1; Redis - Slow Data <span class="ttl">5m TTL</span></h3>
+                <p>IV metrics and technicals change slowly - longer cache OK</p>
+                <div class="storage-items">
+                    <span class="storage-item">iv:{symbol}</span>
+                    <span class="storage-item">technicals:{symbol}</span>
+                </div>
+            </div>
+
+            <div class="storage-card">
+                <h3>&#x26A1; Redis - Static Data <span class="ttl">24h TTL</span></h3>
+                <p>Contract specs and strike lists rarely change</p>
+                <div class="storage-items">
+                    <span class="storage-item">contracts:{symbol}</span>
+                    <span class="storage-item">strikes:{symbol}:{exp}</span>
+                </div>
+            </div>
+
+            <div class="storage-card">
+                <h3>&#x1F5C4; PostgreSQL + TimescaleDB <span class="ttl">Permanent</span></h3>
+                <p>Single instance with TimescaleDB extension - hypertables for time-series, regular tables for config</p>
+                <div class="storage-items">
+                    <span class="storage-item">iv_history (hypertable)</span>
+                    <span class="storage-item">price_history (hypertable)</span>
+                    <span class="storage-item">watchlist, alerts (tables)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Example Result -->
+    <section class="results-section">
+        <div class="section-header">
+            <h2>Example Result</h2>
+            <p>Multi-source enriched strategy recommendation</p>
+        </div>
+
+        <div class="results-container">
+            <div class="result-card">
+                <div class="result-header">
+                    <div class="result-rank">
+                        <div class="rank-badge">#1</div>
+                        <div>
+                            <div class="result-name">Bull Call Spread</div>
+                            <div class="result-type">NVDA Mar 21 '25 140/155 Call Spread</div>
+                        </div>
+                    </div>
+                    <div class="result-score">
+                        <div class="score-value">91.2</div>
+                        <div class="score-label">SCORE</div>
+                    </div>
+                </div>
+
+                <div class="result-legs">
+                    <div class="leg"><span class="action buy">BUY</span> 1x NVDA Mar 140 Call @ $18.50</div>
+                    <div class="leg"><span class="action sell">SELL</span> 1x NVDA Mar 155 Call @ $9.20</div>
+                </div>
+
+                <div class="result-metrics">
+                    <div class="result-metric"><div class="value">$930</div><div class="label">Net Debit</div></div>
+                    <div class="result-metric"><div class="value green">$570</div><div class="label">Max Profit</div></div>
+                    <div class="result-metric"><div class="value red">$930</div><div class="label">Max Loss</div></div>
+                    <div class="result-metric"><div class="value">$149.30</div><div class="label">Breakeven</div></div>
+                    <div class="result-metric"><div class="value green">58%</div><div class="label">Prob. of Profit</div></div>
+                    <div class="result-metric"><div class="value green">$570</div><div class="label">P&L @ $155</div></div>
+                </div>
+
+                <div class="enrichment-badge">
+                    &#x1F4C8; TradingView Enrichment: IV Rank 62 | RSI 54.2 | Signal: BUY
+                </div>
+            </div>
+
+            <div style="background: var(--bg-subtle); border-radius: var(--radius-md); padding: 1.5rem; margin-top: 1.5rem;">
+                <h4 style="font-size: 1rem; margin-bottom: 0.75rem;">Data Sources Used</h4>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="source-tag ib">IB</span>
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);">Chain, Greeks, Prices</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="source-tag tv">TV</span>
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);">IV Rank, RSI, Signal</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="source-tag redis">Redis</span>
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);">Cached 45s ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Peer Review Findings -->
+    <section class="architecture-section" style="margin-top: 3rem;">
+        <div class="section-header">
+            <h2>Critical Components (Peer Reviewed)</h2>
+            <p>Validated by Gemini, Claude, and Codex</p>
+        </div>
+
+        <div class="source-grid">
+            <div class="source-card">
+                <div class="source-header" style="background: linear-gradient(135deg, #dc2626, #991b1b);">
+                    <span class="icon">&#x26A0;</span>
+                    <h3>Corporate Actions</h3>
+                    <span class="badge">CRITICAL</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li>Splits/dividends destroy strategies overnight</li>
+                        <li>Monitor IB corporate actions feed</li>
+                        <li>Auto-invalidate affected cached chains</li>
+                        <li>Alert on positions with pending actions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-header" style="background: linear-gradient(135deg, #7c3aed, #5b21b6);">
+                    <span class="icon">&#x1F6E1;</span>
+                    <h3>Circuit Breakers</h3>
+                    <span class="badge">RELIABILITY</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li>Track provider health status</li>
+                        <li>Fail fast on repeated errors</li>
+                        <li>Auto-fallback to next provider</li>
+                        <li>IB: 5 failures, TradingView: 3 failures</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-header" style="background: linear-gradient(135deg, #0891b2, #0e7490);">
+                    <span class="icon">&#x1F512;</span>
+                    <h3>Cache Stampede Protection</h3>
+                    <span class="badge">PERFORMANCE</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li>Single-flight pattern for cache misses</li>
+                        <li>Only one caller fetches on expiry</li>
+                        <li>Prevents thundering herd to IB API</li>
+                        <li>Async refresh-ahead for hot keys</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-header" style="background: linear-gradient(135deg, #059669, #047857);">
+                    <span class="icon">&#x1F3AF;</span>
+                    <h3>Strategy Scoring</h3>
+                    <span class="badge">ACCURACY</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li>Don't rank purely on ROI</li>
+                        <li>Weight by Probability of Profit</li>
+                        <li>Penalize wide bid/ask spreads</li>
+                        <li>Penalize high gamma (management overhead)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-header" style="background: linear-gradient(135deg, #d97706, #b45309);">
+                    <span class="icon">&#x1F3F7;</span>
+                    <h3>Data Provenance</h3>
+                    <span class="badge">SAFETY</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li>Tag all data with source + timestamp</li>
+                        <li>IB = real-time, TradingView = ~15m delayed</li>
+                        <li>Never mix delayed IV with real-time quotes</li>
+                        <li>Cache version for schema invalidation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-header" style="background: linear-gradient(135deg, #4f46e5, #4338ca);">
+                    <span class="icon">&#x1F4CA;</span>
+                    <h3>Observability</h3>
+                    <span class="badge">OPS</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li>Structured logging with provider labels</li>
+                        <li>Metrics: latency, errors, cache hit ratio</li>
+                        <li>Trace provider calls for debugging</li>
+                        <li>Queue depth monitoring</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scoring Formula -->
+        <div style="background: white; border-radius: var(--radius-lg); padding: 2rem; margin-top: 2rem; box-shadow: var(--shadow-md);">
+            <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--accent-emerald-dark);">Strategy Scoring Formula</h3>
+            <div style="background: var(--bg-subtle); border-radius: var(--radius-md); padding: 1.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">
+                <pre style="margin: 0; white-space: pre-wrap;"><span style="color: var(--accent-purple);">score</span> = (
+    <span style="color: var(--text-muted);"># Expected value weighted by probability</span>
+    (<span style="color: var(--accent-blue);">max_profit</span> × <span style="color: var(--accent-emerald);">prob_of_profit</span>) - (<span style="color: var(--accent-red);">max_loss</span> × (1 - <span style="color: var(--accent-emerald);">prob_of_profit</span>))
+
+    <span style="color: var(--text-muted);"># Penalize illiquid options</span>
+    × <span style="color: var(--accent-orange);">liquidity_factor</span>  <span style="color: var(--text-muted);"># 0-1, based on bid/ask spread</span>
+
+    <span style="color: var(--text-muted);"># Penalize high-maintenance strategies</span>
+    - <span style="color: var(--accent-red);">gamma_penalty</span>  <span style="color: var(--text-muted);"># High gamma = constant adjustment</span>
+)</pre>
+            </div>
+            <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                <strong>Why not just ROI?</strong> A 500% return with 5% probability is worse than 50% return with 60% probability.
+            </p>
+        </div>
+
+        <!-- Warnings -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 2rem;">
+            <div style="background: #fef2f2; border: 2px solid #fecaca; border-radius: var(--radius-md); padding: 1.25rem;">
+                <h4 style="color: #991b1b; font-size: 1rem; margin-bottom: 0.5rem;">&#x26A0; American Options Warning</h4>
+                <p style="color: #7f1d1d; font-size: 0.85rem;">py_vollib calculates European options. US equity options are American style. Flag strategies where early exercise matters (deep ITM puts, calls before dividends).</p>
+            </div>
+            <div style="background: #fffbeb; border: 2px solid #fde68a; border-radius: var(--radius-md); padding: 1.25rem;">
+                <h4 style="color: #92400e; font-size: 1rem; margin-bottom: 0.5rem;">&#x26A0; TradingView Fragility</h4>
+                <p style="color: #78350f; font-size: 0.85rem;">tradingview-ta is unofficial and brittle. Plan for breakage. Free tier is ~15m delayed. Always have fallback strategy.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Position Sizing & Quality Filters -->
+    <section class="architecture-section" style="margin-top: 3rem;">
+        <div class="section-header">
+            <h2>Position Sizing & Quality Filters</h2>
+            <p>Risk management and option quality parameters</p>
+        </div>
+
+        <div class="source-grid">
+            <div class="source-card">
+                <div class="source-header" style="background: linear-gradient(135deg, #059669, #047857);">
+                    <span class="icon">&#x1F4B0;</span>
+                    <h3>Position Sizing</h3>
+                    <span class="badge">RISK MGMT</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li><strong>max_allocation</strong> - Max buying power to use ($)</li>
+                        <li><strong>max_risk</strong> - Max acceptable loss ($)</li>
+                        <li><strong>allow_multiple_contracts</strong> - Scale up position</li>
+                        <li><strong>max_contracts</strong> - Contract limit (default: 10)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-header" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                    <span class="icon">&#x1F50D;</span>
+                    <h3>Liquidity Filters</h3>
+                    <span class="badge">QUALITY</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li><strong>min_open_interest</strong> - Min OI (default: 100)</li>
+                        <li><strong>max_bid_ask_spread_pct</strong> - Max spread % (5%)</li>
+                        <li><strong>min_volume</strong> - Daily volume floor</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-header" style="background: linear-gradient(135deg, #7c3aed, #5b21b6);">
+                    <span class="icon">&#x1F4C5;</span>
+                    <h3>Time Filters</h3>
+                    <span class="badge">EXPIRY</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li><strong>min_days_to_expiry</strong> - No weeklies (14+)</li>
+                        <li><strong>max_days_to_expiry</strong> - Cap for LEAPs</li>
+                        <li><strong>exclude_earnings</strong> - Skip earnings dates</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="source-card">
+                <div class="source-header" style="background: linear-gradient(135deg, #d97706, #b45309);">
+                    <span class="icon">&#x1F3AF;</span>
+                    <h3>Greeks Filters</h3>
+                    <span class="badge">TARGETING</span>
+                </div>
+                <div class="source-body">
+                    <ul>
+                        <li><strong>delta_range</strong> - Target delta [0.2, 0.4]</li>
+                        <li><strong>min_probability_of_profit</strong> - PoP floor (50%)</li>
+                        <li><strong>max_gamma</strong> - Limit adjustment need</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Position Sizing Example -->
+        <div style="background: white; border-radius: var(--radius-lg); padding: 2rem; margin-top: 2rem; box-shadow: var(--shadow-md);">
+            <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--accent-emerald-dark);">Position Sizing Example</h3>
+            <div style="background: var(--bg-subtle); border-radius: var(--radius-md); padding: 1.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+                <pre style="margin: 0; white-space: pre-wrap;"><span style="color: var(--text-muted);">// Request: max_allocation=$5000, max_risk=$2000, allow_multiple=true</span>
+
+<span style="color: var(--accent-purple);">Bull Call Spread:</span> NVDA 140/155 @ $9.30/contract
+  <span style="color: var(--accent-blue);">max_loss_per_contract:</span> <span style="color: var(--accent-red);">$930</span>
+  <span style="color: var(--accent-blue);">max_contracts_by_risk:</span> floor($2000 / $930) = <span style="color: var(--accent-emerald);">2 contracts</span>
+  <span style="color: var(--accent-blue);">max_contracts_by_capital:</span> floor($5000 / $930) = <span style="color: var(--accent-emerald);">5 contracts</span>
+  <span style="color: var(--accent-blue);">recommended:</span> <span style="color: var(--accent-emerald);">2 contracts</span> <span style="color: var(--text-muted);">(limited by max_risk)</span>
+
+<span style="color: var(--accent-purple);">Result:</span>
+  <span style="color: var(--accent-blue);">total_cost:</span> $1,860
+  <span style="color: var(--accent-blue);">max_loss:</span> <span style="color: var(--accent-red);">$1,860</span> <span style="color: var(--text-muted);">(within $2000 limit)</span>
+  <span style="color: var(--accent-blue);">max_profit:</span> <span style="color: var(--accent-emerald);">$1,140</span> <span style="color: var(--text-muted);">(2 × $570)</span></pre>
+            </div>
+            <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                <strong>Defined vs Undefined Risk:</strong> For spreads, max_loss = debit paid. For naked options, max_loss is calculated from margin requirements.
+            </p>
+        </div>
+
+        <!-- API Request Example -->
+        <div style="background: white; border-radius: var(--radius-lg); padding: 2rem; margin-top: 1.5rem; box-shadow: var(--shadow-md);">
+            <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--accent-blue);">Complete API Request</h3>
+            <div style="background: #1e293b; border-radius: var(--radius-md); padding: 1.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; overflow-x: auto;">
+                <pre style="margin: 0; color: #e2e8f0; white-space: pre-wrap;">{
+  <span style="color: #7dd3fc;">"symbol"</span>: <span style="color: #86efac;">"AAPL"</span>,
+  <span style="color: #7dd3fc;">"current_price"</span>: <span style="color: #fde68a;">195.50</span>,
+  <span style="color: #7dd3fc;">"target_prices"</span>: [<span style="color: #fde68a;">205.28</span>, <span style="color: #fde68a;">215.05</span>],
+  <span style="color: #7dd3fc;">"timeline_days"</span>: <span style="color: #fde68a;">90</span>,
+  <span style="color: #7dd3fc;">"allowed_strategies"</span>: [<span style="color: #86efac;">"vertical_spread"</span>, <span style="color: #86efac;">"covered_call"</span>],
+
+  <span style="color: #94a3b8;">// Position Sizing</span>
+  <span style="color: #c4b5fd;">"max_allocation"</span>: <span style="color: #fde68a;">5000</span>,
+  <span style="color: #c4b5fd;">"max_risk"</span>: <span style="color: #fde68a;">2000</span>,
+  <span style="color: #c4b5fd;">"allow_multiple_contracts"</span>: <span style="color: #7dd3fc;">true</span>,
+  <span style="color: #c4b5fd;">"max_contracts"</span>: <span style="color: #fde68a;">10</span>,
+
+  <span style="color: #94a3b8;">// Quality Filters</span>
+  <span style="color: #fca5a5;">"min_probability_of_profit"</span>: <span style="color: #fde68a;">0.50</span>,
+  <span style="color: #fca5a5;">"min_open_interest"</span>: <span style="color: #fde68a;">100</span>,
+  <span style="color: #fca5a5;">"max_bid_ask_spread_pct"</span>: <span style="color: #fde68a;">5.0</span>,
+  <span style="color: #fca5a5;">"min_days_to_expiry"</span>: <span style="color: #fde68a;">14</span>,
+  <span style="color: #fca5a5;">"exclude_earnings"</span>: <span style="color: #7dd3fc;">true</span>,
+  <span style="color: #fca5a5;">"delta_range"</span>: [<span style="color: #fde68a;">0.20</span>, <span style="color: #fde68a;">0.40</span>],
+
+  <span style="color: #94a3b8;">// Data & Storage</span>
+  <span style="color: #7dd3fc;">"data_sources"</span>: [<span style="color: #86efac;">"ib"</span>, <span style="color: #86efac;">"tradingview"</span>],
+  <span style="color: #7dd3fc;">"persist_results"</span>: <span style="color: #7dd3fc;">true</span>
+}</pre>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p class="footer-meta">Options Finder API | Multi-Source Abstraction Layer</p>
+        <p class="footer-meta" style="margin-top: 0.5rem;">Leverages: Interactive Brokers, TradingView, Fidelity</p>
+        <p class="footer-meta" style="margin-top: 0.5rem;">Peer Reviewed by: Gemini, Claude, Codex | Created: 2025-12-11</p>
+    </footer>
+</body>
+</html>

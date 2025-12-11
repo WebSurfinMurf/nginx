@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Options Strategy Finder | Executive Overview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-white: #ffffff;
+            --bg-light: #f8fafc;
+            --accent-emerald: #10b981;
+            --accent-emerald-dark: #059669;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-light: #e2e8f0;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 50%, #fefce8 100%);
+            color: var(--text-primary);
+            line-height: 1.8;
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--accent-emerald); }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--accent-emerald); }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            background: linear-gradient(135deg, var(--accent-emerald), #06b6d4);
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-emerald-dark) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section h2 .icon {
+            font-size: 1.75rem;
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+        }
+
+        .section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 2px solid var(--accent-emerald);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box p {
+            color: #065f46;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .flow-list {
+            list-style: none;
+            counter-reset: flow-counter;
+        }
+
+        .flow-list li {
+            counter-increment: flow-counter;
+            position: relative;
+            padding-left: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        .flow-list li::before {
+            content: counter(flow-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2.25rem;
+            height: 2.25rem;
+            background: linear-gradient(135deg, var(--accent-emerald), #06b6d4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .flow-list li strong {
+            color: var(--text-primary);
+        }
+
+        .example-box {
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .example-box .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--accent-blue);
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-box .content {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-style: italic;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .benefit-card {
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .benefit-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .benefit-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .benefit-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .controls-section {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 2px solid #7dd3fc;
+        }
+
+        .controls-section h2 {
+            color: #0369a1;
+        }
+
+        .control-list {
+            list-style: none;
+        }
+
+        .control-list li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            border-bottom: 1px solid #bae6fd;
+        }
+
+        .control-list li:last-child {
+            border-bottom: none;
+        }
+
+        .control-list li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: #0284c7;
+            font-weight: 700;
+        }
+
+        .control-list li strong {
+            color: #0369a1;
+        }
+
+        .result-preview {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 2px solid var(--accent-emerald);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .result-preview h4 {
+            font-size: 1rem;
+            color: var(--accent-emerald-dark);
+            margin-bottom: 1rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #bbf7d0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item .label {
+            color: var(--text-secondary);
+        }
+
+        .result-item .value {
+            font-weight: 600;
+            color: var(--accent-emerald-dark);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent-emerald);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 2rem 1rem; }
+            .section { padding: 1.5rem; }
+            .flow-list li { padding-left: 3rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-inner">
+            <a href="/" class="back-link"><span>&larr;</span> Portal</a>
+            <div class="nav-links">
+                <a href="/optionsfinder/">Technical Details</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="hero">
+            <div class="hero-badge">Investment Tool</div>
+            <h1>Options Strategy Finder</h1>
+            <p class="hero-subtitle">Ask a simple question, get actionable trade recommendations backed by real-time market data.</p>
+        </header>
+
+        <!-- What It Does -->
+        <section class="section">
+            <h2><span class="icon">&#x1F3AF;</span> What It Does</h2>
+            <p>The Options Strategy Finder takes your investment thesis and finds the best options trades to match it. Instead of manually searching through thousands of options contracts, you describe what you expect to happen and the system does the work.</p>
+
+            <div class="highlight-box">
+                <p>Think of it as having a research analyst who instantly scans the entire options market to find trades that match your outlook.</p>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="section">
+            <h2><span class="icon">&#x26A1;</span> How It Works</h2>
+
+            <div class="example-box">
+                <div class="label">You Say</div>
+                <div class="content">"I think Apple will reach $220 in the next 3 months. I want to risk no more than $2,000."</div>
+            </div>
+
+            <ol class="flow-list">
+                <li><strong>Understands your goal</strong> &mdash; The system parses your target price, timeline, and risk tolerance</li>
+                <li><strong>Gathers market data</strong> &mdash; Pulls real-time options prices, volatility metrics, and market signals from your existing brokerage</li>
+                <li><strong>Evaluates strategies</strong> &mdash; Tests hundreds of possible trades against your criteria</li>
+                <li><strong>Ranks by fit</strong> &mdash; Scores each strategy based on probability of success, risk/reward, and trade quality</li>
+                <li><strong>Presents recommendations</strong> &mdash; Returns the top strategies with clear profit/loss scenarios</li>
+            </ol>
+        </section>
+
+        <!-- What You Control -->
+        <section class="section controls-section">
+            <h2><span class="icon">&#x1F39B;</span> What You Control</h2>
+            <p>Every search can be customized to match your investment style:</p>
+
+            <ul class="control-list">
+                <li><strong>Target price</strong> &mdash; Where you think the stock is heading</li>
+                <li><strong>Timeline</strong> &mdash; When you expect the move to happen</li>
+                <li><strong>Maximum capital</strong> &mdash; How much you're willing to invest</li>
+                <li><strong>Maximum risk</strong> &mdash; The most you're willing to lose</li>
+                <li><strong>Strategy types</strong> &mdash; Limit to specific approaches (spreads only, covered calls, etc.)</li>
+                <li><strong>Quality filters</strong> &mdash; Ensure trades have good liquidity and reasonable pricing</li>
+            </ul>
+        </section>
+
+        <!-- Example Result -->
+        <section class="section">
+            <h2><span class="icon">&#x1F4C8;</span> What You Get Back</h2>
+            <p>Each recommendation includes everything needed to make an informed decision:</p>
+
+            <div class="result-preview">
+                <h4>Top Recommendation: Bull Call Spread</h4>
+                <div class="result-item">
+                    <span class="label">Trade</span>
+                    <span class="value">Buy $200 Call / Sell $220 Call</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">Cost</span>
+                    <span class="value">$1,240</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">Maximum Profit</span>
+                    <span class="value">$760 (61% return)</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">Maximum Loss</span>
+                    <span class="value">$1,240 (within your limit)</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">Probability of Profit</span>
+                    <span class="value">58%</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">Breakeven Price</span>
+                    <span class="value">$212.40</span>
+                </div>
+            </div>
+
+            <p style="margin-top: 1.5rem;">Results include multiple alternatives ranked by score, so you can compare approaches and select the trade that best fits your conviction level.</p>
+        </section>
+
+        <!-- Why This Matters -->
+        <section class="section">
+            <h2><span class="icon">&#x1F4A1;</span> Why This Matters</h2>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="icon">&#x23F1;</div>
+                    <h3>Save Time</h3>
+                    <p>Hours of manual searching reduced to seconds</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">&#x1F4CA;</div>
+                    <h3>Better Data</h3>
+                    <p>Real-time prices and volatility metrics</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">&#x1F6E1;</div>
+                    <h3>Defined Risk</h3>
+                    <p>Know your maximum loss before trading</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">&#x1F50D;</div>
+                    <h3>No Blind Spots</h3>
+                    <p>Evaluates strategies you might overlook</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Sources -->
+        <section class="section">
+            <h2><span class="icon">&#x1F517;</span> Where the Data Comes From</h2>
+            <p>The system uses your existing brokerage accounts and market data subscriptions. No new data feeds to purchase.</p>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="icon">&#x1F4CA;</div>
+                    <h3>Interactive Brokers</h3>
+                    <p>Real-time options chains and execution prices</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">&#x1F4C8;</div>
+                    <h3>TradingView</h3>
+                    <p>Volatility rankings and technical signals</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">&#x1F3E6;</div>
+                    <h3>Fidelity</h3>
+                    <p>Cross-reference and verification</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom Line -->
+        <section class="section" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b;">
+            <h2 style="color: #92400e;"><span class="icon">&#x1F4B0;</span> The Bottom Line</h2>
+            <p style="color: #78350f; font-size: 1.1rem;">You bring the investment thesis. The system finds the optimal trade structure to express that view within your risk parameters.</p>
+            <p style="color: #78350f;">No more guessing which strike prices to use, which expiration to pick, or whether a spread makes more sense than a single option. The math is done for you.</p>
+        </section>
+    </div>
+
+    <footer>
+        <p>Options Strategy Finder | <a href="/optionsfinder/">View Technical Architecture</a></p>
+        <p style="margin-top: 0.5rem;">Uses existing IB, TradingView, and Fidelity subscriptions</p>
+    </footer>
+</body>
+</html>

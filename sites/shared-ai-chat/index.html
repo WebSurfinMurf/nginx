@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared AI Chat | Cross-Server Communication</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-elevated: #1a1a24;
+            --border-subtle: #2a2a3a;
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --text-muted: #55556a;
+            --accent-blue: #4299e1;
+            --accent-purple: #9f7aea;
+            --accent-green: #48bb78;
+            --accent-orange: #ed8936;
+            --accent-cyan: #38b2ac;
+            --accent-pink: #ed64a6;
+            --accent-yellow: #ecc94b;
+        }
+
+        body {
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(237, 100, 166, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(66, 153, 225, 0.1) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ed64a6 0%, #9f7aea 50%, #4299e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(236, 201, 75, 0.2);
+            border: 1px solid rgba(236, 201, 75, 0.4);
+            color: var(--accent-yellow);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-back:hover { color: var(--accent-pink); }
+
+        .section { margin-bottom: 3rem; }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-subtle);
+        }
+
+        .diagram-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 2rem;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .diagram-container svg {
+            width: 100%;
+            height: auto;
+            display: block;
+            min-width: 900px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: border-color 0.2s;
+        }
+
+        .feature-card:hover { border-color: var(--accent-pink); }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--accent-pink);
+        }
+
+        .feature-card ul {
+            list-style: none;
+            color: var(--text-secondary);
+        }
+
+        .feature-card ul li {
+            padding: 0.35rem 0;
+            padding-left: 1.25rem;
+            position: relative;
+        }
+
+        .feature-card ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.7rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-pink);
+        }
+
+        .code-block {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .code-block .comment { color: var(--text-muted); }
+        .code-block .path { color: var(--accent-blue); }
+        .code-block .file { color: var(--accent-green); }
+        .code-block .folder { color: var(--accent-orange); }
+
+        .comparison-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-box { grid-template-columns: 1fr; }
+        }
+
+        .comparison-side {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .comparison-side.current {
+            border-color: var(--accent-pink);
+        }
+
+        .comparison-side.future {
+            border-color: var(--accent-purple);
+            opacity: 0.8;
+        }
+
+        .comparison-side h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .comparison-side.current h3 { color: var(--accent-pink); }
+        .comparison-side.future h3 { color: var(--accent-purple); }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-current { background: rgba(237, 100, 166, 0.2); color: var(--accent-pink); }
+        .badge-future { background: rgba(159, 122, 234, 0.2); color: var(--accent-purple); }
+        .badge-server { background: rgba(66, 153, 225, 0.2); color: var(--accent-blue); }
+        .badge-laptop { background: rgba(72, 187, 120, 0.2); color: var(--accent-green); }
+
+        .file-tree {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .live-files {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .live-files h4 {
+            color: var(--accent-green);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .live-file {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-elevated);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .live-file .icon { font-size: 1.5rem; }
+
+        .live-file .name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .live-file .desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .evolution-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 2rem;
+        }
+
+        .callout {
+            background: linear-gradient(135deg, rgba(237, 100, 166, 0.1) 0%, rgba(159, 122, 234, 0.1) 100%);
+            border: 1px solid rgba(237, 100, 166, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .callout h4 {
+            color: var(--accent-pink);
+            margin-bottom: 0.75rem;
+        }
+
+        .callout p {
+            color: var(--text-secondary);
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent-pink);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Shared AI Chat</h1>
+            <p class="subtitle">Cross-Server, Cross-User AI Communication via Shared Network Drive</p>
+            <div class="status-badge">
+                <span>Current Implementation</span> - Will be replaced by Matrix
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <a href="/ai-swarm-architecture/" class="nav-back">Back to AI Swarm Architecture</a>
+
+        <!-- Overview -->
+        <section class="section">
+            <h2 class="section-title">System Overview</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>What It Does</h3>
+                    <ul>
+                        <li>Enables AI instances on different servers to communicate</li>
+                        <li>Allows different users' CLI sessions to share context</li>
+                        <li>Human-driven: users manually trigger reads/writes</li>
+                        <li>Persistent: messages survive session restarts</li>
+                        <li>Simple: just markdown files on a shared mount</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>Use Cases</h3>
+                    <ul>
+                        <li>Server admin hands off task to laptop developer</li>
+                        <li>Pass context between administrator and websurfinmurf</li>
+                        <li>Share research findings across sessions</li>
+                        <li>Leave notes for "future self" on different machine</li>
+                        <li>Coordinate multi-machine deployments</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>Key Difference from AI Swarm</h3>
+                    <ul>
+                        <li><strong>AI Swarm:</strong> Automated MCP dispatch, same session</li>
+                        <li><strong>Shared Chat:</strong> Human-driven, cross-session</li>
+                        <li><strong>AI Swarm:</strong> Different models (Gemini, Codex, Claude)</li>
+                        <li><strong>Shared Chat:</strong> Same model, different locations</li>
+                        <li>Both enable multi-perspective collaboration</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Network Diagram -->
+        <section class="section">
+            <h2 class="section-title">Network Architecture</h2>
+            <div class="diagram-container">
+                <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#ed64a6"/>
+                        </marker>
+                        <linearGradient id="server-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4299e1"/>
+                            <stop offset="100%" style="stop-color:#3182ce"/>
+                        </linearGradient>
+                        <linearGradient id="laptop-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#48bb78"/>
+                            <stop offset="100%" style="stop-color:#38a169"/>
+                        </linearGradient>
+                        <linearGradient id="shared-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ed64a6"/>
+                            <stop offset="100%" style="stop-color:#d53f8c"/>
+                        </linearGradient>
+                    </defs>
+
+                    <rect x="0" y="0" width="1000" height="500" fill="#12121a"/>
+
+                    <!-- linuxserver.lan -->
+                    <rect x="50" y="50" width="350" height="200" rx="15" fill="#1a1a24" stroke="#4299e1" stroke-width="2"/>
+                    <text x="225" y="85" text-anchor="middle" fill="#4299e1" font-size="16" font-weight="600">linuxserver.lan</text>
+                    <text x="225" y="105" text-anchor="middle" fill="#8888a0" font-size="11">Server</text>
+
+                    <!-- Administrator session -->
+                    <rect x="70" y="120" width="145" height="110" rx="10" fill="url(#server-grad)" stroke="#3182ce" stroke-width="2"/>
+                    <text x="142" y="150" text-anchor="middle" fill="white" font-size="12" font-weight="600">administrator</text>
+                    <text x="142" y="170" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Claude Code CLI</text>
+                    <text x="142" y="190" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Infrastructure</text>
+                    <text x="142" y="205" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Keycloak, Traefik</text>
+                    <text x="142" y="220" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="8">linuxserver.administrator.md</text>
+
+                    <!-- websurfinmurf session on server -->
+                    <rect x="235" y="120" width="145" height="110" rx="10" fill="url(#server-grad)" stroke="#3182ce" stroke-width="2"/>
+                    <text x="307" y="150" text-anchor="middle" fill="white" font-size="12" font-weight="600">websurfinmurf</text>
+                    <text x="307" y="170" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Claude Code CLI</text>
+                    <text x="307" y="190" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">App Deployment</text>
+                    <text x="307" y="205" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">User Apps</text>
+                    <text x="307" y="220" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="8">linuxserver.websurfinmurf.md</text>
+
+                    <!-- Laptop -->
+                    <rect x="600" y="50" width="350" height="200" rx="15" fill="#1a1a24" stroke="#48bb78" stroke-width="2"/>
+                    <text x="775" y="85" text-anchor="middle" fill="#48bb78" font-size="16" font-weight="600">laptop</text>
+                    <text x="775" y="105" text-anchor="middle" fill="#8888a0" font-size="11">Development Machine</text>
+
+                    <!-- websurfinmurf session on laptop -->
+                    <rect x="680" y="120" width="190" height="110" rx="10" fill="url(#laptop-grad)" stroke="#38a169" stroke-width="2"/>
+                    <text x="775" y="150" text-anchor="middle" fill="white" font-size="12" font-weight="600">websurfinmurf</text>
+                    <text x="775" y="170" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Claude Code CLI</text>
+                    <text x="775" y="190" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Core Development</text>
+                    <text x="775" y="205" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Local Testing</text>
+                    <text x="775" y="220" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="8">laptop.websurfinmurf.md</text>
+
+                    <!-- Shared Mount -->
+                    <rect x="300" y="320" width="400" height="130" rx="15" fill="url(#shared-grad)" stroke="#d53f8c" stroke-width="2"/>
+                    <text x="500" y="355" text-anchor="middle" fill="white" font-size="16" font-weight="600">/mnt/shared/aichat/</text>
+                    <text x="500" y="375" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">Network Shared Drive (NFS/SMB)</text>
+
+                    <!-- Files in shared mount -->
+                    <rect x="320" y="390" width="160" height="45" rx="6" fill="rgba(0,0,0,0.3)"/>
+                    <text x="400" y="410" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="10">linuxserver.administrator.md</text>
+                    <text x="400" y="425" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="8">linuxserver.websurfinmurf.md</text>
+
+                    <rect x="520" y="390" width="160" height="45" rx="6" fill="rgba(0,0,0,0.3)"/>
+                    <text x="600" y="410" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="10">laptop.websurfinmurf.md</text>
+                    <text x="600" y="425" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="8">websurfinmurf-laptop...</text>
+
+                    <!-- Connections -->
+                    <path d="M 142 230 L 400 320" stroke="#ed64a6" stroke-width="2" marker-end="url(#arrow)"/>
+                    <path d="M 307 230 L 450 320" stroke="#ed64a6" stroke-width="2" marker-end="url(#arrow)"/>
+                    <path d="M 775 230 L 550 320" stroke="#ed64a6" stroke-width="2" marker-end="url(#arrow)"/>
+
+                    <!-- Labels -->
+                    <text x="250" y="285" fill="#ed64a6" font-size="10">Write own file</text>
+                    <text x="380" y="285" fill="#ed64a6" font-size="10">Read others' files</text>
+                    <text x="650" y="285" fill="#ed64a6" font-size="10">Write/Read</text>
+
+                    <!-- Legend -->
+                    <rect x="50" y="420" width="200" height="60" rx="8" fill="#1a1a24" stroke="#2a2a3a" stroke-width="1"/>
+                    <text x="150" y="445" text-anchor="middle" fill="#f0f0f5" font-size="11" font-weight="600">File Naming Convention</text>
+                    <text x="150" y="465" text-anchor="middle" fill="#8888a0" font-size="9">{hostname}.{username}.md</text>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Live Files -->
+        <section class="section">
+            <h2 class="section-title">Current Files in /mnt/shared/aichat/</h2>
+            <div class="live-files">
+                <h4>Active Communication Files</h4>
+                <div class="live-file">
+                    <span class="icon">📄</span>
+                    <div>
+                        <div class="name">linuxserver.administrator.md</div>
+                        <div class="desc">Notes from administrator@linuxserver.lan - Infrastructure context, deployment info</div>
+                    </div>
+                    <span class="badge badge-server">Server Admin</span>
+                </div>
+                <div class="live-file">
+                    <span class="icon">📄</span>
+                    <div>
+                        <div class="name">linuxserver.websurfinmurf.md</div>
+                        <div class="desc">Notes from websurfinmurf@linuxserver.lan - App development context</div>
+                    </div>
+                    <span class="badge badge-server">Server Dev</span>
+                </div>
+                <div class="live-file">
+                    <span class="icon">📄</span>
+                    <div>
+                        <div class="name">laptop.websurfinmurf.md</div>
+                        <div class="desc">Notes from websurfinmurf@laptop - Local development, feature work</div>
+                    </div>
+                    <span class="badge badge-laptop">Laptop</span>
+                </div>
+                <div class="live-file">
+                    <span class="icon">📄</span>
+                    <div>
+                        <div class="name">websurfinmurf-laptop.websurfinmurf.md</div>
+                        <div class="desc">Alternative naming format</div>
+                    </div>
+                    <span class="badge badge-laptop">Laptop</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="section">
+            <h2 class="section-title">How It Works</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>1. Each AI Writes Its Own File</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">When working on a task, the AI writes notes to its designated file.</p>
+                    <div class="code-block">
+<span class="comment"># Administrator on linuxserver writes to:</span>
+<span class="path">/mnt/shared/aichat/</span><span class="file">linuxserver.administrator.md</span>
+
+<span class="comment"># websurfinmurf on laptop writes to:</span>
+<span class="path">/mnt/shared/aichat/</span><span class="file">laptop.websurfinmurf.md</span>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>2. Other AIs Can Read All Files</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">User can ask their AI to read another user's file for context.</p>
+                    <div class="code-block">
+<span class="comment"># User prompt:</span>
+"Read /mnt/shared/aichat/linuxserver.administrator.md
+to see what context the admin left for us"
+
+<span class="comment"># AI loads the file and has that context</span>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>3. Handoff Workflow</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Administrator hits a permission limit, writes context for developer.</p>
+                    <div class="code-block">
+<span class="comment"># Admin writes:</span>
+"I've configured Keycloak client 'stocktrader'.
+Client secret is in secrets/stocktrader.env.
+Developer needs to update the app's OAuth config.
+See /home/administrator/projects/stocktrader/"
+
+<span class="comment"># Developer reads and continues the work</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison: Current vs Future -->
+        <section class="section">
+            <h2 class="section-title">Evolution Path</h2>
+            <div class="comparison-box">
+                <div class="comparison-side current">
+                    <h3><span class="badge badge-current">CURRENT</span> File-Based Chat</h3>
+                    <ul style="color: var(--text-secondary); list-style: none;">
+                        <li style="padding: 0.5rem 0;">Markdown files on shared NFS mount</li>
+                        <li style="padding: 0.5rem 0;">Human-triggered read/write operations</li>
+                        <li style="padding: 0.5rem 0;">No real-time notifications</li>
+                        <li style="padding: 0.5rem 0;">Simple but manual</li>
+                        <li style="padding: 0.5rem 0;">Works offline (sync on reconnect)</li>
+                    </ul>
+                    <div class="code-block">
+<span class="path">/mnt/shared/aichat/</span>
+├── <span class="file">linuxserver.administrator.md</span>
+├── <span class="file">linuxserver.websurfinmurf.md</span>
+└── <span class="file">laptop.websurfinmurf.md</span>
+                    </div>
+                </div>
+                <div class="comparison-side future">
+                    <h3><span class="badge badge-future">FUTURE</span> Matrix Protocol</h3>
+                    <ul style="color: var(--text-secondary); list-style: none;">
+                        <li style="padding: 0.5rem 0;">Real-time messaging via Matrix server</li>
+                        <li style="padding: 0.5rem 0;">End-to-end encryption available</li>
+                        <li style="padding: 0.5rem 0;">Push notifications for new messages</li>
+                        <li style="padding: 0.5rem 0;">Room-based organization (projects, topics)</li>
+                        <li style="padding: 0.5rem 0;">Federation with external Matrix servers</li>
+                    </ul>
+                    <div class="code-block">
+<span class="comment"># Matrix rooms:</span>
+#infrastructure:matrix.ai-servicers.com
+#stocktrader:matrix.ai-servicers.com
+#ai-handoff:matrix.ai-servicers.com
+                    </div>
+                </div>
+            </div>
+            <div class="callout">
+                <h4>Migration Plan</h4>
+                <p>Matrix server is already running at <code>matrix.ai-servicers.com</code>. Future work will integrate Claude Code CLI with Matrix for real-time AI-to-AI communication. The file-based approach remains as a fallback for offline scenarios.</p>
+            </div>
+        </section>
+
+        <!-- Relationship to Other Systems -->
+        <section class="section">
+            <h2 class="section-title">How This Fits Into the AI Architecture</h2>
+            <div class="diagram-container">
+                <svg viewBox="0 0 900 350" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0" y="0" width="900" height="350" fill="#12121a"/>
+
+                    <!-- Three systems -->
+                    <rect x="50" y="50" width="240" height="140" rx="12" fill="#1a1a24" stroke="#9f7aea" stroke-width="2"/>
+                    <text x="170" y="85" text-anchor="middle" fill="#9f7aea" font-size="14" font-weight="600">Claude Agent System</text>
+                    <text x="170" y="105" text-anchor="middle" fill="#8888a0" font-size="10">File-Based Protocol</text>
+                    <text x="170" y="130" text-anchor="middle" fill="#55556a" font-size="10">PM, Architect, Security, Developer</text>
+                    <text x="170" y="150" text-anchor="middle" fill="#55556a" font-size="10">$HOME/projects/data/claudeagents/</text>
+                    <text x="170" y="175" text-anchor="middle" fill="#8888a0" font-size="9">Same server, different roles</text>
+
+                    <rect x="330" y="50" width="240" height="140" rx="12" fill="#1a1a24" stroke="#38b2ac" stroke-width="2"/>
+                    <text x="450" y="85" text-anchor="middle" fill="#38b2ac" font-size="14" font-weight="600">AI Swarm System</text>
+                    <text x="450" y="105" text-anchor="middle" fill="#8888a0" font-size="10">MCP Dispatch</text>
+                    <text x="450" y="130" text-anchor="middle" fill="#55556a" font-size="10">Gemini, Codex, Claude containers</text>
+                    <text x="450" y="150" text-anchor="middle" fill="#55556a" font-size="10">Real-time via HTTP/JSON</text>
+                    <text x="450" y="175" text-anchor="middle" fill="#8888a0" font-size="9">Different models, same session</text>
+
+                    <rect x="610" y="50" width="240" height="140" rx="12" fill="#1a1a24" stroke="#ed64a6" stroke-width="2"/>
+                    <text x="730" y="85" text-anchor="middle" fill="#ed64a6" font-size="14" font-weight="600">Shared AI Chat</text>
+                    <text x="730" y="105" text-anchor="middle" fill="#8888a0" font-size="10">Network Share</text>
+                    <text x="730" y="130" text-anchor="middle" fill="#55556a" font-size="10">Server, Laptop, Multiple Users</text>
+                    <text x="730" y="150" text-anchor="middle" fill="#55556a" font-size="10">/mnt/shared/aichat/*.md</text>
+                    <text x="730" y="175" text-anchor="middle" fill="#8888a0" font-size="9">Different machines, human-driven</text>
+
+                    <!-- Unifying bar -->
+                    <rect x="50" y="230" width="800" height="80" rx="12" fill="#1a1a24" stroke="#2a2a3a" stroke-width="2"/>
+                    <text x="450" y="260" text-anchor="middle" fill="#f0f0f5" font-size="14" font-weight="600">Common Goal: Share Context Across Boundaries</text>
+                    <text x="450" y="285" text-anchor="middle" fill="#8888a0" font-size="11">Whether between roles, models, or machines - the pattern is the same: persistent, readable context that survives session boundaries</text>
+
+                    <!-- Connecting lines -->
+                    <path d="M 170 190 L 170 230" stroke="#9f7aea" stroke-width="2"/>
+                    <path d="M 450 190 L 450 230" stroke="#38b2ac" stroke-width="2"/>
+                    <path d="M 730 190 L 730 230" stroke="#ed64a6" stroke-width="2"/>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Quick Reference -->
+        <section class="section">
+            <h2 class="section-title">Quick Reference</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Write Your Notes</h3>
+                    <div class="code-block">
+<span class="comment"># Ask your AI to write context:</span>
+"Write a summary of what we did today
+to /mnt/shared/aichat/linuxserver.administrator.md
+so the laptop session can continue"
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>Read Others' Notes</h3>
+                    <div class="code-block">
+<span class="comment"># Ask your AI to load context:</span>
+"Read /mnt/shared/aichat/laptop.websurfinmurf.md
+and tell me what the laptop session
+was working on"
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h3>Naming Convention</h3>
+                    <div class="code-block">
+<span class="comment"># Format:</span>
+{hostname}.{username}.md
+
+<span class="comment"># Examples:</span>
+linuxserver.administrator.md
+linuxserver.websurfinmurf.md
+laptop.websurfinmurf.md
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <strong>Shared AI Chat - Cross-Server Communication</strong><br>
+        Status: Current implementation (will migrate to Matrix)<br>
+        <a href="/ai-swarm-architecture/">AI Swarm Architecture</a> |
+        <a href="/inter-agent-protocol/">Inter-Agent Protocol</a> |
+        <a href="/context-compare/">Context Comparison</a> |
+        <a href="/">Portal Home</a>
+    </footer>
+</body>
+</html>
