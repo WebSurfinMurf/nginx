@@ -43,6 +43,30 @@ AI Swarm is accessed through `code-executor` via `dispatch_to_swarm`, NOT as a s
 
 Don't describe these as "AI models" or "API calls" - they are full CLI agents that can read and analyze the actual codebase.
 
+### QA Agent - GitLab-Based Testing (IMPORTANT)
+
+**QA does NOT run tests locally.** The workflow is:
+1. QA Agent creates test files
+2. Commits to GitLab (creates branch, MR)
+3. GitLab CI runners execute tests (pytest/jest pre-installed in CI images)
+4. QA Agent monitors pipeline via GitLab API
+5. QA Agent reads results and reports pass/fail
+
+**Why GitLab-based:**
+- No need to install pytest/jest on host
+- Consistent test environment (Docker images in CI)
+- Works for both `administrator` and `websurfinmurf` users
+- CI runners already have test frameworks installed
+
+**QA Agent workspace:**
+```
+$HOME/projects/data/claudeagents/qa/
+├── workspace/    # Git clones for test work
+├── tests/        # Test files before commit
+├── results/      # Pipeline results
+└── reports/      # Quality reports for PM
+```
+
 ### Things I Got Wrong Initially
 
 1. **Listed gemini-image as an MCP server** - It doesn't exist. Always verify with `list_mcp_tools()`

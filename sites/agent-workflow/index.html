@@ -551,11 +551,24 @@
                     <h4>Capabilities</h4>
                     <ul>
                         <li>Creates test suites from developer specifications</li>
-                        <li>Writes actual test code (pytest, jest, etc.)</li>
-                        <li>Runs tests and reports results</li>
-                        <li>Enforces quality gates before completion</li>
-                        <li>Documents test coverage and gaps</li>
+                        <li>Writes actual test code (pytest, jest)</li>
+                        <li><strong>Commits tests to GitLab</strong>, triggers CI pipeline</li>
+                        <li><strong>Monitors pipeline</strong> via GitLab API</li>
+                        <li>Enforces quality gates from CI results</li>
                     </ul>
+                </div>
+                <div class="agent-integration">
+                    <h4>GitLab Integration</h4>
+                    <div class="gitlab-flow">
+                        <span class="flow-step">Create tests</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Push to GitLab</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">CI runs tests</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-step">Read results</span>
+                    </div>
+                    <p class="integration-note">Tests execute in GitLab CI runners (not locally)</p>
                 </div>
                 <div class="agent-tools">
                     <h4>Tools</h4>
@@ -566,14 +579,16 @@
                         <span class="tool-badge">Grep</span>
                         <span class="tool-badge">Glob</span>
                         <span class="tool-badge">Bash</span>
+                        <span class="tool-badge gitlab-badge">GitLab API</span>
                     </div>
                 </div>
                 <div class="agent-files">
                     <h4>Workspace Files</h4>
                     <code>$HOME/projects/data/claudeagents/qa/</code>
                     <ul class="file-list">
-                        <li><code>tests/{project}/tests/*.py</code> - Test files</li>
-                        <li><code>results/{project}/results.md</code> - Test results</li>
+                        <li><code>workspace/{project}/</code> - Git clones</li>
+                        <li><code>tests/{project}/</code> - Test files before commit</li>
+                        <li><code>results/{project}/results.md</code> - Pipeline results</li>
                         <li><code>reports/{project}/quality-report.md</code> - Quality assessment</li>
                     </ul>
                 </div>

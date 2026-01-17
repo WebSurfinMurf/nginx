@@ -932,6 +932,56 @@ body {
     font-size: 0.85rem;
 }
 
+/* QA Agent GitLab Integration */
+.agent-integration {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(252, 109, 38, 0.05), rgba(252, 109, 38, 0.1));
+    border: 1px solid rgba(252, 109, 38, 0.3);
+    border-radius: 8px;
+}
+
+.agent-integration h4 {
+    color: #fc6d26;
+    margin-bottom: 0.75rem;
+}
+
+.gitlab-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+}
+
+.gitlab-flow .flow-step {
+    background: #fc6d26;
+    color: white;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.gitlab-flow .flow-arrow {
+    color: #fc6d26;
+    font-weight: bold;
+}
+
+.integration-note {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin: 0;
+    font-style: italic;
+}
+
+.gitlab-badge {
+    background: #fc6d26 !important;
+    color: white !important;
+}
+
 .architecture-flow {
     display: flex;
     align-items: center;

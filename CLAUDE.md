@@ -91,6 +91,27 @@ Main Portal (5 sites)
 ## Recent Work & Changes
 _This section is updated by Claude during each session_
 
+### Session: 2026-01-17 (Agent Workflow Documentation)
+- **Created Agent Workflow Guide**: Comprehensive hierarchical documentation of multi-agent architecture
+  - **URL**: https://nginx.ai-servicers.com/agent-workflow/
+  - **Purpose**: Document PM, Architect, Security, Developer, QA agents and their coordination
+  - **Structure**: 5 levels of progressive detail (Executive → Implementation)
+  - **Key Features**:
+    - SVG workflow diagrams
+    - AI Swarm peer review (native CLI integration, not API calls)
+    - MCP code-executor gateway pattern (9 servers, 71 tools)
+    - QA Agent GitLab integration (tests run in CI, not locally)
+    - Interactive JS (search, dark mode, animations)
+  - **Files**:
+    - `sites/agent-workflow/index.html` - Main documentation
+    - `sites/agent-workflow/css/style.css` - Styling
+    - `sites/agent-workflow/js/main.js` - Interactivity
+    - `sites/agent-workflow/CLAUDE.md` - Maintenance notes
+  - **Corrections Made**:
+    - MCP: Only code-executor is accessible, not separate servers
+    - AI Swarm: Native CLIs with read-only project access + JSON interface
+    - QA: GitLab-based testing (no local pytest needed)
+
 ### Session: 2025-11-07 (Context Comparison Page - Side-by-Side)
 - **Created Context Comparison Page**: Streamlined two-column comparison format
   - **URL**: https://nginx.ai-servicers.com/context-compare/
