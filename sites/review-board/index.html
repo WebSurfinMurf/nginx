@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Peer Review Board: Multi-Model Architecture</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            padding: 2rem;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 3rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #5a67d8;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        h1 {
+            font-size: 2.8rem;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .author-credit {
+            text-align: center;
+            background: #edf2f7;
+            border-left: 4px solid #5a67d8;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+
+        .author-credit p {
+            color: #4a5568;
+            font-size: 1rem;
+        }
+
+        .author-credit a {
+            color: #5a67d8;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .author-credit a:hover {
+            text-decoration: underline;
+        }
+
+        .intro {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            color: white;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+        }
+
+        .intro h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .intro p {
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .intro strong {
+            font-weight: 700;
+        }
+
+        section {
+            margin: 3rem 0;
+        }
+
+        section h2 {
+            color: #1a202c;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid #5a67d8;
+            padding-bottom: 0.5rem;
+        }
+
+        section h3 {
+            color: #2d3748;
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+        }
+
+        section h4 {
+            color: #4a5568;
+            font-size: 1.2rem;
+            margin: 1.5rem 0 0.75rem 0;
+        }
+
+        section p {
+            color: #4a5568;
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .workflow-box {
+            background: #f7fafc;
+            border-left: 6px solid #5a67d8;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+
+        .workflow-box h3 {
+            color: #1a202c;
+            margin-top: 0;
+        }
+
+        .workflow-step {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            position: relative;
+            padding-left: 4rem;
+        }
+
+        .workflow-step .step-number {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #5a67d8;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .workflow-step strong {
+            color: #1a202c;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .implementation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .ai-node {
+            background: linear-gradient(135deg, #f7fafc 0%, #e6fffa 100%);
+            border: 2px solid #38b2ac;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .ai-node h3 {
+            color: #1a202c;
+            margin: 1rem 0 0.5rem 0;
+            font-size: 1.5rem;
+        }
+
+        .ai-node .icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-node .specialty {
+            color: #38b2ac;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-node p {
+            color: #4a5568;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .benefit-card {
+            background: #faf5ff;
+            border-left: 6px solid #9f7aea;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+
+        .benefit-card h4 {
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .benefit-card p {
+            color: #4a5568;
+            margin: 0;
+        }
+
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .code-example .comment {
+            color: #68d391;
+        }
+
+        .code-example .keyword {
+            color: #f687b3;
+        }
+
+        .code-example .string {
+            color: #fbd38d;
+        }
+
+        .key-insight {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .key-insight h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            border: none;
+            color: white;
+        }
+
+        .key-insight p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: white;
+            margin: 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            min-width: 600px;
+        }
+
+        .comparison-table th {
+            background: #5a67d8;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-size: 1.1rem;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        .example-box {
+            background: #ebf8ff;
+            border: 2px solid #4299e1;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .example-box h4 {
+            color: #1a202c;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .example-box .scenario {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+        }
+
+        .example-box .scenario strong {
+            color: #4299e1;
+        }
+
+        .faq-item {
+            background: #fff5f5;
+            border-left: 4px solid #fc8181;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+
+        .faq-item h4 {
+            color: #c53030;
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-item p {
+            color: #4a5568;
+            margin: 0;
+        }
+
+        .quickstart-box {
+            background: #f0fff4;
+            border: 2px solid #48bb78;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .quickstart-box h3 {
+            color: #22543d;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #718096;
+        }
+
+        .footer a {
+            color: #5a67d8;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+            color: #4a5568;
+        }
+
+        code {
+            background: #edf2f7;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #d53f8c;
+        }
+
+        .prompt-template {
+            background: #fffaf0;
+            border: 2px solid #f6ad55;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .prompt-template h4 {
+            color: #c05621;
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .implementation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">&larr; Back to Portal</a>
+
+        <header>
+            <h1>🤝 AI Peer Review Board</h1>
+            <p class="subtitle">Multi-Model Architecture for Better Technical Decisions</p>
+
+            <div class="author-credit">
+                <p><strong>Concept:</strong> Michael Murphy | <a href="https://www.linkedin.com/pulse/next-leap-ai-peer-review-board-michael-murphy-97cge" target="_blank">The Next Leap is an AI Peer Review Board</a> (January 8, 2026)</p>
+                <p><strong>Implementation:</strong> MCP Swarm Architecture on linuxserver.lan</p>
+            </div>
+        </header>
+
+        <main>
+            <!-- INTRODUCTION -->
+            <div class="intro">
+                <h2>💡 The Core Insight</h2>
+                <p><strong>Mature companies don't operate on the "one genius" model.</strong> They operate on planning, specialized knowledge, roles, and governance.</p>
+                <p>Rather than asking "Which AI model is smartest?" we should ask: <strong>"How can AI teams behave like high-performing human teams?"</strong></p>
+                <p>The answer: <strong>Implement peer review structures.</strong> Just as human organizations use Architecture Review Boards, security audits, and code reviews, AI systems should leverage multiple models reviewing each other's work.</p>
+            </div>
+
+            <!-- SECTION: THE PROBLEM -->
+            <section id="problem">
+                <h2>🔍 The Problem with "One Genius" Thinking</h2>
+                <p>Organizations often deploy AI with this mindset:</p>
+                <ul>
+                    <li>"Claude is the smartest model, so we'll use only Claude"</li>
+                    <li>"GPT-4 is best for our use case, stick with that"</li>
+                    <li>"We need to pick THE winner"</li>
+                </ul>
+                <p>But this mirrors a failed human organizational pattern: relying on a single brilliant individual instead of building systematic processes with checks and balances.</p>
+                <p><strong>The reality:</strong> Different AI models, like professionals with different educational backgrounds, have different training data, reasoning patterns, and blind spots. A single model will miss things that another model catches.</p>
+            </section>
+
+            <!-- SECTION: THE SOLUTION -->
+            <section id="solution">
+                <h2>✅ The Solution: Multi-Model Peer Review</h2>
+
+                <div class="workflow-box">
+                    <h3>The Review Workflow</h3>
+
+                    <div class="workflow-step">
+                        <div class="step-number">1</div>
+                        <strong>Plan Creation</strong>
+                        <p>An AI agent (acting as project manager) drafts a plan, design document, or code implementation.</p>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-number">2</div>
+                        <strong>Multi-Model Review</strong>
+                        <p>Multiple AI models independently review the artifact. Each brings different training backgrounds and reasoning patterns.</p>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-number">3</div>
+                        <strong>Critique from Different Perspectives</strong>
+                        <p>Each model critiques from its own angle—security concerns, performance implications, maintainability, edge cases.</p>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-number">4</div>
+                        <strong>Feedback Synthesis & Conflict Resolution</strong>
+                        <p>Feedback returns to the lead agent for synthesis. When models agree, confidence increases. When they disagree, the issue is flagged for human judgment or deeper investigation.</p>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-number">5</div>
+                        <strong>Improved Execution</strong>
+                        <p>The plan improves before execution, catching issues early when they're cheap to fix.</p>
+                    </div>
+                </div>
+
+                <p><strong>Critical Principle:</strong> Reviews must examine actual artifacts—code, schemas, architectural diagrams, deployment scripts—not abstract concepts. Real scrutiny requires tangible materials.</p>
+            </section>
+
+            <!-- SECTION: OUR IMPLEMENTATION -->
+            <section id="implementation">
+                <h2>⚙️ Our Implementation: MCP Swarm Architecture</h2>
+                <p>We've implemented this peer review concept using the MCP (Model Context Protocol) swarm architecture with three independent AI nodes running in Docker containers:</p>
+
+                <div class="implementation-grid">
+                    <div class="ai-node">
+                        <div class="icon">🟢</div>
+                        <h3>Gemini</h3>
+                        <p class="specialty">Primary Consultant</p>
+                        <p>Google's Gemini model with internet search capabilities. Excellent for research, external validation, and finding best practices.</p>
+                    </div>
+
+                    <div class="ai-node">
+                        <div class="icon">🔵</div>
+                        <h3>ChatGPT</h3>
+                        <p class="specialty">Code Specialist</p>
+                        <p>OpenAI's GPT-4 model. Different coding style preferences and reasoning patterns provide valuable contrast.</p>
+                    </div>
+
+                    <div class="ai-node">
+                        <div class="icon">🟣</div>
+                        <h3>Claude (Sonnet)</h3>
+                        <p class="specialty">Deep Analysis</p>
+                        <p>Anthropic's Claude model for deep architectural review, long-context analysis, and nuanced technical decisions.</p>
+                    </div>
+                </div>
+
+                <h3>Technical Architecture</h3>
+                <ul>
+                    <li><strong>Shared Access:</strong> All three AI nodes have read-only access to <code>/workspace</code> (mounted from <code>/home/administrator/projects/</code> on the host)</li>
+                    <li><strong>Isolation:</strong> Each node runs in a separate Docker container with network isolation</li>
+                    <li><strong>Dispatch Tool:</strong> <code>dispatch_to_swarm(target, prompt)</code> - Send review requests to any node</li>
+                    <li><strong>Context Preservation:</strong> Each node receives the full artifact being reviewed (code, config, documentation)</li>
+                    <li><strong>Read-Only Enforcement:</strong> Docker volume mounts ensure reviewers can read but not modify artifacts</li>
+                </ul>
+
+                <h3>Example: Real Implementation Code</h3>
+                <div class="code-example"><span class="comment"># Import the MCP swarm dispatch function</span>
+<span class="keyword">from</span> mcp_tools <span class="keyword">import</span> dispatch_to_swarm
+
+<span class="comment"># Read the artifact to review (from host: /home/administrator/projects/nginx/deployment.yaml)</span>
+<span class="keyword">with</span> open(<span class="string">'/workspace/nginx/deployment.yaml'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:
+    artifact_content = f.read()
+
+<span class="comment"># Dispatch to Gemini for security review</span>
+gemini_response = dispatch_to_swarm(
+    target=<span class="string">"gemini"</span>,
+    prompt=<span class="string">f"""
+    Please review this Kubernetes deployment configuration for security best practices:
+
+    {artifact_content}
+
+    Review for:
+    - Security best practices (OWASP, CIS benchmarks)
+    - Resource allocation appropriateness
+    - High availability considerations
+    - Common misconfigurations
+    """</span>,
+    timeout=600
+)
+
+<span class="comment"># Dispatch to ChatGPT for alternative perspective</span>
+chatgpt_response = dispatch_to_swarm(
+    target=<span class="string">"codex"</span>,  <span class="comment"># Codex endpoint for GPT-4</span>
+    prompt=<span class="string">f"""
+    Review this deployment configuration from a DevOps perspective:
+
+    {artifact_content}
+
+    Focus on:
+    - Deployment strategy and rollback capability
+    - Observability (logging, metrics, tracing)
+    - Resource limits and requests
+    - Readiness and liveness probes
+    """</span>,
+    timeout=600
+)
+
+<span class="comment"># Synthesize feedback</span>
+<span class="keyword">if</span> gemini_response[<span class="string">'success'</span>] <span class="keyword">and</span> chatgpt_response[<span class="string">'success'</span>]:
+    print(<span class="string">"Gemini Review:"</span>, gemini_response[<span class="string">'result'</span>])
+    print(<span class="string">"ChatGPT Review:"</span>, chatgpt_response[<span class="string">'result'</span>])
+
+    <span class="comment"># Check for consensus or conflicts</span>
+    <span class="keyword">if</span> <span class="string">"CRITICAL"</span> <span class="keyword">in</span> gemini_response[<span class="string">'result'</span>] <span class="keyword">or</span> <span class="string">"CRITICAL"</span> <span class="keyword">in</span> chatgpt_response[<span class="string">'result'</span>]:
+        print(<span class="string">"⚠️  Critical issues found - human review required"</span>)
+<span class="keyword">else</span>:
+    print(<span class="string">"❌ Review failed - check connectivity"</span>)
+</div>
+            </section>
+
+            <!-- SECTION: QUICKSTART -->
+            <section id="quickstart">
+                <h2>🚀 Quick Start Guide</h2>
+
+                <div class="quickstart-box">
+                    <h3>Step 1: Start the MCP Swarm</h3>
+                    <div class="code-example">cd /home/administrator/projects/mcp
+docker-compose up -d
+
+<span class="comment"># Verify all nodes are running</span>
+docker ps | grep mcp</div>
+
+                    <h3>Step 2: Test Connectivity</h3>
+                    <div class="code-example">python3 test_swarm.py
+
+<span class="comment"># Expected output:</span>
+<span class="comment"># ✓ Gemini: Connected</span>
+<span class="comment"># ✓ Codex (ChatGPT): Connected</span>
+<span class="comment"># ✓ Claude: Connected</span></div>
+
+                    <h3>Step 3: Submit Your First Review</h3>
+                    <div class="code-example">python3 request_review.py \
+    --artifact ./my-deployment.yaml \
+    --reviewers gemini,codex \
+    --focus security,performance</div>
+
+                    <h3>Step 4: Review Results</h3>
+                    <p>Review results are saved to <code>./reviews/[timestamp]/</code> with separate files for each reviewer's feedback.</p>
+                </div>
+            </section>
+
+            <!-- SECTION: PROMPT TEMPLATES -->
+            <section id="prompts">
+                <h2>📝 Prompt Templates</h2>
+                <p>Use these proven prompt templates for different review types:</p>
+
+                <div class="prompt-template">
+                    <h4>Security Review Template</h4>
+                    <div class="code-example">Review this [artifact type] for security vulnerabilities:
+
+[Artifact content]
+
+Focus areas:
+- OWASP Top 10 vulnerabilities
+- Authentication and authorization flaws
+- Data exposure risks
+- Injection attack vectors
+- Cryptographic weaknesses
+- Known CVEs in dependencies
+
+Provide specific recommendations with severity levels (CRITICAL/HIGH/MEDIUM/LOW).</div>
+                </div>
+
+                <div class="prompt-template">
+                    <h4>Performance Review Template</h4>
+                    <div class="code-example">Review this [artifact type] for performance optimization:
+
+[Artifact content]
+
+Focus areas:
+- Algorithmic complexity (Big O)
+- Resource utilization (CPU, memory, I/O)
+- Caching opportunities
+- Database query efficiency
+- Network latency considerations
+- Scalability bottlenecks
+
+Suggest specific optimizations with estimated impact.</div>
+                </div>
+
+                <div class="prompt-template">
+                    <h4>Architecture Review Template</h4>
+                    <div class="code-example">Review this architectural design:
+
+[Artifact content]
+
+Focus areas:
+- Separation of concerns
+- Service boundaries and coupling
+- Data flow and consistency
+- Failure modes and resilience
+- Operational complexity
+- Technical debt implications
+
+Evaluate against industry best practices and suggest alternatives where appropriate.</div>
+                </div>
+            </section>
+
+            <!-- SECTION: GOVERNANCE -->
+            <section id="governance">
+                <h2>⚖️ Governance & Conflict Resolution</h2>
+
+                <h3>When to Trigger Peer Review</h3>
+                <ul>
+                    <li>Architecture decisions with long-term impact</li>
+                    <li>Security-critical implementations (authentication, authorization, encryption)</li>
+                    <li>Public API designs and contracts</li>
+                    <li>Database schemas and migration strategies</li>
+                    <li>Infrastructure as Code (IaC) configurations</li>
+                    <li>Complex algorithms or critical business logic</li>
+                    <li>Before deploying to production</li>
+                </ul>
+
+                <h3>Conflict Resolution Rules</h3>
+                <ol>
+                    <li><strong>Consensus (2+ models agree):</strong> Proceed with recommended changes</li>
+                    <li><strong>Minor Disagreement:</strong> Lead agent synthesizes best ideas from both perspectives</li>
+                    <li><strong>Major Conflict:</strong> Flag for human technical lead to arbitrate</li>
+                    <li><strong>Critical Security Issue (any model):</strong> Escalate immediately, block deployment</li>
+                </ol>
+
+                <h3>Decision Logging</h3>
+                <p>All peer reviews are logged in Architecture Decision Records (ADRs):</p>
+                <ul>
+                    <li>What was reviewed and why</li>
+                    <li>Which models provided feedback</li>
+                    <li>Key recommendations and conflicts</li>
+                    <li>Final decision and rationale</li>
+                    <li>Implementation status</li>
+                </ul>
+            </section>
+
+            <!-- SECTION: CONNECTION TO CONTEXT LAYERS -->
+            <section id="context">
+                <h2>🔗 Connection to Context Layers</h2>
+                <p>Peer review is <strong>Level 5</strong> in our <a href="/context-compare/" style="color: #5a67d8;">layered context architecture</a>:</p>
+
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Level</th>
+                                <th>Human Organization</th>
+                                <th>AI Architecture</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Level 0</strong></td>
+                                <td>College Graduate</td>
+                                <td>AI Model (base training)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Level 1</strong></td>
+                                <td>Company Onboarding</td>
+                                <td>User Level Context</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Level 2</strong></td>
+                                <td>Department Training</td>
+                                <td>Project Level Common Context</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Level 3</strong></td>
+                                <td>Role Assignment</td>
+                                <td>Project Specific Context</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Level 4</strong></td>
+                                <td>Task Execution</td>
+                                <td>Run-Time Tool Loading</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Level 5</strong></td>
+                                <td>Cross-Team Collaboration</td>
+                                <td><strong>AI Peer Review Board</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>Just as senior engineers share knowledge through Architecture Review Boards and consult external experts for fresh perspectives, AI systems consult different models for diverse viewpoints.</p>
+            </section>
+
+            <!-- SECTION: PRACTICAL EXAMPLES -->
+            <section id="examples">
+                <h2>🎯 Practical Examples</h2>
+
+                <div class="example-box">
+                    <h4>Example 1: Kubernetes Security Review</h4>
+                    <div class="scenario">
+                        <strong>Lead Agent:</strong> Claude drafts a Kubernetes deployment for a payment processing service<br>
+                        <strong>Gemini Review:</strong> Searches for CIS Kubernetes benchmarks, validates against security best practices, identifies missing Pod Security Policies<br>
+                        <strong>ChatGPT Review:</strong> Evaluates resource limits, network policies, secret management<br>
+                        <strong>Outcome:</strong> Both models flagged the lack of network policies and excessive container privileges. Deployment was updated before reaching production, preventing a potential security breach.
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>Example 2: Database Schema Design</h4>
+                    <div class="scenario">
+                        <strong>Lead Agent:</strong> Architect agent designs PostgreSQL schema for analytics platform<br>
+                        <strong>ChatGPT Review:</strong> Evaluates normalization level, indexing strategy, query patterns<br>
+                        <strong>Claude Review:</strong> Analyzes scalability, partitioning strategy, TimescaleDB hypertable opportunities<br>
+                        <strong>Outcome:</strong> Claude suggested using TimescaleDB for time-series data, ChatGPT recommended composite indexes for common queries. Implemented changes resulted in 10x query performance improvement before any data was loaded.
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <h4>Example 3: API Design Review</h4>
+                    <div class="scenario">
+                        <strong>Lead Agent:</strong> Developer agent implements REST API for user management<br>
+                        <strong>Gemini Review:</strong> Checks for RESTful best practices, validates against OpenAPI spec, searches for common API anti-patterns<br>
+                        <strong>ChatGPT Review:</strong> Evaluates error handling, versioning strategy, pagination approach<br>
+                        <strong>Outcome:</strong> Gemini caught inconsistent error response format, ChatGPT identified missing rate limiting. API was redesigned for consistency before client integration began.
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: WHY IT WORKS -->
+            <section id="benefits">
+                <h2>🎓 Why Multiple Models Matter</h2>
+
+                <div class="benefit-card">
+                    <h4>Different Training Data</h4>
+                    <p>Each AI model was trained on different datasets, at different times, with different emphases. This diversity mirrors professionals from different educational backgrounds, creating natural variation in perspectives.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <h4>Different Reasoning Patterns</h4>
+                    <p>Models use different internal architectures and reasoning approaches. What one model misses, another catches. A security concern invisible to one model might be obvious to another.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <h4>Blind Spot Coverage</h4>
+                    <p>No single model is perfect. Each has blind spots based on training data gaps or architectural limitations. Multiple models reviewing the same artifact provide overlapping coverage.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <h4>Confidence Through Consensus</h4>
+                    <p>When multiple independent models agree on a concern or recommendation, confidence increases. When models disagree, it highlights areas requiring human judgment or further investigation.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <h4>Mimics Human Best Practices</h4>
+                    <p>This approach directly mirrors how mature engineering organizations work: Architecture Review Boards, security audits, code reviews, design critiques. If it works for humans, it works for AI.</p>
+                </div>
+            </section>
+
+            <!-- KEY INSIGHT -->
+            <div class="key-insight">
+                <h2>🚀 The Winning Approach</h2>
+                <p><strong>"The winning approach isn't deploying the smartest model, it's building AI teams that behave like high-performing human teams."</strong></p>
+                <p style="margin-top: 1.5rem;">Context layering transforms generalists into specialists. Peer review transforms good plans into great ones. Together, they create AI systems that don't just execute tasks—they execute them <em>well</em>.</p>
+            </div>
+
+            <!-- SECTION: FAQ & RISKS -->
+            <section id="faq">
+                <h2>❓ Frequently Asked Questions</h2>
+
+                <div class="faq-item">
+                    <h4>Q: Does multi-model review mean AI makes the final decision?</h4>
+                    <p><strong>A:</strong> No. AI models surface issues and provide recommendations, but humans own final decisions. Think of it as an enhanced code review process—AI reviewers catch technical issues, humans make judgment calls on trade-offs and business alignment.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Q: What about data privacy when sending artifacts to external AI models?</h4>
+                    <p><strong>A:</strong> Valid concern. For sensitive code or proprietary designs, use local/self-hosted models or implement redaction policies. Our implementation allows configuring which reviewers see which artifacts. Never send credentials, PII, or trade secrets to external APIs without proper controls.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Q: What if a model is unavailable or times out?</h4>
+                    <p><strong>A:</strong> The system continues with available reviewers. A single-model review is still better than no review. Timeouts are logged, and the artifact can be re-submitted when the model recovers.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Q: Doesn't this add latency and cost?</h4>
+                    <p><strong>A:</strong> Yes, but strategically. Run peer reviews in parallel to minimize latency. Reserve multi-model reviews for high-impact decisions (architecture, security, public APIs) where the cost of mistakes far exceeds review costs. For routine code changes, a single-model review or human-only review may suffice.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Q: How do you handle conflicting recommendations?</h4>
+                    <p><strong>A:</strong> We use a conflict resolution rubric: (1) If 2+ models agree, high confidence. (2) If models conflict on approach but agree on the problem, synthesize solutions. (3) If fundamental disagreement, escalate to human technical lead with full context from all reviewers.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Q: Can I use this in air-gapped or regulated environments?</h4>
+                    <p><strong>A:</strong> Yes. Replace external API-based models (Gemini, ChatGPT) with self-hosted alternatives (Llama, Mixtral, CodeLlama). The architecture remains the same—Docker containers, read-only workspace access, dispatch tool—but all processing stays on-premises.</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p><strong>AI Peer Review Board</strong></p>
+            <p style="margin-top: 0.5rem;">Multi-Model Architecture for Better Technical Decisions</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                📚 See also:
+                <a href="/context-compare/">Context Comparison</a> |
+                <a href="/claudecodecliconfig/">Claude Code CLI</a> |
+                <a href="/infrastructure-docs/">Infrastructure Docs</a> |
+                <a href="/">All Documentation</a>
+            </p>
+            <p style="margin-top: 1rem; font-size: 0.85rem;">
+                <strong>Original Concept:</strong> <a href="https://www.linkedin.com/pulse/next-leap-ai-peer-review-board-michael-murphy-97cge" target="_blank">Michael Murphy</a> |
+                <strong>Implementation:</strong> MCP Swarm Architecture
+            </p>
+            <p style="margin-top: 0.5rem; color: #a0aec0; font-size: 0.85rem;">
+                <strong>Peer Reviewed By:</strong> Gemini (Google) & ChatGPT (OpenAI) |
+                Created: 2026-01-13
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
