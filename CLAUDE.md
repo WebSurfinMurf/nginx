@@ -1,6 +1,6 @@
 # Claude AI Assistant Notes - NGINX Reverse Proxy
 
-> **For overall environment context, see: `/home/administrator/projects/AINotes/AINotes.md`**
+> **For overall environment context, see: `/home/administrator/projects/ainotes/ainotes.md`**
 
 ## Project Overview
 NGINX serves as the main reverse proxy and static site host:
@@ -24,7 +24,7 @@ All static sites are now served under **nginx.ai-servicers.com** using path-base
 - **MCP Architecture Guide** - /mcp-architecture/
   - Token-efficient MCP architecture documentation
 - **Infrastructure Backlog** - /backlog/
-  - Dynamic backlog viewer - fetches AINotes/backlog.md at runtime
+  - Dynamic backlog viewer - fetches ainotes/backlog.md at runtime
   - Collapsible sections by priority, no build step needed
 - **Flat Cap History** - /flat-cap-history/
   - History of the Irish flat cap / Paddy cap
@@ -83,7 +83,7 @@ Main Portal (5 sites)
 │   └── /devscripts/
 │
 ├── /mcp-architecture/
-├── /backlog/  ← Dynamic (fetches AINotes/backlog.md)
+├── /backlog/  ← Dynamic (fetches ainotes/backlog.md)
 └── /flat-cap-history/
 ```
 **Note**: When adding/removing sub-pages, update both the parent page nav AND ensure back-links exist on sub-pages.
@@ -98,7 +98,7 @@ _This section is updated by Claude during each session_
   - **Structure**: 5 levels of progressive detail (Executive → Implementation)
   - **Key Features**:
     - SVG workflow diagrams
-    - AI Swarm peer review (native CLI integration, not API calls)
+    - AI Review Board peer review (native CLI integration, not API calls)
     - MCP code-executor gateway pattern (9 servers, 71 tools)
     - QA Agent GitLab integration (tests run in CI, not locally)
     - Interactive JS (search, dark mode, animations)
@@ -109,7 +109,7 @@ _This section is updated by Claude during each session_
     - `sites/agent-workflow/CLAUDE.md` - Maintenance notes
   - **Corrections Made**:
     - MCP: Only code-executor is accessible, not separate servers
-    - AI Swarm: Native CLIs with read-only project access + JSON interface
+    - AI Review Board: Native CLIs with read-only project access + JSON interface
     - QA: GitLab-based testing (no local pytest needed)
 
 ### Session: 2025-11-07 (Context Comparison Page - Side-by-Side)
@@ -180,10 +180,10 @@ _This section is updated by Claude during each session_
   - **New Content**:
     - "Configuration Backup & Version Control" section
     - Documentation of claude-pull and claude-push scripts
-    - GitLab repository structure (claude-code-config)
+    - GitLab repository structure (claudecodeconfig)
     - What gets backed up vs excluded
     - Best practices for backup workflow
-    - Repository location: gitlab.ai-servicers.com/administrators/claude-code-config
+    - Repository location: gitlab.ai-servicers.com/administrators/claudecodeconfig
   - **Updates to Existing Sections**:
     - Added GitLab backup mentions to Layer 1 (User Bootstrap) and Layer 2 (Infrastructure)
     - Updated implementation checklist with backup script creation
@@ -204,7 +204,7 @@ _This section is updated by Claude during each session_
     - Executive summary of context architecture
     - 5-layer system: Initialization, Project Docs, Commands, Skills, Agents
     - Complete documentation of memoryfiles.md bootstrap process
-    - 9 core AINotes files loaded on every session
+    - 9 core ainotes files loaded on every session
     - 50+ CLAUDE.md project documentation files
     - 11 slash commands with two-tier system
     - 13 infrastructure skills
@@ -595,18 +595,18 @@ ls -ld /home/administrator/projects/nginx/sites/[site-name]/
   - **Note**: Images stored locally under site directory, not in shared generated-images folder
 
 ### Session: 2025-12-07 (Infrastructure Backlog Site)
-- **Created Infrastructure Backlog Site**: Dynamic viewer for AINotes/backlog.md
+- **Created Infrastructure Backlog Site**: Dynamic viewer for ainotes/backlog.md
   - **URL**: https://nginx.ai-servicers.com/backlog/
   - **Design**: Dark theme with purple accents, collapsible priority sections
   - **Dynamic Fetching**: Page fetches backlog.md at runtime via JavaScript
     - No build step required - changes to backlog.md appear immediately
     - Uses `fetch('backlog.md', { cache: 'no-store' })` for fresh content
-  - **Volume Mount Added**: AINotes directory mounted in nginx container
-    - `deploy.sh` updated: `-v /home/administrator/projects/AINotes:/usr/share/nginx/AINotes:ro`
+  - **Volume Mount Added**: ainotes directory mounted in nginx container
+    - `deploy.sh` updated: `-v /home/administrator/projects/ainotes:/usr/share/nginx/ainotes:ro`
   - **nginx-portal.conf locations added**:
     ```nginx
     location /backlog/ { alias /usr/share/nginx/sites/backlog/; }
-    location /backlog/backlog.md { alias /usr/share/nginx/AINotes/backlog.md; }
+    location /backlog/backlog.md { alias /usr/share/nginx/ainotes/backlog.md; }
     ```
   - **Features**:
     - Parses markdown sections by priority (Critical, High, Planned, Medium, Low, Completed)

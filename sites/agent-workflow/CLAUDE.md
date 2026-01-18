@@ -28,13 +28,13 @@ As of 2026-01-17, this returns:
 - **9 servers, 71 tools total**
 - arangodb (7), filesystem (9), ib (10), memory (9), minio (9), n8n (6), playwright (6), postgres (9), timescaledb (6)
 
-### AI Swarm Access
+### AI Review Board Access
 
-AI Swarm is accessed through `code-executor` via `dispatch_to_swarm`, NOT as a separate system. The diagram should show:
+AI Review Board is accessed through `code-executor` via `dispatch_to_reviewboard`, NOT as a separate system. The diagram should show:
 - `execute_code` → MCP tools (9 servers, 71 tools)
-- `dispatch_to_swarm` → AI Swarm (Gemini, Codex, Claude)
+- `dispatch_to_reviewboard` → AI Review Board (Gemini, Codex, Claude)
 
-### AI Swarm - Native CLI Integration (IMPORTANT)
+### AI Review Board - Native CLI Integration (IMPORTANT)
 
 **These are NOT simple API calls.** Each swarm node is a native CLI running in a Docker container with:
 - **Full read-only access** to all projects (`/workspace` mounted read-only)
@@ -71,7 +71,7 @@ $HOME/projects/data/claudeagents/qa/
 
 1. **Listed gemini-image as an MCP server** - It doesn't exist. Always verify with `list_mcp_tools()`
 2. **Showed filesystem/postgres/timescaledb as separate MCP servers** - They're underlying servers accessed via code-executor
-3. **Didn't show AI Swarm in the MCP section** - It's a key pathway through code-executor
+3. **Didn't show AI Review Board in the MCP section** - It's a key pathway through code-executor
 
 ---
 
@@ -92,7 +92,7 @@ $HOME/projects/data/claudeagents/qa/
 | Level | Focus | What to Include |
 |-------|-------|-----------------|
 | 1 | Executive Overview | Agents only (PM, Architect, Security, Developer, QA) |
-| 2 | Agent Coordination | Add AI Swarm, workflow with peer review |
+| 2 | Agent Coordination | Add AI Review Board, workflow with peer review |
 | 3 | Agent Details | Deep dive into each agent's tools, responsibilities |
 | 4 | Infrastructure | Skills, Hooks, MCP code-executor with both pathways |
 | 5 | Implementation | File paths, code examples, handoff protocols |
@@ -147,8 +147,8 @@ Located at `~/.claude/hooks/`:
 | Class | Purpose |
 |-------|---------|
 | `.dual-architecture` | MCP section showing both pathways |
-| `.arch-branch` | Left/right branches (MCP tools / AI Swarm) |
-| `.swarm-box` | AI Swarm container with gradient border |
+| `.arch-branch` | Left/right branches (MCP tools / AI Review Board) |
+| `.swarm-box` | AI Review Board container with gradient border |
 | `.primary-mcp` | Highlighted code-executor card |
 | `.underlying-tool` | Individual MCP server cards with connector lines |
 
@@ -157,7 +157,7 @@ Located at `~/.claude/hooks/`:
 ## Common Mistakes to Avoid
 
 1. **Don't invent MCP servers** - Always verify with list_mcp_tools()
-2. **Don't separate AI Swarm from MCP** - It's accessed via code-executor
+2. **Don't separate AI Review Board from MCP** - It's accessed via code-executor
 3. **Don't show tools agents can't access** - Agents only call code-executor directly
 4. **Don't hardcode tool counts** - They change; verify before updating
 5. **Keep levels progressive** - Don't dump infrastructure details at Level 1
@@ -166,7 +166,7 @@ Located at `~/.claude/hooks/`:
 
 ## Related Documentation
 
-- **AI Swarm Architecture**: https://nginx.ai-servicers.com/ai-swarm-architecture/
+- **AI Review Board Architecture**: https://nginx.ai-servicers.com/ai-swarm-architecture/
 - **Inter-Agent Protocol**: https://nginx.ai-servicers.com/inter-agent-protocol/
 - **MCP Architecture**: https://nginx.ai-servicers.com/mcp-architecture/
 - **Context Layers**: https://nginx.ai-servicers.com/context-layers/

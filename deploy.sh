@@ -209,7 +209,7 @@ if [ "$OAUTH2_PROXY_ENABLED" = "true" ] && [ "$KEYCLOAK_CLIENT_SECRET" != "CHANG
         --restart unless-stopped \
         -v /home/administrator/projects/nginx/configs:/etc/nginx/conf.d:ro \
         -v /home/administrator/projects/nginx/sites:/usr/share/nginx/sites:ro \
-        -v /home/administrator/projects/AINotes:/usr/share/nginx/AINotes:ro \
+        -v /home/administrator/projects/ainotes:/usr/share/nginx/ainotes:ro \
         -v /home/administrator/projects/data/nginx/certs:/etc/nginx/certs:ro \
         "$NGINX_IMAGE"
     
@@ -261,7 +261,7 @@ else
         -p "${NGINX_PORT}:80" \
         -v /home/administrator/projects/nginx/configs:/etc/nginx/conf.d:ro \
         -v /home/administrator/projects/nginx/sites:/usr/share/nginx/sites:ro \
-        -v /home/administrator/projects/AINotes:/usr/share/nginx/AINotes:ro \
+        -v /home/administrator/projects/ainotes:/usr/share/nginx/ainotes:ro \
         -v /home/administrator/projects/data/nginx/certs:/etc/nginx/certs:ro \
         --label "traefik.enable=true" \
         --label "traefik.docker.network=traefik-net" \

@@ -545,21 +545,21 @@
                 <ul>
                     <li><strong>Shared Access:</strong> All three AI nodes have read-only access to <code>/workspace</code> (mounted from <code>/home/administrator/projects/</code> on the host)</li>
                     <li><strong>Isolation:</strong> Each node runs in a separate Docker container with network isolation</li>
-                    <li><strong>Dispatch Tool:</strong> <code>dispatch_to_swarm(target, prompt)</code> - Send review requests to any node</li>
+                    <li><strong>Dispatch Tool:</strong> <code>dispatch_to_reviewboard(target, prompt)</code> - Send review requests to any node</li>
                     <li><strong>Context Preservation:</strong> Each node receives the full artifact being reviewed (code, config, documentation)</li>
                     <li><strong>Read-Only Enforcement:</strong> Docker volume mounts ensure reviewers can read but not modify artifacts</li>
                 </ul>
 
                 <h3>Example: Real Implementation Code</h3>
                 <div class="code-example"><span class="comment"># Import the MCP swarm dispatch function</span>
-<span class="keyword">from</span> mcp_tools <span class="keyword">import</span> dispatch_to_swarm
+<span class="keyword">from</span> mcp_tools <span class="keyword">import</span> dispatch_to_reviewboard
 
 <span class="comment"># Read the artifact to review (from host: /home/administrator/projects/nginx/deployment.yaml)</span>
 <span class="keyword">with</span> open(<span class="string">'/workspace/nginx/deployment.yaml'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:
     artifact_content = f.read()
 
 <span class="comment"># Dispatch to Gemini for security review</span>
-gemini_response = dispatch_to_swarm(
+gemini_response = dispatch_to_reviewboard(
     target=<span class="string">"gemini"</span>,
     prompt=<span class="string">f"""
     Please review this Kubernetes deployment configuration for security best practices:
@@ -576,7 +576,7 @@ gemini_response = dispatch_to_swarm(
 )
 
 <span class="comment"># Dispatch to ChatGPT for alternative perspective</span>
-chatgpt_response = dispatch_to_swarm(
+chatgpt_response = dispatch_to_reviewboard(
     target=<span class="string">"codex"</span>,  <span class="comment"># Codex endpoint for GPT-4</span>
     prompt=<span class="string">f"""
     Review this deployment configuration from a DevOps perspective:

@@ -370,7 +370,7 @@
 
         <div class="author-credit">
             <p><strong>Concept:</strong> Michael Murphy | <a href="https://www.linkedin.com/pulse/next-leap-ai-peer-review-board-michael-murphy-97cge" target="_blank">The Next Leap is an AI Peer Review Board</a> (January 8, 2026)</p>
-            <p><strong>Implementation:</strong> MCP Swarm Architecture on linuxserver.lan</p>
+            <p><strong>Implementation:</strong> MCP AI Review Board Architecture on linuxserver.lan</p>
         </div>
 
         <!-- INTRODUCTION -->
@@ -437,8 +437,8 @@
 
         <!-- SECTION: OUR IMPLEMENTATION -->
         <div class="section">
-            <h2>⚙️ Our Implementation: MCP Swarm Architecture</h2>
-            <p>We've implemented this peer review concept using the MCP (Model Context Protocol) swarm architecture with three independent AI nodes running in Docker containers:</p>
+            <h2>⚙️ Our Implementation: MCP AI Review Board Architecture</h2>
+            <p>We've implemented this peer review concept using the MCP (Model Context Protocol) AI Review Board architecture with three independent AI nodes running in Docker containers:</p>
 
             <div class="implementation-grid">
                 <div class="ai-node">
@@ -467,13 +467,13 @@
             <ul>
                 <li><strong>Shared Access:</strong> All three AI nodes have read-only access to <code>/workspace</code> (the projects directory)</li>
                 <li><strong>Isolation:</strong> Each node runs in a separate Docker container</li>
-                <li><strong>Dispatch Tool:</strong> <code>dispatch_to_swarm(target, prompt)</code> - Send review requests to any node</li>
+                <li><strong>Dispatch Tool:</strong> <code>dispatch_to_reviewboard(target, prompt)</code> - Send review requests to any node</li>
                 <li><strong>Context Preservation:</strong> Each node receives the full artifact being reviewed (code, config, documentation)</li>
             </ul>
 
             <div class="code-example">
 <span class="comment"># Example: Requesting peer review from Gemini</span>
-dispatch_to_swarm(
+dispatch_to_reviewboard(
     target="gemini",
     prompt="""
     Please review this Kubernetes deployment configuration:
@@ -489,7 +489,7 @@ dispatch_to_swarm(
 )
 
 <span class="comment"># Example: Getting alternate perspective from Codex</span>
-dispatch_to_swarm(
+dispatch_to_reviewboard(
     target="codex",
     prompt="""
     Review this API design for RESTful best practices
@@ -541,7 +541,7 @@ dispatch_to_swarm(
                     <tr>
                         <td><strong>Level 5</strong></td>
                         <td>Cross-Team Collaboration & External Consulting</td>
-                        <td><strong>AI Swarm Peer Review</strong></td>
+                        <td><strong>AI Review Board</strong></td>
                     </tr>
                 </tbody>
             </table>
@@ -660,7 +660,7 @@ dispatch_to_swarm(
             </p>
             <p style="margin-top: 1rem; font-size: 0.85rem;">
                 <strong>Original Concept:</strong> <a href="https://www.linkedin.com/pulse/next-leap-ai-peer-review-board-michael-murphy-97cge" target="_blank">Michael Murphy</a> |
-                <strong>Implementation:</strong> MCP Swarm Architecture
+                <strong>Implementation:</strong> MCP AI Review Board Architecture
             </p>
             <p style="margin-top: 0.5rem; color: #a0aec0; font-size: 0.85rem;">Created: 2026-01-13</p>
         </div>

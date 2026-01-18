@@ -285,7 +285,7 @@
     </header>
 
     <main class="container">
-        <a href="/ai-swarm-architecture/" class="nav-back">Back to AI Swarm Architecture</a>
+        <a href="/ai-swarm-architecture/" class="nav-back">Back to AI Review Board Architecture</a>
 
         <!-- Request/Response Flow Diagram -->
         <section class="section">
@@ -315,7 +315,7 @@
                     <rect x="50" y="200" width="180" height="120" rx="12" fill="url(#cli-grad)" stroke="#9f7aea" stroke-width="2"/>
                     <text x="140" y="240" text-anchor="middle" fill="white" font-size="14" font-weight="600">Claude Code CLI</text>
                     <text x="140" y="260" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">Opus 4.5</text>
-                    <text x="140" y="285" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">dispatch_to_swarm()</text>
+                    <text x="140" y="285" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">dispatch_to_reviewboard()</text>
                     <text x="140" y="300" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">swarm_health()</text>
 
                     <!-- MCP Server -->
@@ -323,9 +323,9 @@
                     <text x="420" y="215" text-anchor="middle" fill="white" font-size="14" font-weight="600">MCP Code Executor</text>
                     <text x="420" y="235" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">localhost:9091</text>
                     <rect x="340" y="250" width="160" height="30" rx="6" fill="rgba(0,0,0,0.3)"/>
-                    <text x="420" y="270" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="10">/swarm/dispatch</text>
+                    <text x="420" y="270" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="10">/reviewboard/dispatch</text>
                     <rect x="340" y="285" width="160" height="30" rx="6" fill="rgba(0,0,0,0.3)"/>
-                    <text x="420" y="305" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="10">/swarm/health</text>
+                    <text x="420" y="305" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="10">/reviewboard/health</text>
 
                     <!-- Docker Network -->
                     <rect x="590" y="120" width="460" height="350" rx="15" fill="#1a1a24" stroke="#2a2a3a" stroke-width="2"/>
@@ -333,19 +333,19 @@
 
                     <!-- Swarm Nodes -->
                     <rect x="620" y="180" width="130" height="100" rx="10" fill="#1a1a24" stroke="#4299e1" stroke-width="2"/>
-                    <text x="685" y="210" text-anchor="middle" fill="#4299e1" font-size="12" font-weight="600">swarm-gemini</text>
+                    <text x="685" y="210" text-anchor="middle" fill="#4299e1" font-size="12" font-weight="600">reviewboard-gemini</text>
                     <text x="685" y="230" text-anchor="middle" fill="#8888a0" font-size="9">Gemini 2.5 Flash</text>
                     <text x="685" y="250" text-anchor="middle" fill="#55556a" font-size="9">:8080/execute</text>
                     <text x="685" y="265" text-anchor="middle" fill="#48bb78" font-size="8">PRIMARY</text>
 
                     <rect x="770" y="180" width="130" height="100" rx="10" fill="#1a1a24" stroke="#48bb78" stroke-width="2"/>
-                    <text x="835" y="210" text-anchor="middle" fill="#48bb78" font-size="12" font-weight="600">swarm-codex</text>
+                    <text x="835" y="210" text-anchor="middle" fill="#48bb78" font-size="12" font-weight="600">reviewboard-codex</text>
                     <text x="835" y="230" text-anchor="middle" fill="#8888a0" font-size="9">OpenAI ChatGPT</text>
                     <text x="835" y="250" text-anchor="middle" fill="#55556a" font-size="9">:8080/execute</text>
                     <text x="835" y="265" text-anchor="middle" fill="#ed8936" font-size="8">ALTERNATE</text>
 
                     <rect x="920" y="180" width="130" height="100" rx="10" fill="#1a1a24" stroke="#9f7aea" stroke-width="2"/>
-                    <text x="985" y="210" text-anchor="middle" fill="#9f7aea" font-size="12" font-weight="600">swarm-claude</text>
+                    <text x="985" y="210" text-anchor="middle" fill="#9f7aea" font-size="12" font-weight="600">reviewboard-claude</text>
                     <text x="985" y="230" text-anchor="middle" fill="#8888a0" font-size="9">Claude Sonnet 4.5</text>
                     <text x="985" y="250" text-anchor="middle" fill="#55556a" font-size="9">:8080/execute</text>
                     <text x="985" y="265" text-anchor="middle" fill="#38b2ac" font-size="8">DEEP ANALYSIS</text>
@@ -407,10 +407,10 @@
                     </div>
                     <div class="step-content">
                         <h4>Claude Code Invokes MCP Tool</h4>
-                        <p>User asks Claude a question. Claude decides to consult an external AI and calls <code>dispatch_to_swarm</code> with a prompt and target.</p>
+                        <p>User asks Claude a question. Claude decides to consult an external AI and calls <code>dispatch_to_reviewboard</code> with a prompt and target.</p>
                         <div class="code-block">
-<span class="function">mcp__code-executor__dispatch_to_swarm</span>({
-  <span class="string">"prompt"</span>: <span class="string">"Review /workspace/aiswarm/server.py for security issues"</span>,
+<span class="function">mcp__code-executor__dispatch_to_reviewboard</span>({
+  <span class="string">"prompt"</span>: <span class="string">"Review /workspace/reviewboard/server.py for security issues"</span>,
   <span class="string">"target"</span>: <span class="string">"gemini"</span>,
   <span class="string">"timeout"</span>: <span class="number">900</span>
 })
@@ -426,11 +426,11 @@
                         <h4>MCP Server Receives Request</h4>
                         <p>The MCP code-executor server (localhost:9091) receives the request via stdio transport and parses the JSON parameters.</p>
                         <div class="code-block">
-<span class="comment">// executor.ts - /swarm/dispatch endpoint</span>
+<span class="comment">// executor.ts - /reviewboard/dispatch endpoint</span>
 <span class="keyword">const</span> SWARM_NODES = {
-  gemini: <span class="string">'http://swarm-gemini:8080'</span>,
-  codex: <span class="string">'http://swarm-codex:8080'</span>,
-  claude: <span class="string">'http://swarm-claude:8080'</span>
+  gemini: <span class="string">'http://reviewboard-gemini:8080'</span>,
+  codex: <span class="string">'http://reviewboard-codex:8080'</span>,
+  claude: <span class="string">'http://reviewboard-claude:8080'</span>
 };
                         </div>
                     </div>
@@ -444,11 +444,11 @@
                         <h4>HTTP POST to Swarm Node</h4>
                         <p>MCP server sends HTTP POST to the target container via Docker's internal DNS (mcp-net network).</p>
                         <div class="code-block">
-<span class="keyword">POST</span> http://swarm-gemini:8080/execute
+<span class="keyword">POST</span> http://reviewboard-gemini:8080/execute
 Content-Type: application/json
 
 {
-  <span class="string">"prompt"</span>: <span class="string">"Review /workspace/aiswarm/server.py..."</span>,
+  <span class="string">"prompt"</span>: <span class="string">"Review /workspace/reviewboard/server.py..."</span>,
   <span class="string">"working_dir"</span>: <span class="string">"/workspace"</span>
 }
                         </div>
@@ -514,9 +514,9 @@ stdout, stderr = <span class="keyword">await</span> proc.communicate()
             <div class="endpoint-card">
                 <div class="endpoint-header">
                     <span class="method method-post">POST</span>
-                    <span class="endpoint-path">/swarm/dispatch</span>
+                    <span class="endpoint-path">/reviewboard/dispatch</span>
                 </div>
-                <p class="endpoint-desc">Dispatch a prompt to an AI swarm node for execution.</p>
+                <p class="endpoint-desc">Dispatch a prompt to an AI Board node for execution.</p>
                 <div class="code-block">
 <span class="comment">// Request Body</span>
 {
@@ -539,7 +539,7 @@ stdout, stderr = <span class="keyword">await</span> proc.communicate()
             <div class="endpoint-card">
                 <div class="endpoint-header">
                     <span class="method method-get">GET</span>
-                    <span class="endpoint-path">/swarm/health</span>
+                    <span class="endpoint-path">/reviewboard/health</span>
                 </div>
                 <p class="endpoint-desc">Check health status of all swarm nodes.</p>
                 <div class="code-block">
@@ -565,7 +565,7 @@ stdout, stderr = <span class="keyword">await</span> proc.communicate()
                     <h3>Code Review</h3>
                     <div class="code-block">
 <span class="comment">// Ask Gemini to review code</span>
-dispatch_to_swarm({
+dispatch_to_reviewboard({
   prompt: <span class="string">"Review the code in /workspace/myproject/src/ for security issues. Read the files first."</span>,
   target: <span class="string">"gemini"</span>
 })
@@ -575,7 +575,7 @@ dispatch_to_swarm({
                     <h3>Second Opinion</h3>
                     <div class="code-block">
 <span class="comment">// Get alternate perspective</span>
-dispatch_to_swarm({
+dispatch_to_reviewboard({
   prompt: <span class="string">"Gemini suggested using Redis. What's your perspective on Redis vs PostgreSQL for session storage?"</span>,
   target: <span class="string">"codex"</span>
 })
@@ -585,7 +585,7 @@ dispatch_to_swarm({
                     <h3>Internet Research</h3>
                     <div class="code-block">
 <span class="comment">// Gemini has web access</span>
-dispatch_to_swarm({
+dispatch_to_reviewboard({
   prompt: <span class="string">"Search for the latest Docker security best practices in 2025"</span>,
   target: <span class="string">"gemini"</span>
 })
@@ -595,8 +595,8 @@ dispatch_to_swarm({
                     <h3>Deep Analysis</h3>
                     <div class="code-block">
 <span class="comment">// Complex reasoning with Claude</span>
-dispatch_to_swarm({
-  prompt: <span class="string">"Analyze the architecture in /workspace/aiswarm and suggest improvements for scalability"</span>,
+dispatch_to_reviewboard({
+  prompt: <span class="string">"Analyze the architecture in /workspace/reviewboard and suggest improvements for scalability"</span>,
   target: <span class="string">"claude"</span>
 })
                     </div>
@@ -676,7 +676,7 @@ dispatch_to_swarm({
     <footer>
         <strong>MCP Swarm Dispatch Flow v1.0</strong><br>
         Generated: 2025-12-08 | linuxserver.lan<br>
-        <a href="/ai-swarm-architecture/">AI Swarm Architecture</a> |
+        <a href="/ai-swarm-architecture/">AI Review Board Architecture</a> |
         <a href="/inter-agent-protocol/">Inter-Agent Protocol</a> |
         <a href="/">Portal Home</a>
     </footer>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Swarm Architecture | linuxserver.lan</title>
+    <title>AI Review Board Architecture | linuxserver.lan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -401,7 +401,7 @@
     <!-- Hero Section -->
     <header class="hero">
         <div class="hero-content">
-            <h1>AI Swarm Architecture</h1>
+            <h1>AI Review Board Architecture</h1>
             <p class="subtitle">Multi-Model Inter-Agent Communication System for linuxserver.lan</p>
             <div class="metrics-bar">
                 <div class="metric">
@@ -442,7 +442,7 @@
                     </ul>
                 </div>
                 <div class="feature-card">
-                    <h3>AI Swarm System (MCP-Based)</h3>
+                    <h3>AI Review Board System (MCP-Based)</h3>
                     <ul>
                         <li>3 AI nodes: Gemini, Codex (ChatGPT), Claude</li>
                         <li>Real-time dispatch via MCP protocol</li>
@@ -455,7 +455,7 @@
                     <h3>Use Case Differentiation</h3>
                     <ul>
                         <li><strong>Claude Agents:</strong> Complex multi-phase projects</li>
-                        <li><strong>AI Swarm:</strong> Quick consultations, validations</li>
+                        <li><strong>AI Review Board:</strong> Quick consultations, validations</li>
                         <li><strong>Combined:</strong> Agent escalates to swarm for second opinion</li>
                         <li>Gemini: Primary for external validation + internet search</li>
                         <li>Codex: Alternate when Gemini's answer unsatisfactory</li>
@@ -509,7 +509,7 @@
                     <text x="620" y="65" text-anchor="middle" fill="#38b2ac" font-size="16" font-weight="600">MCP Code Executor</text>
 
                     <rect x="810" y="30" width="360" height="640" rx="20" fill="#1a1a2e" stroke="#2a2a3a" stroke-width="2"/>
-                    <text x="990" y="65" text-anchor="middle" fill="#ed8936" font-size="16" font-weight="600">AI Swarm Nodes (Docker)</text>
+                    <text x="990" y="65" text-anchor="middle" fill="#ed8936" font-size="16" font-weight="600">AI Board Nodes (Docker)</text>
 
                     <!-- User/Claude Code CLI -->
                     <rect x="490" y="100" width="260" height="80" rx="12" fill="url(#grad-purple)" stroke="#9f7aea" stroke-width="2"/>
@@ -567,13 +567,13 @@
                     <rect x="500" y="220" width="240" height="120" rx="12" fill="url(#grad-cyan)" stroke="#319795" stroke-width="2"/>
                     <text x="620" y="255" text-anchor="middle" fill="white" font-size="14" font-weight="600">MCP Code Executor</text>
                     <text x="620" y="275" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">localhost:9091</text>
-                    <text x="620" y="300" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">/swarm/dispatch</text>
-                    <text x="620" y="315" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">/swarm/health</text>
+                    <text x="620" y="300" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">/reviewboard/dispatch</text>
+                    <text x="620" y="315" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">/reviewboard/health</text>
 
                     <!-- MCP Tools -->
                     <rect x="500" y="360" width="240" height="100" rx="10" fill="#12121a" stroke="#38b2ac" stroke-width="2"/>
                     <text x="620" y="385" text-anchor="middle" fill="#38b2ac" font-size="12" font-weight="600">MCP Tools (64+)</text>
-                    <text x="540" y="410" fill="#8888a0" font-size="10">dispatch_to_swarm</text>
+                    <text x="540" y="410" fill="#8888a0" font-size="10">dispatch_to_reviewboard</text>
                     <text x="540" y="425" fill="#8888a0" font-size="10">swarm_health</text>
                     <text x="540" y="440" fill="#8888a0" font-size="10">execute_code</text>
                     <text x="680" y="410" fill="#55556a" font-size="10">15min timeout</text>
@@ -589,7 +589,7 @@
                     <!-- Swarm Nodes -->
                     <!-- Gemini -->
                     <rect x="840" y="100" width="150" height="130" rx="10" fill="url(#grad-blue)" stroke="#3182ce" stroke-width="2"/>
-                    <text x="915" y="125" text-anchor="middle" fill="white" font-size="13" font-weight="600">swarm-gemini</text>
+                    <text x="915" y="125" text-anchor="middle" fill="white" font-size="13" font-weight="600">reviewboard-gemini</text>
                     <text x="915" y="145" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Gemini 2.5 Flash</text>
                     <text x="915" y="165" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Primary consultant</text>
                     <text x="915" y="180" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Internet search</text>
@@ -598,7 +598,7 @@
 
                     <!-- Codex -->
                     <rect x="1000" y="100" width="150" height="130" rx="10" fill="url(#grad-green)" stroke="#38a169" stroke-width="2"/>
-                    <text x="1075" y="125" text-anchor="middle" fill="white" font-size="13" font-weight="600">swarm-codex</text>
+                    <text x="1075" y="125" text-anchor="middle" fill="white" font-size="13" font-weight="600">reviewboard-codex</text>
                     <text x="1075" y="145" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">OpenAI ChatGPT</text>
                     <text x="1075" y="165" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Alternate opinion</text>
                     <text x="1075" y="180" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">When Gemini unsatisfactory</text>
@@ -607,7 +607,7 @@
 
                     <!-- Claude -->
                     <rect x="920" y="250" width="150" height="130" rx="10" fill="url(#grad-purple)" stroke="#764ba2" stroke-width="2"/>
-                    <text x="995" y="275" text-anchor="middle" fill="white" font-size="13" font-weight="600">swarm-claude</text>
+                    <text x="995" y="275" text-anchor="middle" fill="white" font-size="13" font-weight="600">reviewboard-claude</text>
                     <text x="995" y="295" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Claude Sonnet 4.5</text>
                     <text x="995" y="315" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Deep analysis</text>
                     <text x="995" y="330" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">Complex reasoning</text>
@@ -626,9 +626,9 @@
                     <!-- Auth Volumes -->
                     <rect x="840" y="530" width="310" height="70" rx="10" fill="#12121a" stroke="#9f7aea" stroke-width="2"/>
                     <text x="995" y="555" text-anchor="middle" fill="#9f7aea" font-size="12" font-weight="600">Persistent Auth Volumes</text>
-                    <text x="880" y="580" fill="#8888a0" font-size="9">aiswarm-gemini-auth</text>
-                    <text x="995" y="580" fill="#8888a0" font-size="9">aiswarm-codex-auth</text>
-                    <text x="1100" y="580" fill="#8888a0" font-size="9">aiswarm-claude-auth</text>
+                    <text x="880" y="580" fill="#8888a0" font-size="9">reviewboard-gemini-auth</text>
+                    <text x="995" y="580" fill="#8888a0" font-size="9">reviewboard-codex-auth</text>
+                    <text x="1100" y="580" fill="#8888a0" font-size="9">reviewboard-claude-auth</text>
 
                     <!-- Connections -->
                     <!-- Claude Code to PM -->
@@ -734,9 +734,9 @@
             </div>
         </section>
 
-        <!-- AI Swarm Consultation -->
+        <!-- AI Review Board Consultation -->
         <section class="section">
-            <h2 class="section-title">AI Swarm Consultation Pattern</h2>
+            <h2 class="section-title">AI Review Board Consultation Pattern</h2>
             <div class="feature-grid">
                 <div class="feature-card">
                     <h3>When to Use Gemini (Primary)</h3>
@@ -772,14 +772,14 @@
 
             <div class="code-block">
 <span class="comment">// Example: Dispatch to Gemini for code review</span>
-<span class="function">mcp__code-executor__dispatch_to_swarm</span>({
-  <span class="string">"prompt"</span>: <span class="string">"Review the code in /workspace/aiswarm/shared/server.py for security issues and best practices. Read the file first."</span>,
+<span class="function">mcp__code-executor__dispatch_to_reviewboard</span>({
+  <span class="string">"prompt"</span>: <span class="string">"Review the code in /workspace/reviewboard/shared/server.py for security issues and best practices. Read the file first."</span>,
   <span class="string">"target"</span>: <span class="string">"gemini"</span>,
   <span class="string">"timeout"</span>: <span class="keyword">900</span>  <span class="comment">// 15 minutes</span>
 })
 
 <span class="comment">// Example: Get alternate opinion from Codex</span>
-<span class="function">mcp__code-executor__dispatch_to_swarm</span>({
+<span class="function">mcp__code-executor__dispatch_to_reviewboard</span>({
   <span class="string">"prompt"</span>: <span class="string">"Gemini suggested using Redis for session storage. What's your perspective? Pros/cons vs PostgreSQL?"</span>,
   <span class="string">"target"</span>: <span class="string">"codex"</span>,
   <span class="string">"timeout"</span>: <span class="keyword">900</span>
@@ -803,21 +803,21 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><span class="badge badge-blue">swarm-gemini</span></td>
+                            <td><span class="badge badge-blue">reviewboard-gemini</span></td>
                             <td>Gemini 2.5 Flash</td>
                             <td>$20/mo Google subscription (OAuth)</td>
                             <td>Second opinions, code reviews, research</td>
                             <td>Internet search access</td>
                         </tr>
                         <tr>
-                            <td><span class="badge badge-green">swarm-codex</span></td>
+                            <td><span class="badge badge-green">reviewboard-codex</span></td>
                             <td>OpenAI ChatGPT</td>
                             <td>API Key (sk-proj-*)</td>
                             <td>Alternate perspective, debugging assist</td>
                             <td>Different training approach</td>
                         </tr>
                         <tr>
-                            <td><span class="badge badge-purple">swarm-claude</span></td>
+                            <td><span class="badge badge-purple">reviewboard-claude</span></td>
                             <td>Claude Sonnet 4.5</td>
                             <td>$200/mo Max subscription (OAuth)</td>
                             <td>Deep analysis, complex reasoning</td>
@@ -846,7 +846,7 @@
                     <h3>MCP Integration</h3>
                     <ul>
                         <li>MCP server on localhost:9091</li>
-                        <li>dispatch_to_swarm tool with 15min timeout</li>
+                        <li>dispatch_to_reviewboard tool with 15min timeout</li>
                         <li>swarm_health checks all 3 nodes</li>
                         <li>Stdio transport for Claude Code CLI</li>
                         <li>JSON responses with metrics</li>
@@ -889,7 +889,7 @@
                 <div class="feature-card">
                     <h3>Deploy/Redeploy Swarm</h3>
                     <div class="code-block">
-<span class="keyword">cd</span> /home/administrator/projects/aiswarm
+<span class="keyword">cd</span> /home/administrator/projects/reviewboard
 ./deploy.sh
                     </div>
                 </div>
@@ -897,18 +897,18 @@
                     <h3>Authenticate Nodes</h3>
                     <div class="code-block">
 <span class="comment"># Gemini (Google OAuth)</span>
-docker exec -it swarm-gemini gemini
+docker exec -it reviewboard-gemini gemini
 
 <span class="comment"># Claude (Anthropic OAuth)</span>
-docker exec -it swarm-claude claude setup-token
+docker exec -it reviewboard-claude claude setup-token
                     </div>
                 </div>
                 <div class="feature-card">
                     <h3>View Container Logs</h3>
                     <div class="code-block">
-docker logs swarm-gemini -f
-docker logs swarm-codex -f
-docker logs swarm-claude -f
+docker logs reviewboard-gemini -f
+docker logs reviewboard-codex -f
+docker logs reviewboard-claude -f
                     </div>
                 </div>
             </div>
@@ -916,7 +916,7 @@ docker logs swarm-claude -f
     </main>
 
     <footer>
-        <strong>AI Swarm Architecture v1.0</strong><br>
+        <strong>AI Review Board Architecture v1.0</strong><br>
         Generated: 2025-12-08 | linuxserver.lan<br>
         <a href="/infrastructure-docs/">Infrastructure Docs</a> |
         <a href="/context-compare/">Claude Context</a> |
