@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiveKit WebRTC Debug</title>
+    <script src="https://unpkg.com/livekit-client@2.5.0/dist/livekit-client.umd.js"></script>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #0f0; }
+        .log { margin: 2px 0; }
+        .error { color: #f66; }
+        .warn { color: #ff0; }
+        .info { color: #0f0; }
+        .debug { color: #888; }
+        #logOutput { background: #000; padding: 10px; height: 400px; overflow-y: scroll; border: 1px solid #333; }
+        button { margin: 5px; padding: 10px 20px; background: #333; color: #fff; border: none; cursor: pointer; }
+        button:hover { background: #555; }
+        input { padding: 8px; margin: 5px; background: #333; color: #fff; border: 1px solid #555; width: 300px; }
+        #videos { display: flex; gap: 10px; margin: 20px 0; }
+        video { width: 320px; height: 240px; background: #000; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+    <h1>LiveKit WebRTC Debug Tool</h1>
+
+    <div>
+        <input type="text" id="serverUrl" placeholder="Server URL (wss://livekit.ai-servicers.com)" value="wss://livekit.ai-servicers.com">
+        <input type="text" id="roomName" placeholder="Room Name" value="claude">
+    </div>
+
+    <div style="margin: 10px 0; padding: 10px; border: 1px solid #444; background: #222;">
+        <strong>Select AI Agent:</strong>
+        <label style="margin-left: 15px; cursor: pointer;">
+            <input type="radio" name="agentSelect" value="claude" checked onchange="selectAgent('claude')">
+            <img src="https://nginx.ai-servicers.com/logos/claude.png" alt="Claude" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 5px;">Claude
+        </label>
+        <label style="margin-left: 15px; cursor: pointer;">
+            <input type="radio" name="agentSelect" value="gemini" onchange="selectAgent('gemini')">
+            <img src="https://nginx.ai-servicers.com/logos/gemini.png" alt="Gemini" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 5px;">Gemini
+        </label>
+        <label style="margin-left: 15px; cursor: pointer;">
+            <input type="radio" name="agentSelect" value="chatgpt" onchange="selectAgent('chatgpt')">
+            <img src="https://nginx.ai-servicers.com/logos/chatgpt.png" alt="ChatGPT" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 5px;">ChatGPT
+        </label>
+        <span id="selectedAgent" style="margin-left: 20px; color: #DA7756;">Agent: Claude (claude-sonnet-4-5) (room: claude)</span>
+    </div>
+
+    <div style="margin: 10px 0; padding: 10px; border: 1px solid #444; background: #222;">
+        <strong>Select User:</strong>
+        <label style="margin-left: 15px; cursor: pointer;">
+            <input type="radio" name="userSelect" value="1" onchange="selectUser(1)"> User 1
+        </label>
+        <label style="margin-left: 15px; cursor: pointer;">
+            <input type="radio" name="userSelect" value="2" onchange="selectUser(2)"> User 2
+        </label>
+        <label style="margin-left: 15px; cursor: pointer;">
+            <input type="radio" name="userSelect" value="manual" onchange="selectUser('manual')"> Manual
+        </label>
+        <span id="selectedUser" style="margin-left: 20px; color: #0ff;"></span>
+    </div>
+
+    <div id="manualTokenDiv" style="margin: 10px 0; display: none;">
+        <input type="text" id="manualToken" placeholder="Paste token here for manual mode" style="width: 500px;">
+        <input type="text" id="manualName" placeholder="Participant name" value="manual-user" style="width: 150px;">
+    </div>
+
+    <div>
+        <input type="hidden" id="participantName" value="">
+        <input type="hidden" id="token" value="">
+    </div>
+
+    <div>
+        <button onclick="connect()">Connect</button>
+        <button onclick="disconnect()">Disconnect</button>
+        <button onclick="publishVideo()">Publish Video</button>
+        <button onclick="publishAudio()">Publish Audio</button>
+        <button onclick="checkSubscriptions()">Check Subscriptions</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+
+    <div id="videos">
+        <div>
+            <h4>Local Video</h4>
+            <video id="localVideo" autoplay muted playsinline></video>
+        </div>
+        <div>
+            <h4>Remote Video</h4>
+            <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+    </div>
+
+    <div id="logOutput"></div>
+
+    <script>
+        let room = null;
+        let localVideoTrack = null;
+        let localAudioTrack = null;
+
+        // Agent configurations with tokens (valid for 30 days from generation)
+        const AGENTS = {
+            claude: {
+                room: 'claude',
+                name: 'Claude (claude-sonnet-4-5)',
+                icon: 'https://nginx.ai-servicers.com/logos/claude.png',
+                color: '#DA7756',
+                tokens: {
+                    1: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzEzNTM4NzEsImlkZW50aXR5IjoidXNlci0xIiwiaXNzIjoiQVBJNjczNzY1MDI2NDQ3Yjg5ODQ2OWYiLCJuYmYiOjE3Njg3NjE4NzEsInN1YiI6InVzZXItMSIsInZpZGVvIjp7InJvb20iOiJjbGF1ZGUiLCJyb29tSm9pbiI6dHJ1ZX19.bIhWqbzbYIyOIyNeU5hKDqBMHKXdxyRkmeG5dopmAyk',
+                    2: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzEzNTM4NzIsImlkZW50aXR5IjoidXNlci0yIiwiaXNzIjoiQVBJNjczNzY1MDI2NDQ3Yjg5ODQ2OWYiLCJuYmYiOjE3Njg3NjE4NzIsInN1YiI6InVzZXItMiIsInZpZGVvIjp7InJvb20iOiJjbGF1ZGUiLCJyb29tSm9pbiI6dHJ1ZX19.bR9TBEf5rp4bJlCHi9RoBNizsWmh3Nvq2l4ArN4FOOA'
+                }
+            },
+            gemini: {
+                room: 'gemini',
+                name: 'Gemini (gemini-3-flash)',
+                icon: 'https://nginx.ai-servicers.com/logos/gemini.png',
+                color: '#4285F4',
+                tokens: {
+                    1: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzEzNTM4NzIsImlkZW50aXR5IjoidXNlci0xIiwiaXNzIjoiQVBJNjczNzY1MDI2NDQ3Yjg5ODQ2OWYiLCJuYmYiOjE3Njg3NjE4NzIsInN1YiI6InVzZXItMSIsInZpZGVvIjp7InJvb20iOiJnZW1pbmkiLCJyb29tSm9pbiI6dHJ1ZX19.e90O6wheUVRYI_KeihZih1oJtj-DaMqMCvYU5fa0QpY',
+                    2: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzEzNTM4NzIsImlkZW50aXR5IjoidXNlci0yIiwiaXNzIjoiQVBJNjczNzY1MDI2NDQ3Yjg5ODQ2OWYiLCJuYmYiOjE3Njg3NjE4NzIsInN1YiI6InVzZXItMiIsInZpZGVvIjp7InJvb20iOiJnZW1pbmkiLCJyb29tSm9pbiI6dHJ1ZX19.LCW4LrDIsi4vqYeUYlcGphJfYWrJg5MBVInd1NwwE9w'
+                }
+            },
+            chatgpt: {
+                room: 'chatgpt',
+                name: 'ChatGPT (gpt-5-mini)',
+                icon: 'https://nginx.ai-servicers.com/logos/chatgpt.png',
+                color: '#10A37F',
+                tokens: {
+                    1: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzEzNTM4NzMsImlkZW50aXR5IjoidXNlci0xIiwiaXNzIjoiQVBJNjczNzY1MDI2NDQ3Yjg5ODQ2OWYiLCJuYmYiOjE3Njg3NjE4NzMsInN1YiI6InVzZXItMSIsInZpZGVvIjp7InJvb20iOiJjaGF0Z3B0Iiwicm9vbUpvaW4iOnRydWV9fQ.BwFdprIPXL5LPPHCf8JVSmvL_eh1WBdK9khwn68GOAM',
+                    2: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzEzNTM4NzMsImlkZW50aXR5IjoidXNlci0yIiwiaXNzIjoiQVBJNjczNzY1MDI2NDQ3Yjg5ODQ2OWYiLCJuYmYiOjE3Njg3NjE4NzMsInN1YiI6InVzZXItMiIsInZpZGVvIjp7InJvb20iOiJjaGF0Z3B0Iiwicm9vbUpvaW4iOnRydWV9fQ.ssUWhgU9OJSKaMwsLnDxNSaumeP7qXmb1e0LYZb7TX8'
+                }
+            }
+        };
+
+        let currentAgent = 'claude'; // Default agent
+
+        // Legacy TOKENS structure for backward compatibility
+        const TOKENS = {
+            1: { name: 'user-1', token: AGENTS[currentAgent].tokens[1] },
+            2: { name: 'user-2', token: AGENTS[currentAgent].tokens[2] }
+        };
+
+        function selectAgent(agentKey) {
+            currentAgent = agentKey;
+            const agent = AGENTS[agentKey];
+
+            // Update room name
+            document.getElementById('roomName').value = agent.room;
+
+            // Update agent status display
+            const agentSpan = document.getElementById('selectedAgent');
+            agentSpan.textContent = `Agent: ${agent.name} (room: ${agent.room})`;
+            agentSpan.style.color = agent.color;
+
+            // Update tokens for current user selection
+            const selectedUserRadio = document.querySelector('input[name="userSelect"]:checked');
+            if (selectedUserRadio && selectedUserRadio.value !== 'manual') {
+                selectUser(parseInt(selectedUserRadio.value));
+            }
+
+            log(`Switched to ${agent.name} (room: ${agent.room})`, 'info');
+        }
+
+        function selectUser(userNum) {
+            const manualDiv = document.getElementById('manualTokenDiv');
+            const selectedSpan = document.getElementById('selectedUser');
+
+            if (userNum === 'manual') {
+                manualDiv.style.display = 'block';
+                document.getElementById('participantName').value = document.getElementById('manualName').value;
+                document.getElementById('token').value = document.getElementById('manualToken').value;
+                selectedSpan.textContent = 'Manual mode - paste token below';
+                log('Manual mode selected - paste your token', 'info');
+            } else {
+                manualDiv.style.display = 'none';
+                const agent = AGENTS[currentAgent];
+                const name = `user-${userNum}`;
+                const token = agent.tokens[userNum];
+                document.getElementById('participantName').value = name;
+                document.getElementById('token').value = token;
+                selectedSpan.textContent = `Selected: ${name} for ${currentAgent}`;
+                log(`Selected User ${userNum}: ${name} (agent: ${currentAgent})`, 'info');
+            }
+        }
+
+        // Update token/name when manual fields change
+        document.addEventListener('DOMContentLoaded', () => {
+            const manualToken = document.getElementById('manualToken');
+            const manualName = document.getElementById('manualName');
+
+            if (manualToken) {
+                manualToken.addEventListener('input', () => {
+                    const selectedRadio = document.querySelector('input[name="userSelect"]:checked');
+                    if (selectedRadio && selectedRadio.value === 'manual') {
+                        document.getElementById('token').value = manualToken.value;
+                    }
+                });
+            }
+
+            if (manualName) {
+                manualName.addEventListener('input', () => {
+                    const selectedRadio = document.querySelector('input[name="userSelect"]:checked');
+                    if (selectedRadio && selectedRadio.value === 'manual') {
+                        document.getElementById('participantName').value = manualName.value;
+                    }
+                });
+            }
+        });
+
+        const logTypes = { error: 'error', warn: 'warn', info: 'info', debug: 'debug' };
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            const logDiv = document.getElementById('logOutput');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log ${type}`;
+            logEntry.textContent = `[${timestamp}] [${type.toUpperCase()}] ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('logOutput').innerHTML = '';
+        }
+
+        async function connect() {
+            const serverUrl = document.getElementById('serverUrl').value;
+            const roomName = document.getElementById('roomName').value;
+            const participantName = document.getElementById('participantName').value;
+            const token = document.getElementById('token').value;
+
+            if (!token) {
+                log('Please provide an access token', 'error');
+                return;
+            }
+
+            log(`Connecting to ${serverUrl}...`, 'info');
+            log(`Room: ${roomName}, Participant: ${participantName}`, 'info');
+
+            try {
+                room = new LivekitClient.Room({
+                    adaptiveStream: true,
+                    dynacast: true,
+                });
+
+                // Connection state events
+                room.on(LivekitClient.RoomEvent.Connected, () => {
+                    log('CONNECTED to room!', 'info');
+                    log(`Room SID: ${room.sid}`, 'info');
+                    log(`Local participant: ${room.localParticipant.identity}`, 'info');
+                });
+
+                room.on(LivekitClient.RoomEvent.Disconnected, (reason) => {
+                    log(`DISCONNECTED: ${reason}`, 'warn');
+                });
+
+                room.on(LivekitClient.RoomEvent.Reconnecting, () => {
+                    log('RECONNECTING...', 'warn');
+                });
+
+                room.on(LivekitClient.RoomEvent.Reconnected, () => {
+                    log('RECONNECTED', 'info');
+                });
+
+                // ICE connection states
+                room.on(LivekitClient.RoomEvent.ConnectionStateChanged, (state) => {
+                    log(`Connection state: ${state}`, 'info');
+                });
+
+                room.on(LivekitClient.RoomEvent.SignalConnected, () => {
+                    log('Signal connection established', 'debug');
+                });
+
+                // Track events
+                room.on(LivekitClient.RoomEvent.TrackSubscribed, (track, publication, participant) => {
+                    log(`TRACK SUBSCRIBED: ${track.kind} from ${participant.identity}`, 'info');
+                    if (track.kind === 'video') {
+                        const videoEl = document.getElementById('remoteVideo');
+                        track.attach(videoEl);
+                        log('Remote video attached', 'info');
+                    }
+                    if (track.kind === 'audio') {
+                        const audioEl = document.createElement('audio');
+                        track.attach(audioEl);
+                        document.body.appendChild(audioEl);
+                        log('Remote audio attached', 'info');
+                    }
+                });
+
+                room.on(LivekitClient.RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
+                    log(`Track unsubscribed: ${track.kind} from ${participant.identity}`, 'debug');
+                    track.detach();
+                });
+
+                room.on(LivekitClient.RoomEvent.TrackSubscriptionFailed, (trackSid, participant, error) => {
+                    log(`TRACK SUBSCRIPTION FAILED: ${trackSid} from ${participant.identity}: ${error}`, 'error');
+                });
+
+                room.on(LivekitClient.RoomEvent.LocalTrackPublished, (publication, participant) => {
+                    log(`Local track published: ${publication.kind}`, 'info');
+                });
+
+                room.on(LivekitClient.RoomEvent.TrackPublished, (publication, participant) => {
+                    log(`Track published by ${participant.identity}: ${publication.kind} (trackSid: ${publication.trackSid})`, 'info');
+                    log(`  - isSubscribed: ${publication.isSubscribed}, track: ${publication.track ? 'exists' : 'null'}`, 'debug');
+                    // Try to subscribe if not already
+                    if (!publication.isSubscribed) {
+                        log(`  - Attempting to subscribe...`, 'debug');
+                        publication.setSubscribed(true);
+                    }
+                });
+
+                room.on(LivekitClient.RoomEvent.TrackStreamStateChanged, (publication, streamState, participant) => {
+                    log(`Stream state changed: ${publication.kind} from ${participant.identity} -> ${streamState}`, 'debug');
+                });
+
+                room.on(LivekitClient.RoomEvent.TrackMuted, (publication, participant) => {
+                    log(`Track muted: ${publication.kind} from ${participant.identity}`, 'debug');
+                });
+
+                room.on(LivekitClient.RoomEvent.TrackUnmuted, (publication, participant) => {
+                    log(`Track unmuted: ${publication.kind} from ${participant.identity}`, 'debug');
+                });
+
+                // Participant events
+                room.on(LivekitClient.RoomEvent.ParticipantConnected, (participant) => {
+                    log(`Participant joined: ${participant.identity}`, 'info');
+                    log(`  - trackPublications count: ${participant.trackPublications.size}`, 'debug');
+                    participant.trackPublications.forEach((publication) => {
+                        log(`  - Has track: ${publication.kind} (subscribed: ${publication.isSubscribed}, trackSid: ${publication.trackSid})`, 'debug');
+                        // If auto-subscribe didn't work, try manual subscribe
+                        if (!publication.isSubscribed && publication.track) {
+                            log(`  - Manually subscribing to ${publication.kind}...`, 'warn');
+                            publication.setSubscribed(true);
+                        }
+                    });
+
+                    // Also listen for track publications on this participant
+                    participant.on('trackPublished', (publication) => {
+                        log(`PARTICIPANT TRACK PUBLISHED: ${publication.kind} from ${participant.identity} (trackSid: ${publication.trackSid})`, 'info');
+                        log(`  - isSubscribed: ${publication.isSubscribed}, track: ${publication.track ? 'exists' : 'null'}`, 'debug');
+                    });
+
+                    participant.on('trackSubscribed', (track, publication) => {
+                        log(`PARTICIPANT TRACK SUBSCRIBED: ${track.kind} from ${participant.identity}`, 'info');
+                    });
+                });
+
+                room.on(LivekitClient.RoomEvent.ParticipantDisconnected, (participant) => {
+                    log(`Participant left: ${participant.identity}`, 'info');
+                });
+
+                // Media device events
+                room.on(LivekitClient.RoomEvent.MediaDevicesError, (error) => {
+                    log(`Media device error: ${error.message}`, 'error');
+                });
+
+                // Log all room events for debugging
+                room.on(LivekitClient.RoomEvent.DataReceived, (payload, participant) => {
+                    log(`Data received from ${participant?.identity || 'server'}`, 'debug');
+                });
+
+                // ICE candidate events (for debugging connectivity)
+                room.on('iceCandidate', (candidate, target) => {
+                    log(`ICE candidate (${target}): ${candidate.candidate?.substring(0, 50)}...`, 'debug');
+                });
+
+                // Connect to room
+                log('Initiating connection...', 'debug');
+                await room.connect(serverUrl, token, {
+                    autoSubscribe: true,
+                });
+
+                log('Connection successful!', 'info');
+                log(`SDK Version: ${LivekitClient.version}`, 'info');
+
+                // Log existing participants
+                room.remoteParticipants.forEach((participant) => {
+                    log(`Existing participant: ${participant.identity}`, 'info');
+                    participant.trackPublications.forEach((publication) => {
+                        log(`  - Track: ${publication.kind} (subscribed: ${publication.isSubscribed})`, 'debug');
+                    });
+                });
+
+                // Check ICE connection state and participant status
+                setInterval(() => {
+                    if (room && room.engine) {
+                        const pubState = room.engine.publisher?.pc?.iceConnectionState || 'unknown';
+                        const subState = room.engine.subscriber?.pc?.iceConnectionState || 'unknown';
+                        log(`ICE States - Publisher: ${pubState}, Subscriber: ${subState}`, 'debug');
+
+                        // Periodic check of all remote participants
+                        room.remoteParticipants.forEach((p) => {
+                            const trackCount = p.trackPublications.size;
+                            const subscribedCount = Array.from(p.trackPublications.values()).filter(t => t.isSubscribed).length;
+                            log(`  ${p.identity}: ${subscribedCount}/${trackCount} tracks subscribed`, 'debug');
+                        });
+                    }
+                }, 5000);
+
+            } catch (error) {
+                log(`Connection error: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        async function disconnect() {
+            if (room) {
+                log('Disconnecting...', 'info');
+                await room.disconnect();
+                room = null;
+                log('Disconnected', 'info');
+            }
+        }
+
+        async function publishVideo() {
+            if (!room) {
+                log('Not connected to room', 'error');
+                return;
+            }
+
+            try {
+                log('Creating video track...', 'debug');
+                localVideoTrack = await LivekitClient.createLocalVideoTrack({
+                    resolution: { width: 640, height: 480 },
+                    facingMode: 'user',
+                });
+
+                log('Publishing video track...', 'debug');
+                await room.localParticipant.publishTrack(localVideoTrack);
+
+                localVideoTrack.attach(document.getElementById('localVideo'));
+                log('Video published and attached', 'info');
+            } catch (error) {
+                log(`Video publish error: ${error.message}`, 'error');
+            }
+        }
+
+        async function publishAudio() {
+            if (!room) {
+                log('Not connected to room', 'error');
+                return;
+            }
+
+            try {
+                log('Creating audio track...', 'debug');
+                localAudioTrack = await LivekitClient.createLocalAudioTrack();
+
+                log('Publishing audio track...', 'debug');
+                await room.localParticipant.publishTrack(localAudioTrack);
+                log('Audio published', 'info');
+            } catch (error) {
+                log(`Audio publish error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkSubscriptions() {
+            if (!room) {
+                log('Not connected to room', 'error');
+                return;
+            }
+
+            log('=== SUBSCRIPTION CHECK ===', 'info');
+            log(`Remote participants: ${room.remoteParticipants.size}`, 'info');
+
+            room.remoteParticipants.forEach((participant) => {
+                log(`Participant: ${participant.identity}`, 'info');
+                log(`  - trackPublications: ${participant.trackPublications.size}`, 'debug');
+
+                participant.trackPublications.forEach((publication, sid) => {
+                    log(`  Track SID: ${sid}`, 'debug');
+                    log(`    - kind: ${publication.kind}`, 'debug');
+                    log(`    - isSubscribed: ${publication.isSubscribed}`, 'debug');
+                    log(`    - track exists: ${publication.track ? 'YES' : 'NO'}`, 'debug');
+                    log(`    - simulcasted: ${publication.simulcasted}`, 'debug');
+                    log(`    - trackName: ${publication.trackName}`, 'debug');
+
+                    if (!publication.isSubscribed) {
+                        log(`    - FORCING SUBSCRIBE...`, 'warn');
+                        try {
+                            publication.setSubscribed(true);
+                            log(`    - Subscribe request sent`, 'info');
+                        } catch (e) {
+                            log(`    - Subscribe error: ${e.message}`, 'error');
+                        }
+                    }
+                });
+            });
+
+            log('=== END CHECK ===', 'info');
+        }
+
+        // Initial log
+        log('LiveKit WebRTC Debug Tool loaded', 'info');
+        log('LiveKit Client Version: ' + LivekitClient.version, 'info');
+        log('=== Multi-Agent Testing ===', 'info');
+        log('Available agents: Claude, Gemini, ChatGPT', 'info');
+        log('Instructions:', 'info');
+        log('1. Select an AI Agent (Claude/Gemini/ChatGPT)', 'info');
+        log('2. Select User 1 or User 2', 'info');
+        log('3. Click Connect to join the agent room', 'info');
+        log('4. Click Publish Audio to talk to the agent', 'info');
+        log('5. The first user to join gets AI voice interaction', 'info');
+        log('Note: Each agent has its own voice, name, and LLM backend', 'info');
+    </script>
+</body>
+</html>

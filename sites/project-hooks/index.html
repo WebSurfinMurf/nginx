@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Hooks - Claude Code</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a1b9a 0%, #8e24aa 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #6a1b9a;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .location-box {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f3e5f5;
+            border-radius: 10px;
+            border-left: 4px solid #8e24aa;
+        }
+
+        .location-box code {
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .intro {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #8e24aa;
+        }
+
+        .intro h2 {
+            color: #6a1b9a;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .intro p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .stats-row {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .stat-box {
+            display: inline-block;
+            background: #8e24aa;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+
+        .hooks-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .hook-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .hook-card:hover {
+            border-color: #8e24aa;
+            box-shadow: 0 5px 20px rgba(142, 36, 170, 0.15);
+        }
+
+        .hook-card.pretool {
+            border-left: 5px solid #1565c0;
+        }
+
+        .hook-card.posttool {
+            border-left: 5px solid #2e7d32;
+        }
+
+        .hook-card.session {
+            border-left: 5px solid #f57c00;
+        }
+
+        .hook-card.stop {
+            border-left: 5px solid #d32f2f;
+        }
+
+        .hook-card.prompt {
+            border-left: 5px solid #00838f;
+        }
+
+        .hook-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f3e5f5;
+        }
+
+        .hook-icon {
+            font-size: 3em;
+        }
+
+        .hook-title h3 {
+            color: #6a1b9a;
+            font-size: 1.6em;
+            margin-bottom: 5px;
+        }
+
+        .hook-name {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #f3e5f5;
+            color: #6a1b9a;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .event-badge {
+            display: inline-block;
+            background: #7c4dff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+
+        .hook-description {
+            color: #555;
+            line-height: 1.7;
+            font-size: 1.05em;
+            margin-bottom: 20px;
+        }
+
+        .hook-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 800px) {
+            .hook-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hook-section {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .hook-section h4 {
+            color: #8e24aa;
+            font-size: 1em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hook-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .hook-section li {
+            color: #555;
+            padding: 4px 0;
+            padding-left: 18px;
+            position: relative;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .hook-section li::before {
+            content: ">";
+            position: absolute;
+            left: 0;
+            color: #8e24aa;
+        }
+
+        .hook-section pre {
+            background: #263238;
+            color: #80cbc4;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .event-section {
+            background: #e8f5e9;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .event-section h2 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .event-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .event-box {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 120px;
+        }
+
+        .event-box.session-start { border: 2px solid #f57c00; }
+        .event-box.prompt { border: 2px solid #00838f; }
+        .event-box.pretool { border: 2px solid #1565c0; }
+        .event-box.posttool { border: 2px solid #2e7d32; }
+        .event-box.stop { border: 2px solid #d32f2f; }
+
+        .event-box span {
+            font-size: 1.5em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .event-arrow {
+            font-size: 1.5em;
+            color: #999;
+        }
+
+        .comparison-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .comparison-section h2 {
+            color: #6a1b9a;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: #6a1b9a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f3e5f5;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .footer a {
+            color: #8e24aa;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #8e24aa;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: #f3e5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/context-layers/" class="back-link">&larr; Back to Context Layers</a>
+
+        <h1>Project Hooks</h1>
+        <p class="subtitle">Deterministic automation scripts that run at specific lifecycle events</p>
+
+        <div class="location-box">
+            <strong>Location:</strong> <code>~/.claude/hooks/</code> |
+            <strong>Config:</strong> <code>~/.claude/settings.json</code>
+        </div>
+
+        <div class="stats-row">
+            <span class="stat-box">7 Hooks</span>
+            <span class="stat-box">5 Event Types</span>
+            <span class="stat-box">Deterministic Execution</span>
+        </div>
+
+        <div class="intro">
+            <h2>What Are Hooks?</h2>
+            <p>
+                Hooks are shell scripts or Python programs that run automatically at specific points in Claude Code's lifecycle.
+                Unlike skills (which are prompts) or agents (which are LLM-driven), hooks provide <strong>deterministic behavior</strong> -
+                they always run and always produce the same output given the same input. Use hooks for security enforcement,
+                audit logging, naming validation, and automated checklists.
+            </p>
+        </div>
+
+        <div class="event-section">
+            <h2>Hook Event Lifecycle</h2>
+            <div class="event-diagram">
+                <div class="event-box session-start">
+                    <span>1</span>
+                    <strong>SessionStart</strong>
+                </div>
+                <span class="event-arrow">-></span>
+                <div class="event-box prompt">
+                    <span>2</span>
+                    <strong>UserPrompt</strong>
+                </div>
+                <span class="event-arrow">-></span>
+                <div class="event-box pretool">
+                    <span>3</span>
+                    <strong>PreToolUse</strong>
+                </div>
+                <span class="event-arrow">-></span>
+                <div class="event-box posttool">
+                    <span>4</span>
+                    <strong>PostToolUse</strong>
+                </div>
+                <span class="event-arrow">-></span>
+                <div class="event-box stop">
+                    <span>5</span>
+                    <strong>Stop</strong>
+                </div>
+            </div>
+            <p style="text-align: center; color: #666; font-size: 0.9em;">
+                Hooks fire in sequence: Session start -> User prompt -> Before each tool -> After each tool -> Session end
+            </p>
+        </div>
+
+        <div class="hooks-grid">
+            <!-- New Project Checklist Hook -->
+            <div class="hook-card pretool">
+                <div class="hook-header">
+                    <span class="hook-icon">&#x1F4CB;</span>
+                    <div class="hook-title">
+                        <h3>New Project Checklist <span class="event-badge">PreToolUse</span></h3>
+                        <span class="hook-name">new-project-checklist.py</span>
+                    </div>
+                </div>
+
+                <p class="hook-description">
+                    Shows a "don't forget" checklist when creating a new project directory under <code>~/projects/</code>.
+                    Detects <code>mkdir</code> commands targeting new top-level project directories and injects a reminder
+                    about network configuration, GitLab CI/CD setup, standard files, and integrations.
+                </p>
+
+                <div class="hook-content">
+                    <div class="hook-section">
+                        <h4>&#x1F3AF; Trigger Conditions</h4>
+                        <ul>
+                            <li>Tool: <code>Bash</code></li>
+                            <li>Command: <code>mkdir /home/administrator/projects/NEW</code></li>
+                            <li>Only triggers for new top-level directories</li>
+                            <li>Skips existing projects and subdirectories</li>
+                        </ul>
+                    </div>
+
+                    <div class="hook-section">
+                        <h4>&#x2705; Checklist Items</h4>
+                        <ul>
+                            <li><strong>Router Port Forwarding</strong> - External access config</li>
+                            <li><strong>Server Firewall (UFW)</strong> - Firewall rules</li>
+                            <li><strong>GitLab Repository</strong> - Create and initialize</li>
+                            <li><strong>.gitlab-ci.yml</strong> - CI/CD pipeline</li>
+                            <li><strong>CLAUDE.md</strong> - Project documentation</li>
+                            <li><strong>deploy.sh</strong> - Deployment script</li>
+                            <li><strong>Traefik/Keycloak</strong> - Integration setup</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Naming Validation Hook -->
+            <div class="hook-card pretool">
+                <div class="hook-header">
+                    <span class="hook-icon">&#x1F3F7;</span>
+                    <div class="hook-title">
+                        <h3>Naming Validation <span class="event-badge">PreToolUse</span></h3>
+                        <span class="hook-name">naming-validation.py</span>
+                    </div>
+                </div>
+
+                <p class="hook-description">
+                    Enforces naming conventions for resources created through Claude Code. Validates project directories,
+                    container names, and database names against infrastructure standards. Blocks operations that violate
+                    naming rules with helpful suggestions.
+                </p>
+
+                <div class="hook-content">
+                    <div class="hook-section">
+                        <h4>&#x1F4DC; Naming Rules</h4>
+                        <ul>
+                            <li><strong>Rule 1:</strong> All names must be lowercase</li>
+                            <li><strong>Rule 2:</strong> Root projects: no hyphens (our projects)</li>
+                            <li><strong>Rule 3:</strong> Upstream projects: match upstream name</li>
+                            <li><strong>Rule 4:</strong> MCP/nested: use hyphens for multi-word</li>
+                        </ul>
+                    </div>
+
+                    <div class="hook-section">
+                        <h4>&#x1F6D1; Blocked Operations</h4>
+                        <ul>
+                            <li><code>mkdir ~/projects/My-Project</code> (uppercase)</li>
+                            <li><code>mkdir ~/projects/my-project</code> (hyphen in our project)</li>
+                            <li><code>docker run --name MyContainer</code> (uppercase)</li>
+                            <li><code>CREATE DATABASE MyDB</code> (uppercase)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pre-Tool-Use Security Hook -->
+            <div class="hook-card pretool">
+                <div class="hook-header">
+                    <span class="hook-icon">&#x1F6E1;</span>
+                    <div class="hook-title">
+                        <h3>Security Guard <span class="event-badge">PreToolUse</span></h3>
+                        <span class="hook-name">pre-tool-use.sh</span>
+                    </div>
+                </div>
+
+                <p class="hook-description">
+                    Blocks dangerous operations before they execute. Prevents force pushes to main/master,
+                    deletion of secrets directories, recursive deletion of home directory, and production
+                    operations without security agent approval.
+                </p>
+
+                <div class="hook-content">
+                    <div class="hook-section">
+                        <h4>&#x1F6D1; Blocked Operations</h4>
+                        <ul>
+                            <li><code>git push --force origin main</code></li>
+                            <li><code>rm -rf secrets/</code></li>
+                            <li><code>rm -rf /home/administrator</code></li>
+                            <li>Production operations without security agent</li>
+                        </ul>
+                    </div>
+
+                    <div class="hook-section">
+                        <h4>&#x1F512; Security Features</h4>
+                        <ul>
+                            <li>Agent-aware: Checks CLAUDE_AGENT_TYPE</li>
+                            <li>Pattern matching on dangerous commands</li>
+                            <li>Exit code 1 blocks the operation</li>
+                            <li>Clear error messages for blocked actions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Post-Tool-Use Audit Hook -->
+            <div class="hook-card posttool">
+                <div class="hook-header">
+                    <span class="hook-icon">&#x1F4DD;</span>
+                    <div class="hook-title">
+                        <h3>Audit Logger <span class="event-badge">PostToolUse</span></h3>
+                        <span class="hook-name">post-tool-use.sh</span>
+                    </div>
+                </div>
+
+                <p class="hook-description">
+                    Logs all tool calls for compliance and debugging. Creates daily audit logs with timestamps,
+                    agent type, tool name, and session ID. For Bash commands, also logs the command text (truncated
+                    to 200 chars for security). Auto-rotates logs older than 30 days.
+                </p>
+
+                <div class="hook-content">
+                    <div class="hook-section">
+                        <h4>&#x1F4C1; Log Location</h4>
+                        <ul>
+                            <li>Directory: <code>~/.claude/audit/</code></li>
+                            <li>Files: <code>YYYY-MM-DD.log</code></li>
+                            <li>Retention: 30 days auto-rotation</li>
+                        </ul>
+                    </div>
+
+                    <div class="hook-section">
+                        <h4>&#x1F4CA; Log Format</h4>
+                        <pre>2026-01-18 15:30:45 | Agent: pm | Tool: Bash | Session: abc123
+  Command: docker compose up -d</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Start Hook -->
+            <div class="hook-card session">
+                <div class="hook-header">
+                    <span class="hook-icon">&#x1F680;</span>
+                    <div class="hook-title">
+                        <h3>Session Start <span class="event-badge">SessionStart</span></h3>
+                        <span class="hook-name">session-start.sh</span>
+                    </div>
+                </div>
+
+                <p class="hook-description">
+                    Logs session start and detects project context. Checks for CLAUDE.md, project-level agents,
+                    and skills in the current directory. Provides informational output about available context.
+                </p>
+
+                <div class="hook-content">
+                    <div class="hook-section">
+                        <h4>&#x1F50D; Context Detection</h4>
+                        <ul>
+                            <li>Checks for <code>CLAUDE.md</code> in CWD</li>
+                            <li>Checks for <code>.claude/agents/</code></li>
+                            <li>Checks for <code>.claude/skills/</code></li>
+                            <li>Logs session start to audit log</li>
+                        </ul>
+                    </div>
+
+                    <div class="hook-section">
+                        <h4>&#x1F4E4; Environment Variables</h4>
+                        <ul>
+                            <li><code>CLAUDE_CWD</code> - Current working directory</li>
+                            <li><code>CLAUDE_SESSION_ID</code> - Session identifier</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stop Hook -->
+            <div class="hook-card stop">
+                <div class="hook-header">
+                    <span class="hook-icon">&#x1F3C1;</span>
+                    <div class="hook-title">
+                        <h3>Session Summary <span class="event-badge">Stop</span></h3>
+                        <span class="hook-name">stop.sh</span>
+                    </div>
+                </div>
+
+                <p class="hook-description">
+                    Summarizes work done when agent stops. Logs session end to audit log. For PM agent sessions,
+                    creates a summary file with session details. Auto-cleans summary files older than 7 days.
+                </p>
+
+                <div class="hook-content">
+                    <div class="hook-section">
+                        <h4>&#x1F4C2; Output Files</h4>
+                        <ul>
+                            <li>Audit log: <code>~/.claude/audit/sessions.log</code></li>
+                            <li>Summaries: <code>~/.claude/sessions/{session}-summary.txt</code></li>
+                            <li>Retention: 7 days for summaries</li>
+                        </ul>
+                    </div>
+
+                    <div class="hook-section">
+                        <h4>&#x1F916; Agent-Aware</h4>
+                        <ul>
+                            <li>PM agent: Creates detailed session summary</li>
+                            <li>Other agents: Basic session end logging</li>
+                            <li>Links to daily audit log for details</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Prompt Submit Hook -->
+            <div class="hook-card prompt">
+                <div class="hook-header">
+                    <span class="hook-icon">&#x1F4AC;</span>
+                    <div class="hook-title">
+                        <h3>Prompt Logger <span class="event-badge">UserPromptSubmit</span></h3>
+                        <span class="hook-name">user-prompt-submit.sh</span>
+                    </div>
+                </div>
+
+                <p class="hook-description">
+                    Logs all user prompts with timestamps. Simple audit hook that records when prompts are submitted
+                    to Claude Code. Always allows prompts to proceed (exit 0).
+                </p>
+
+                <div class="hook-content">
+                    <div class="hook-section">
+                        <h4>&#x1F4C1; Log Location</h4>
+                        <ul>
+                            <li>File: <code>~/.claude/prompt-log.txt</code></li>
+                            <li>Format: Timestamp only (privacy-aware)</li>
+                        </ul>
+                    </div>
+
+                    <div class="hook-section">
+                        <h4>&#x2699; Behavior</h4>
+                        <ul>
+                            <li>Always exits 0 (never blocks)</li>
+                            <li>Logs timestamp, not content</li>
+                            <li>Useful for usage tracking</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-section">
+            <h2>Hooks vs Skills vs Agents</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Hooks</th>
+                        <th>Skills</th>
+                        <th>Agents</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Location</strong></td>
+                        <td><code>~/.claude/hooks/</code></td>
+                        <td><code>~/.claude/skills/</code></td>
+                        <td><code>~/.claude/agents/</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Format</strong></td>
+                        <td>Shell scripts / Python</td>
+                        <td>Markdown prompts</td>
+                        <td>Markdown with config</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Execution</strong></td>
+                        <td>Deterministic (always runs)</td>
+                        <td>On-demand (LLM chooses)</td>
+                        <td>Task-based (LLM-driven)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Can Block</strong></td>
+                        <td>Yes (exit code 1 or 2)</td>
+                        <td>No</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Use Cases</strong></td>
+                        <td>Security, audit, validation</td>
+                        <td>Domain knowledge, procedures</td>
+                        <td>Complex multi-step tasks</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Example</strong></td>
+                        <td>Block force push to main</td>
+                        <td>How to deploy a service</td>
+                        <td>Deploy entire infrastructure</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="comparison-section">
+            <h2>Hook Configuration</h2>
+            <p style="margin-bottom: 15px;">Hooks are registered in <code>~/.claude/settings.json</code>:</p>
+            <pre style="background: #263238; color: #80cbc4; padding: 15px; border-radius: 8px; overflow-x: auto; font-family: 'Consolas', 'Monaco', monospace;">
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/new-project-checklist.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}</pre>
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>Related:</strong>
+                <a href="/project-agents/">Project Agents</a> |
+                <a href="/project-skills/">Project Skills</a> |
+                <a href="/context-layers/">Context Layers</a> |
+                <a href="/user-level-skills/">User Skills</a>
+            </p>
+            <p style="margin-top: 10px; color: #999;">
+                Hooks provide deterministic automation - they always run, unlike LLM-driven skills/agents
+            </p>
+        </div>
+    </div>
+</body>
+</html>
