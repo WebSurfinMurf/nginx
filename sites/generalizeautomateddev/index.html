@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated AI-Assisted Development Workflow</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-brand">AI Development Workflow</div>
+        <div class="nav-links">
+            <a href="#overview">Overview</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#phases">Phases</a>
+            <a href="#components">Components</a>
+            <a href="#roadmap">Roadmap</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-content">
+            <h1>On-Premise AI Factory</h1>
+            <p class="hero-subtitle">Automated AI-Assisted Development Workflow</p>
+            <p class="hero-version">Version 2.0 - AI Review Board Enhanced</p>
+            <div class="hero-badges">
+                <span class="badge">7-Phase Workflow</span>
+                <span class="badge">Multi-LLM Review</span>
+                <span class="badge">Full Traceability</span>
+                <span class="badge">GitLab Integration</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Executive Summary -->
+    <section id="overview" class="section">
+        <div class="section-header">
+            <h2>Executive Summary</h2>
+            <p class="section-description">The solution in 30 seconds</p>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-card highlight">
+                <h3>The Recommendation</h3>
+                <p><strong>Option C: Custom Integration with Existing Infrastructure</strong></p>
+                <p>Leverage your existing 78-container infrastructure (n8n, GitLab, ArangoDB, specialist agents) rather than introducing new tools.</p>
+                <div class="insight-box">
+                    <strong>Key Insight:</strong> You already have the building blocks. The solution is orchestration, not acquisition.
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <h3>Key Decision</h3>
+                <p>Use <strong>GitLab Issues</strong> as the single source of truth for Kanban tracking.</p>
+                <ul>
+                    <li>Keeps data closer to code</li>
+                    <li>Eliminates sync overhead</li>
+                    <li>Native CI/CD integration</li>
+                </ul>
+            </div>
+
+            <div class="summary-card">
+                <h3>AI Consensus</h3>
+                <table class="mini-table">
+                    <tr><td>Claude</td><td>Option C Modified</td></tr>
+                    <tr><td>Gemini</td><td>Option C</td></tr>
+                    <tr><td>Codex</td><td>Option C</td></tr>
+                </table>
+                <p class="note">Unanimous recommendation after 2 review rounds</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Flow -->
+    <section id="architecture" class="section dark">
+        <div class="section-header">
+            <h2>Architecture Flow</h2>
+            <p class="section-description">The On-Premise AI Factory workflow</p>
+        </div>
+
+        <div class="architecture-diagram">
+            <svg viewBox="0 0 900 650" class="flow-svg">
+                <!-- Phase 0: Prompt Engineering -->
+                <g class="phase phase-0">
+                    <rect x="50" y="20" width="800" height="60" rx="10" fill="#374151"/>
+                    <text x="450" y="40" text-anchor="middle" fill="#9ca3af" font-size="11">PHASE 0: PRE-WORK</text>
+                    <text x="450" y="58" text-anchor="middle" fill="white" font-weight="bold" font-size="14">Prompt Engineering & Agent Contracts</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M450 80 L450 100" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <!-- Phase 1: Specification -->
+                <g class="phase phase-1">
+                    <rect x="50" y="100" width="800" height="70" rx="10" fill="#1e3a5f"/>
+                    <text x="450" y="120" text-anchor="middle" fill="#60a5fa" font-size="11">PHASE 1: SPECIFICATION</text>
+                    <text x="450" y="140" text-anchor="middle" fill="white" font-weight="bold" font-size="13">User creates requests/*.md in GitLab</text>
+                    <text x="450" y="158" text-anchor="middle" fill="#94a3b8" font-size="11">GitLab Webhook -> n8n -> Architect Agent -> specs/*.md + MR</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M450 170 L450 190" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <!-- Phase 2: Feasibility -->
+                <g class="phase phase-2">
+                    <rect x="150" y="190" width="600" height="50" rx="10" fill="#3b2f4a"/>
+                    <text x="450" y="210" text-anchor="middle" fill="#a78bfa" font-size="11">PHASE 2: FEASIBILITY CHECK</text>
+                    <text x="450" y="228" text-anchor="middle" fill="white" font-size="12">Developer Agent validates dependencies & APIs</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M450 240 L450 260" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <!-- Phase 3: Review Gate -->
+                <g class="phase phase-3">
+                    <rect x="100" y="260" width="700" height="70" rx="10" fill="#1e3a3a"/>
+                    <text x="450" y="280" text-anchor="middle" fill="#2dd4bf" font-size="11">PHASE 3: REVIEW GATE</text>
+                    <text x="450" y="300" text-anchor="middle" fill="white" font-weight="bold" font-size="13">Multi-LLM Review (Gemini + Codex + Claude)</text>
+                    <text x="450" y="318" text-anchor="middle" fill="#94a3b8" font-size="11">Human approval required -> Merge to specs/</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M450 330 L450 350" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <!-- Phase 4: Task Explosion -->
+                <g class="phase phase-4">
+                    <rect x="50" y="350" width="800" height="70" rx="10" fill="#1e3a5f"/>
+                    <text x="450" y="370" text-anchor="middle" fill="#60a5fa" font-size="11">PHASE 4: TASK EXPLOSION</text>
+                    <text x="450" y="390" text-anchor="middle" fill="white" font-weight="bold" font-size="13">PM Agent creates GitLab Issues + ArangoDB Links</text>
+                    <text x="450" y="408" text-anchor="middle" fill="#94a3b8" font-size="11">File locking in ArangoDB -> Task assignment via n8n</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M450 420 L450 440" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <!-- Phase 5: Implementation -->
+                <g class="phase phase-5">
+                    <rect x="50" y="440" width="800" height="70" rx="10" fill="#1a3324"/>
+                    <text x="450" y="460" text-anchor="middle" fill="#4ade80" font-size="11">PHASE 5: IMPLEMENTATION</text>
+                    <text x="450" y="480" text-anchor="middle" fill="white" font-weight="bold" font-size="13">Developer Agent: Branch -> Code -> Sandbox Test -> MR</text>
+                    <text x="450" y="498" text-anchor="middle" fill="#94a3b8" font-size="11">CI/CD: lint + tests + SAST + secrets scan</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M450 510 L450 530" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <!-- Phase 6: QA & Security -->
+                <g class="phase phase-6">
+                    <rect x="100" y="530" width="700" height="50" rx="10" fill="#3b2f2f"/>
+                    <text x="450" y="550" text-anchor="middle" fill="#f87171" font-size="11">PHASE 6: QA & SECURITY GATE</text>
+                    <text x="450" y="568" text-anchor="middle" fill="white" font-size="12">Error Feedback Loop (max 3 retries) -> All gates pass -> Merge</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M450 580 L450 600" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <!-- Phase 7: Deployment -->
+                <g class="phase phase-7">
+                    <rect x="150" y="600" width="600" height="40" rx="10" fill="#1e293b"/>
+                    <text x="450" y="625" text-anchor="middle" fill="white" font-weight="bold" font-size="13">PHASE 7: Deploy -> Update Status -> Notify -> Release Locks</text>
+                </g>
+
+                <!-- Arrow marker definition -->
+                <defs>
+                    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#6366f1"/>
+                    </marker>
+                </defs>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Phases Detail -->
+    <section id="phases" class="section">
+        <div class="section-header">
+            <h2>Workflow Phases</h2>
+            <p class="section-description">What happens at each step</p>
+        </div>
+
+        <div class="phases-grid">
+            <div class="phase-card">
+                <div class="phase-number">0</div>
+                <h3>Prompt Engineering</h3>
+                <p>Define and test system prompts for each agent role. Document input/output contracts.</p>
+                <div class="phase-agents">
+                    <span class="agent-tag all">All Agents</span>
+                </div>
+            </div>
+
+            <div class="phase-card">
+                <div class="phase-number">1</div>
+                <h3>Specification</h3>
+                <p>User creates request file. Architect Agent generates detailed specs and creates GitLab MR.</p>
+                <div class="phase-agents">
+                    <span class="agent-tag architect">Architect</span>
+                </div>
+            </div>
+
+            <div class="phase-card">
+                <div class="phase-number">2</div>
+                <h3>Feasibility Check</h3>
+                <p>Developer Agent validates dependencies, APIs, and flags infeasible requirements.</p>
+                <div class="phase-agents">
+                    <span class="agent-tag developer">Developer</span>
+                </div>
+            </div>
+
+            <div class="phase-card">
+                <div class="phase-number">3</div>
+                <h3>Review Gate</h3>
+                <p>Multi-LLM review (Gemini, Codex, Claude) + human approval before proceeding.</p>
+                <div class="phase-agents">
+                    <span class="agent-tag review">Multi-LLM</span>
+                    <span class="agent-tag human">Human</span>
+                </div>
+            </div>
+
+            <div class="phase-card">
+                <div class="phase-number">4</div>
+                <h3>Task Explosion</h3>
+                <p>PM Agent creates GitLab Issues, updates ArangoDB graph, assigns tasks with file locking.</p>
+                <div class="phase-agents">
+                    <span class="agent-tag pm">PM</span>
+                </div>
+            </div>
+
+            <div class="phase-card">
+                <div class="phase-number">5</div>
+                <h3>Implementation</h3>
+                <p>Developer Agent creates branch, writes code in sandbox, pushes MR. CI/CD runs all checks.</p>
+                <div class="phase-agents">
+                    <span class="agent-tag developer">Developer</span>
+                </div>
+            </div>
+
+            <div class="phase-card">
+                <div class="phase-number">6</div>
+                <h3>QA & Security Gate</h3>
+                <p>QA and Security Agents review. Error feedback loop enables self-correction (max 3 retries).</p>
+                <div class="phase-agents">
+                    <span class="agent-tag qa">QA</span>
+                    <span class="agent-tag security">Security</span>
+                </div>
+            </div>
+
+            <div class="phase-card">
+                <div class="phase-number">7</div>
+                <h3>Deployment</h3>
+                <p>GitLab CI/CD deploys. n8n updates status. Matrix notifies (ACTION_REQUIRED only).</p>
+                <div class="phase-agents">
+                    <span class="agent-tag cicd">CI/CD</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Components -->
+    <section id="components" class="section dark">
+        <div class="section-header">
+            <h2>Core Components</h2>
+            <p class="section-description">Existing infrastructure to leverage</p>
+        </div>
+
+        <div class="components-grid">
+            <div class="component-card core">
+                <div class="component-icon">G</div>
+                <h4>GitLab</h4>
+                <p>Repository, MRs, CI/CD, Issues, Kanban</p>
+                <span class="component-status">Single Source of Truth</span>
+            </div>
+
+            <div class="component-card core">
+                <div class="component-icon">N</div>
+                <h4>n8n</h4>
+                <p>Orchestration, webhooks, triggers</p>
+                <span class="component-status">Core Backbone</span>
+            </div>
+
+            <div class="component-card core">
+                <div class="component-icon">A</div>
+                <h4>ArangoDB</h4>
+                <p>Traceability graph + file locking</p>
+                <span class="component-status">Structural Links</span>
+            </div>
+
+            <div class="component-card core">
+                <div class="component-icon">Q</div>
+                <h4>Qdrant</h4>
+                <p>Semantic search (RAG) for code context</p>
+                <span class="component-status">Code Retrieval</span>
+            </div>
+
+            <div class="component-card">
+                <div class="component-icon">M</div>
+                <h4>Matrix</h4>
+                <p>ACTION_REQUIRED notifications</p>
+                <span class="component-status">Existing</span>
+            </div>
+
+            <div class="component-card">
+                <div class="component-icon">G</div>
+                <h4>Grafana</h4>
+                <p>Dashboards, metrics, audit</p>
+                <span class="component-status">Existing</span>
+            </div>
+
+            <div class="component-card">
+                <div class="component-icon">K</div>
+                <h4>Keycloak</h4>
+                <p>SSO, role-based access</p>
+                <span class="component-status">Existing</span>
+            </div>
+
+            <div class="component-card deploy">
+                <div class="component-icon">S</div>
+                <h4>Spec-Kit</h4>
+                <p>Specification generation</p>
+                <span class="component-status">Deploy (Docker)</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Flow -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Data Flow & Traceability</h2>
+            <p class="section-description">Complete audit trail from request to release</p>
+        </div>
+
+        <div class="traceability-diagram">
+            <svg viewBox="0 0 800 200" class="trace-svg">
+                <!-- Request -->
+                <g>
+                    <rect x="20" y="80" width="100" height="50" rx="8" fill="#6366f1"/>
+                    <text x="70" y="100" text-anchor="middle" fill="white" font-weight="bold" font-size="12">Request</text>
+                    <text x="70" y="118" text-anchor="middle" fill="#c7d2fe" font-size="10">REQ-xxx</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M120 105 L160 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#trace-arrow)"/>
+
+                <!-- Spec -->
+                <g>
+                    <rect x="160" y="80" width="100" height="50" rx="8" fill="#8b5cf6"/>
+                    <text x="210" y="100" text-anchor="middle" fill="white" font-weight="bold" font-size="12">Spec</text>
+                    <text x="210" y="118" text-anchor="middle" fill="#ddd6fe" font-size="10">SPEC-xxx</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M260 105 L300 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#trace-arrow)"/>
+
+                <!-- Plan -->
+                <g>
+                    <rect x="300" y="80" width="100" height="50" rx="8" fill="#a855f7"/>
+                    <text x="350" y="100" text-anchor="middle" fill="white" font-weight="bold" font-size="12">Plan</text>
+                    <text x="350" y="118" text-anchor="middle" fill="#e9d5ff" font-size="10">PLAN-xxx</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M400 105 L440 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#trace-arrow)"/>
+
+                <!-- Task -->
+                <g>
+                    <rect x="440" y="80" width="100" height="50" rx="8" fill="#10b981"/>
+                    <text x="490" y="100" text-anchor="middle" fill="white" font-weight="bold" font-size="12">Task</text>
+                    <text x="490" y="118" text-anchor="middle" fill="#a7f3d0" font-size="10">TASK-xxx</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M540 105 L580 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#trace-arrow)"/>
+
+                <!-- Commit -->
+                <g>
+                    <rect x="580" y="80" width="100" height="50" rx="8" fill="#f59e0b"/>
+                    <text x="630" y="100" text-anchor="middle" fill="white" font-weight="bold" font-size="12">Commit</text>
+                    <text x="630" y="118" text-anchor="middle" fill="#fef3c7" font-size="10">git SHA</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M680 105 L720 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#trace-arrow)"/>
+
+                <!-- Release -->
+                <g>
+                    <rect x="720" y="80" width="70" height="50" rx="8" fill="#ef4444"/>
+                    <text x="755" y="100" text-anchor="middle" fill="white" font-weight="bold" font-size="12">Release</text>
+                    <text x="755" y="118" text-anchor="middle" fill="#fecaca" font-size="10">REL-xxx</text>
+                </g>
+
+                <!-- Arrow marker -->
+                <defs>
+                    <marker id="trace-arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+                    </marker>
+                </defs>
+
+                <!-- Storage label -->
+                <text x="400" y="170" text-anchor="middle" fill="#6366f1" font-size="14" font-weight="bold">Stored in ArangoDB with bidirectional edges</text>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Roadmap -->
+    <section id="roadmap" class="section dark">
+        <div class="section-header">
+            <h2>Implementation Roadmap</h2>
+            <p class="section-description">8-week implementation plan</p>
+        </div>
+
+        <div class="roadmap-timeline">
+            <div class="roadmap-item">
+                <div class="roadmap-week">Week 0</div>
+                <div class="roadmap-content">
+                    <h4>Prompt Engineering</h4>
+                    <p>Define system prompts, test agent contracts, document I/O schemas</p>
+                </div>
+            </div>
+
+            <div class="roadmap-item">
+                <div class="roadmap-week">Weeks 1-2</div>
+                <div class="roadmap-content">
+                    <h4>Foundation</h4>
+                    <p>ArangoDB schema, GitLab templates, Dockerize Spec-Kit, n8n webhooks, Qdrant setup</p>
+                </div>
+            </div>
+
+            <div class="roadmap-item highlight">
+                <div class="roadmap-week">Week 2.5</div>
+                <div class="roadmap-content">
+                    <h4>Tracer Bullet</h4>
+                    <p>End-to-end test with "Add README" - validate entire pipeline flow</p>
+                </div>
+            </div>
+
+            <div class="roadmap-item">
+                <div class="roadmap-week">Weeks 3-4</div>
+                <div class="roadmap-content">
+                    <h4>Orchestration</h4>
+                    <p>n8n workflows, Agent Sandbox, Matrix alerts, file locking</p>
+                </div>
+            </div>
+
+            <div class="roadmap-item">
+                <div class="roadmap-week">Weeks 5-6</div>
+                <div class="roadmap-content">
+                    <h4>Gates & Security</h4>
+                    <p>GitLab CI/CD pipeline, error feedback loop, QA/Security integration, limits</p>
+                </div>
+            </div>
+
+            <div class="roadmap-item">
+                <div class="roadmap-week">Weeks 7-8</div>
+                <div class="roadmap-content">
+                    <h4>Visualization & Polish</h4>
+                    <p>Grafana dashboard, GitLab Board config, dry-run mode, documentation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Metrics -->
+    <section class="section">
+        <div class="section-header">
+            <h2>Success Metrics</h2>
+            <p class="section-description">How we measure success</p>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">&lt; 1 day</div>
+                <div class="metric-label">Spec-to-Code Cycle</div>
+                <div class="metric-desc">Simple features</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-value">&lt; 30%</div>
+                <div class="metric-label">Human Intervention</div>
+                <div class="metric-desc">Of all tasks</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-value">&gt; 70%</div>
+                <div class="metric-label">First-Pass Approval</div>
+                <div class="metric-desc">MR acceptance rate</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-value">&gt; 95%</div>
+                <div class="metric-label">Security Gate Pass</div>
+                <div class="metric-desc">CI pipeline success</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-value">100%</div>
+                <div class="metric-label">Traceability</div>
+                <div class="metric-desc">Every commit linked</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-value">&gt; 60%</div>
+                <div class="metric-label">Self-Correction</div>
+                <div class="metric-desc">Within 3 retries</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>Automated AI-Assisted Development Workflow v2.0</p>
+            <p class="footer-subtitle">AI Review Board Enhanced | Claude + Gemini + Codex Consensus</p>
+            <p class="footer-links">
+                <a href="/home/administrator/projects/ainotes/generalizeautomateddev.final.md">Full Documentation</a> |
+                <a href="/">nginx Portal</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

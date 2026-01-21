@@ -1,14 +1,14 @@
 # Project-Level Agents Page - Documentation
 
 ## Page Purpose
-Documents the 3 project-level agents loaded from the projects directory for Claude Code. These are infrastructure-specific specialist agents for the linuxserver.lan environment.
+Documents the 4 project-level agents loaded from the projects directory for Claude Code. These are infrastructure-specific specialist agents for the linuxserver.lan environment.
 
 ## Source Directory
 ```
 ~/projects/.claude/agents/
 ```
 
-## Agents Documented (as of 2025-11-26)
+## Agents Documented (as of 2026-01-20)
 1. **architect.md** - System design and architecture specialist
    - Infrastructure design, tech stack decisions
    - Service integration planning, performance optimization
@@ -26,6 +26,13 @@ Documents the 3 project-level agents loaded from the projects directory for Clau
    - Keycloak/OAuth2 setup, Traefik routing
    - Model: Sonnet
    - Tools: Read, Write, Grep, Glob, Bash
+
+4. **qa.md** - Quality Assurance specialist
+   - Test creation from developer specifications
+   - GitLab CI pipeline integration and monitoring
+   - Quality gate enforcement
+   - Model: Sonnet
+   - Tools: Read, Write, Edit, Grep, Glob, Bash
 
 ## Additional Files
 - **AGENT-UPDATES-2025-11-02.md** - Historical agent update notes
@@ -96,4 +103,4 @@ cd /home/administrator/projects/nginx
 - Update this page when agents are added/modified
 
 ---
-*Last Updated: 2025-11-26*
+*Last Updated: 2026-01-20*

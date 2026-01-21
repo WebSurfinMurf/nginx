@@ -1,14 +1,14 @@
 # User-Level Skills Page - Documentation
 
 ## Page Purpose
-Documents the 7 user-level skills loaded from the user's home directory for Claude Code.
+Documents the 11 user-level skills loaded from the user's home directory for Claude Code.
 
 ## Source Directory
 ```
 ~/.claude/skills/
 ```
 
-## Skills Documented (as of 2025-11-26)
+## Skills Documented (as of 2026-01-20)
 1. **naming-validator** - Resource naming standards validation
 2. **secrets-security** - Secrets management and security hardening
 3. **openmemory** - mem0/OpenMemory integration for persistent memory
@@ -16,6 +16,10 @@ Documents the 7 user-level skills loaded from the user's home directory for Clau
 5. **architecture-diagram-creator** - Project architecture diagram generation
 6. **claudemd-generator** - CLAUDE.md file generation
 7. **skill-creator** - Guide for creating new skills
+8. **ai-communication** - AI-to-AI communication (file-based + MCP Review Board)
+9. **frontend-design-pro** - Production-ready frontend interfaces
+10. **createsolution** - AI Board Review workflow for multi-model solutions
+11. **test-skill** - Hot reload testing for skill development
 
 ## How to Update This Page
 
@@ -74,4 +78,4 @@ cd /home/administrator/projects/nginx
 - Update this page when skills are added/removed/modified
 
 ---
-*Last Updated: 2025-11-26*
+*Last Updated: 2026-01-20*

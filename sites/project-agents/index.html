@@ -122,6 +122,10 @@
             border-left: 5px solid #f57c00;
         }
 
+        .agent-card.qa {
+            border-left: 5px solid #7b1fa2;
+        }
+
         .agent-header {
             display: flex;
             align-items: center;
@@ -276,6 +280,10 @@
             border: 2px solid #f57c00;
         }
 
+        .coord-box.qa {
+            border: 2px solid #7b1fa2;
+        }
+
         .coord-box span {
             font-size: 2em;
             display: block;
@@ -372,7 +380,7 @@
         </div>
 
         <div class="stats-row">
-            <span class="stat-box">3 Agents</span>
+            <span class="stat-box">4 Agents</span>
             <span class="stat-box">Infrastructure-Focused</span>
             <span class="stat-box">Coordinated by PM</span>
         </div>
@@ -414,9 +422,15 @@
                     <strong>Developer</strong>
                     <div style="font-size: 0.8em; color: #666;">Implements</div>
                 </div>
+                <span class="coord-arrow">→</span>
+                <div class="coord-box qa">
+                    <span>🧪</span>
+                    <strong>QA</strong>
+                    <div style="font-size: 0.8em; color: #666;">Tests</div>
+                </div>
             </div>
             <p style="text-align: center; color: #666; font-size: 0.9em;">
-                Typical flow: PM breaks down tasks → Architect designs → Security configures network/auth → Developer implements
+                Typical flow: PM breaks down tasks → Architect designs → Security configures → Developer implements → QA tests
             </p>
         </div>
 
@@ -607,6 +621,67 @@
                     </div>
                 </div>
             </div>
+
+            <!-- QA Agent -->
+            <div class="agent-card qa">
+                <div class="agent-header">
+                    <span class="agent-icon">🧪</span>
+                    <div class="agent-title">
+                        <h3>QA <span class="model-badge">Sonnet</span></h3>
+                        <span class="agent-name">qa</span>
+                    </div>
+                </div>
+
+                <p class="agent-description">
+                    Quality Assurance specialist for test creation, GitLab CI integration, pipeline monitoring,
+                    and quality gate enforcement. Creates comprehensive test suites from developer specifications,
+                    commits to GitLab, and reports results with detailed failure analysis.
+                </p>
+
+                <div class="agent-content">
+                    <div class="agent-section">
+                        <h4>🛠️ Available Tools</h4>
+                        <div class="tools-grid">
+                            <span class="tool-tag">Read</span>
+                            <span class="tool-tag">Write</span>
+                            <span class="tool-tag">Edit</span>
+                            <span class="tool-tag">Grep</span>
+                            <span class="tool-tag">Glob</span>
+                            <span class="tool-tag">Bash</span>
+                        </div>
+                    </div>
+
+                    <div class="agent-section">
+                        <h4>🎯 Core Expertise</h4>
+                        <ul>
+                            <li>Test design and specification (pytest, jest)</li>
+                            <li>GitLab CI pipeline integration</li>
+                            <li>Test execution monitoring via API</li>
+                            <li>Quality gate enforcement</li>
+                            <li>Bug identification and documentation</li>
+                            <li>Test automation patterns</li>
+                        </ul>
+                    </div>
+
+                    <div class="agent-section">
+                        <h4>📂 Context Files</h4>
+                        <ul>
+                            <li>developer/specs/{project}/spec.md</li>
+                            <li>qa/tests/{project}/</li>
+                            <li>qa/results/{project}/results.md</li>
+                            <li>qa/reports/{project}/quality-report.md</li>
+                        </ul>
+                    </div>
+
+                    <div class="agent-section">
+                        <h4>🔗 Escalates To</h4>
+                        <ul>
+                            <li><strong>Developer</strong> - Spec ambiguity, implementation bugs</li>
+                            <li><strong>PM</strong> - Quality gate failures, scope changes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="comparison-section">
@@ -632,7 +707,7 @@
                     </tr>
                     <tr>
                         <td><strong>Count</strong></td>
-                        <td>3 agents</td>
+                        <td>4 agents</td>
                         <td>1 agent (PM)</td>
                     </tr>
                     <tr>
@@ -642,12 +717,12 @@
                     </tr>
                     <tr>
                         <td><strong>Agents</strong></td>
-                        <td>Architect, Developer, Security</td>
+                        <td>Architect, Developer, Security, QA</td>
                         <td>PM (Project Manager)</td>
                     </tr>
                     <tr>
                         <td><strong>Invocation</strong></td>
-                        <td><code>subagent_type="architect|developer|security"</code></td>
+                        <td><code>subagent_type="architect|developer|security|qa"</code></td>
                         <td><code>subagent_type="pm"</code></td>
                     </tr>
                 </tbody>

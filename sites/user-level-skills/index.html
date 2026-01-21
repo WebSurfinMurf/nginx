@@ -306,7 +306,7 @@
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-value">7</div>
+                <div class="stat-value">11</div>
                 <div class="stat-label">Total Skills</div>
             </div>
             <div class="stat-card">
@@ -314,7 +314,7 @@
                 <div class="stat-label">Proactive</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">5</div>
+                <div class="stat-value">9</div>
                 <div class="stat-label">On-Demand</div>
             </div>
             <div class="stat-card">
@@ -489,6 +489,95 @@
                     <span class="resource-tag">scripts/package_skill.py</span>
                 </div>
             </div>
+
+            <!-- AI Communication -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">🤖</span>
+                    <span class="skill-name">ai-communication</span>
+                </div>
+                <span class="skill-type on-demand">On-Demand</span>
+                <p class="skill-description">Covers all AI-to-AI communication: async file-based messaging via /mnt/shared/aichat/ and sync peer review via MCP Review Board dispatch to Gemini/Codex/Claude.</p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases:</h4>
+                    <ul>
+                        <li>"Peer review this plan"</li>
+                        <li>"Respond to aichat"</li>
+                        <li>"Ask Gemini/Codex for feedback"</li>
+                        <li>"Write to shared file"</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">/mnt/shared/aichat/</span>
+                    <span class="resource-tag">MCP Review Board</span>
+                </div>
+            </div>
+
+            <!-- Frontend Design Pro -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">🎨</span>
+                    <span class="skill-name">frontend-design-pro</span>
+                </div>
+                <span class="skill-type on-demand">On-Demand</span>
+                <p class="skill-description">Creates production-ready frontend interfaces with bold aesthetics (glassmorphism, brutalism, neumorphism, etc.) and perfect images - real Unsplash/Pexels photos or custom AI image prompts.</p>
+                <div class="skill-triggers">
+                    <h4>Trigger Phrases:</h4>
+                    <ul>
+                        <li>"Create a stunning landing page"</li>
+                        <li>"Design a modern interface"</li>
+                        <li>"Build a professional UI"</li>
+                        <li>Any frontend design request</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">11 aesthetic styles</span>
+                    <span class="resource-tag">Unsplash/Pexels integration</span>
+                </div>
+            </div>
+
+            <!-- Create Solution -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">💡</span>
+                    <a href="/createsolution-docs/" class="skill-name" style="text-decoration: none; color: #1a365d;">createsolution</a>
+                </div>
+                <span class="skill-type on-demand">On-Demand - Workflow</span>
+                <p class="skill-description">Execute the AI Board Review workflow: refine requirements, analyze, gather multi-AI perspectives (Gemini, Codex), synthesize into a final solution, and create an executive web presentation.</p>
+                <div class="skill-triggers">
+                    <h4>Workflow Steps:</h4>
+                    <ul>
+                        <li>Refine program ask into formal spec</li>
+                        <li>Submit to AI Review Board</li>
+                        <li>Synthesize multi-model feedback</li>
+                        <li>Create executive presentation site</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">$HOME/projects/ainotes/</span>
+                    <span class="resource-tag">nginx deployment</span>
+                </div>
+            </div>
+
+            <!-- Test Skill -->
+            <div class="skill-card meta">
+                <div class="skill-header">
+                    <span class="skill-icon">🧪</span>
+                    <span class="skill-name">test-skill</span>
+                </div>
+                <span class="skill-type on-demand">On-Demand - Development</span>
+                <p class="skill-description">Test skill for verifying hot reload functionality. Modify while Claude Code is running to test changes appear without restart.</p>
+                <div class="skill-triggers">
+                    <h4>When to Use:</h4>
+                    <ul>
+                        <li>Testing skill hot reload</li>
+                        <li>Verifying skill system functionality</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">Development only</span>
+                </div>
+            </div>
         </div>
 
         <h2 class="section-title">Skill Anatomy</h2>
@@ -496,12 +585,18 @@
         <div class="workflow-box">
             <h3>Directory Structure</h3>
             <div class="code-block">~/.claude/skills/
+├── ai-communication/
+│   └── SKILL.md
 ├── architecture-diagram-creator/
 │   ├── SKILL.md
 │   ├── assets/templates/
 │   └── references/
 ├── claudemd-generator/
-│   └── skill.md
+│   └── SKILL.md
+├── createsolution/
+│   └── SKILL.md
+├── frontend-design-pro/
+│   └── SKILL.md
 ├── gitlab-integration/
 │   └── SKILL.md
 ├── naming-validator/
@@ -509,14 +604,16 @@
 │   ├── references/naming-standards.md
 │   └── scripts/validate_name.py
 ├── openmemory/
-│   └── skill.md
+│   └── SKILL.md
 ├── secrets-security/
 │   ├── SKILL.md
 │   ├── references/
 │   └── scripts/
-└── skill-creator/
-    ├── SKILL.md
-    └── scripts/</div>
+├── skill-creator/
+│   ├── SKILL.md
+│   └── scripts/
+└── test-skill/
+    └── SKILL.md</div>
         </div>
 
         <div class="workflow-box">
@@ -548,7 +645,7 @@
                     </tr>
                     <tr>
                         <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;"><strong>Count</strong></td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">7 skills</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">11 skills</td>
                         <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">8 skills</td>
                     </tr>
                     <tr>
@@ -558,7 +655,7 @@
                     </tr>
                     <tr>
                         <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;"><strong>Examples</strong></td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">naming-validator, openmemory, skill-creator</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">createsolution, ai-communication, frontend-design-pro, naming-validator</td>
                         <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">keycloak-setup, postgres-integration, traefik-setup</td>
                     </tr>
                 </tbody>

@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spec-Driven Development Pipeline - Executive Summary</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid #1f4068;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #94a3b8;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #e94560;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-top: 15px;
+        }
+
+        .badge-green {
+            background: #10b981;
+        }
+
+        .section {
+            background: rgba(31, 64, 104, 0.5);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid #1f4068;
+        }
+
+        .section h2 {
+            color: #e94560;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1f4068;
+            font-size: 1.5em;
+        }
+
+        .section h3 {
+            color: #60a5fa;
+            margin: 20px 0 15px 0;
+            font-size: 1.2em;
+        }
+
+        .key-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .key-point {
+            background: rgba(15, 52, 96, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #e94560;
+        }
+
+        .key-point.green {
+            border-left-color: #10b981;
+        }
+
+        .key-point.blue {
+            border-left-color: #60a5fa;
+        }
+
+        .key-point.orange {
+            border-left-color: #f59e0b;
+        }
+
+        .key-point h4 {
+            color: #f1f5f9;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .key-point p {
+            color: #94a3b8;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .diagram-container {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(15, 52, 96, 0.5);
+            border-radius: 10px;
+        }
+
+        .step-number {
+            background: #e94560;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            color: #f1f5f9;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #1f4068;
+        }
+
+        .comparison-table th {
+            background: rgba(15, 52, 96, 0.7);
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            color: #cbd5e1;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(15, 52, 96, 0.3);
+        }
+
+        .decision-box {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .decision-box h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .decision-box p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(15, 52, 96, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #e94560;
+        }
+
+        .stat-card .label {
+            color: #94a3b8;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .timeline {
+            margin: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .timeline-week {
+            background: #e94560;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            width: 100px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            background: rgba(15, 52, 96, 0.5);
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-left: 15px;
+            flex-grow: 1;
+        }
+
+        .timeline-content h4 {
+            color: #f1f5f9;
+            margin-bottom: 5px;
+        }
+
+        .timeline-content p {
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+            font-size: 0.9em;
+        }
+
+        .footer a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        .back-link {
+            display: inline-block;
+            background: #1f4068;
+            color: #60a5fa;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+
+        .back-link:hover {
+            background: #2d5a8a;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .flow-step {
+                flex-direction: column;
+            }
+
+            .step-number {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">&larr; Back to Portal</a>
+
+        <div class="header">
+            <h1>Spec-Driven Development Pipeline</h1>
+            <p>GitLab Integration with Claude Code CLI</p>
+            <span class="badge">AI Board Reviewed</span>
+            <span class="badge badge-green">2026-01-20</span>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="section">
+            <h2>Executive Summary</h2>
+            <p style="font-size: 1.1em; line-height: 1.8; margin-bottom: 20px;">
+                This proposal outlines an automated software development pipeline that combines
+                <strong>Spec-Driven Development</strong> methodology with <strong>Claude Code CLI</strong>
+                and <strong>GitLab</strong> for task visibility. The solution leverages existing infrastructure
+                (64 MCP tools, 5 agents) while adding structured specification workflows and Kanban board tracking.
+            </p>
+
+            <div class="key-points">
+                <div class="key-point green">
+                    <h4>Process First, Tools Second</h4>
+                    <p>Specifications define intent before code. Multi-step refinement, not single-prompt generation.</p>
+                </div>
+                <div class="key-point blue">
+                    <h4>Full Visibility</h4>
+                    <p>All AI agent work visible on GitLab Kanban boards with real-time label updates.</p>
+                </div>
+                <div class="key-point orange">
+                    <h4>Human Oversight</h4>
+                    <p>Approval gates at spec review and code review stages ensure human control.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Build on Existing</h4>
+                    <p>No new tools needed initially. Defer GitLab Duo ($29/user) and OpenHands until validated.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture Diagram -->
+        <div class="section">
+            <h2>Architecture Overview</h2>
+            <p style="margin-bottom: 20px;">Five-layer architecture separating concerns from infrastructure to visibility:</p>
+
+            <div class="diagram-container">
+                <pre class="mermaid">
+flowchart LR
+    subgraph L4["Layer 4: Visibility"]
+        direction TB
+        KB[GitLab Kanban Board]
+        WH[Webhooks]
+    end
+
+    subgraph L3["Layer 3: Orchestration"]
+        direction TB
+        CI[GitLab CI/CD]
+        TR[Triage]
+        SP[Spec]
+        B1[ ]
+        PL[Plan]
+        B2[ ]
+        B3[ ]
+        IM[Implement]
+        SC[Security]
+        TS[Test]
+        CI --> TR --> SP --> B1 --> PL --> B2 --> B3 --> IM --> SC --> TS
+    end
+
+    subgraph L2["Layer 2: Methodology"]
+        direction TB
+        SK[Spec-Kit CLI]
+        S1["/speckit.clarify"]
+        S2["/speckit.specify"]
+        S3["/speckit.checklist"]
+        S4["/speckit.plan"]
+        S5["/speckit.tasks"]
+        S6["/speckit.analyze"]
+        S7["/speckit.implement"]
+        B4[ ]
+        B5[ ]
+        SK ~~~ S1 ~~~ S2 ~~~ S3 ~~~ S4 ~~~ S5 ~~~ S6 ~~~ S7 ~~~ B4 ~~~ B5
+    end
+
+    subgraph L15["Layer 1.5: Bridge"]
+        direction TB
+        GL[glab CLI / MCP-GitLab]
+        TK[GL_TOKEN Auth]
+    end
+
+    subgraph L0["Layer 1: Execution"]
+        direction TB
+        CC[Claude Code CLI]
+        PM[PM Agent]
+        AR[Architect]
+        DV[Developer]
+        SE[Security]
+        QA[QA Agent]
+        CC --> PM & AR & DV & SE & QA
+    end
+
+    %% Connections to enforce left-to-right order
+    KB --> CI
+    CI -.-> SK
+
+    %% Layer 3 to Layer 2 (horizontal arrows - aligned)
+    TR -.-> S1
+    SP -.-> S2
+    B1 -.-> S3
+    PL -.-> S4
+    B2 -.-> S5
+    B3 -.-> S6
+    IM -.-> S7
+
+    %% Layer 2 to Layer 1.5 to Layer 1
+    B5 --> GL
+    GL --> CC
+
+    style L4 fill:#10b981,stroke:#059669
+    style L3 fill:#60a5fa,stroke:#3b82f6
+    style L2 fill:#f59e0b,stroke:#d97706
+    style L15 fill:#e94560,stroke:#dc2626
+    style L0 fill:#8b5cf6,stroke:#7c3aed
+    style B1 fill:none,stroke:none
+    style B2 fill:none,stroke:none
+    style B3 fill:none,stroke:none
+    style B4 fill:none,stroke:none
+    style B5 fill:none,stroke:none
+                </pre>
+            </div>
+        </div>
+
+        <!-- Spec-Kit Command Reference -->
+        <div class="section">
+            <h2>Spec-Kit Command Reference</h2>
+            <p style="margin-bottom: 20px;">All 8 Spec-Kit commands and when they're invoked in the pipeline:</p>
+
+            <table class="comparison-table">
+                <tr>
+                    <th>Command</th>
+                    <th>Stage</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td><code>/speckit.constitution</code></td>
+                    <td>Setup (one-time)</td>
+                    <td>Define project principles, tech stack constraints, coding standards</td>
+                </tr>
+                <tr>
+                    <td><code>/speckit.clarify</code></td>
+                    <td>Clarification</td>
+                    <td>Generate structured questions to resolve vague/ambiguous requirements</td>
+                </tr>
+                <tr>
+                    <td><code>/speckit.specify</code></td>
+                    <td>Specification</td>
+                    <td>Create structured spec document (WHAT + WHY, not technical HOW)</td>
+                </tr>
+                <tr>
+                    <td><code>/speckit.checklist</code></td>
+                    <td>Quality Gates</td>
+                    <td>"Unit tests for English" - domain-specific validation (security, UX, etc.)</td>
+                </tr>
+                <tr>
+                    <td><code>/speckit.plan</code></td>
+                    <td>Planning</td>
+                    <td>Technical implementation plan + data models + API contracts</td>
+                </tr>
+                <tr>
+                    <td><code>/speckit.tasks</code></td>
+                    <td>Task Generation</td>
+                    <td>Break plan into granular, ordered, parallelizable tasks</td>
+                </tr>
+                <tr>
+                    <td><code>/speckit.analyze</code></td>
+                    <td>Analysis</td>
+                    <td>Cross-artifact consistency check (spec ↔ plan ↔ tasks)</td>
+                </tr>
+                <tr>
+                    <td><code>/speckit.implement</code></td>
+                    <td>Implementation</td>
+                    <td>Execute tasks in order, creating code changes</td>
+                </tr>
+            </table>
+
+            <div class="decision-box" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <h3>Key Insight: Quality Gates Before Code</h3>
+                <p><code>/speckit.clarify</code>, <code>/speckit.checklist</code>, and <code>/speckit.analyze</code> catch problems BEFORE any code is written, preventing wasted implementation effort.</p>
+            </div>
+        </div>
+
+        <!-- Workflow Walkthrough -->
+        <div class="section">
+            <h2>Workflow Walkthrough</h2>
+            <p style="margin-bottom: 20px;">How a feature request flows through the pipeline (with full Spec-Kit integration):</p>
+
+            <div class="flow-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>Issue Created</h4>
+                    <p>Human creates GitLab issue describing the feature request. Native GitLab pipeline triggers on issue events.</p>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>AI Triage + Clarity Check</h4>
+                    <p>Claude analyzes the issue for complexity (simple/complex) AND clarity. <strong>If requirements are vague</strong>, the issue is routed to clarification before any spec is generated. This prevents wasted effort on specs built from assumptions.</p>
+                </div>
+            </div>
+
+            <div class="flow-step" style="border-left: 4px solid #f59e0b;">
+                <div class="step-number" style="background: #f59e0b;">2b</div>
+                <div class="step-content">
+                    <h4>Clarification (if needed)</h4>
+                    <p>Claude executes <code>/speckit.clarify</code> to generate structured clarifying questions. Questions are posted as a comment on the issue. <strong>Pipeline blocks</strong> until human answers. This loop repeats until requirements are clear.</p>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>Specification</h4>
+                    <p>Claude executes <code>/speckit.specify</code> to generate a structured specification document with requirements, acceptance criteria, and constraints. Focus is on WHAT and WHY, not technical HOW.</p>
+                </div>
+            </div>
+
+            <div class="flow-step" style="border-left: 4px solid #10b981;">
+                <div class="step-number" style="background: #10b981;">4</div>
+                <div class="step-content">
+                    <h4>Quality Gates ("Unit Tests for English")</h4>
+                    <p>Claude executes <code>/speckit.checklist</code> to run domain-specific quality checks: security requirements, infrastructure needs, testability, UX considerations. Failed checks loop back to clarification.</p>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h4>Human Spec Review</h4>
+                    <p>Spec moves to <code>status::spec-review</code> on Kanban. Human reviews and approves (or requests changes). This is a mandatory gate before technical planning.</p>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">6</div>
+                <div class="step-content">
+                    <h4>Planning</h4>
+                    <p>Architect agent executes <code>/speckit.plan</code> to create detailed implementation plan: architecture decisions, data models, API contracts, file changes, risks. This transforms WHAT into HOW.</p>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">7</div>
+                <div class="step-content">
+                    <h4>Task Generation</h4>
+                    <p>Claude executes <code>/speckit.tasks</code> to break the plan into granular, ordered tasks. Parallelizable tasks are marked with <code>[P]</code>. Each task is atomic with clear completion criteria.</p>
+                </div>
+            </div>
+
+            <div class="flow-step" style="border-left: 4px solid #8b5cf6;">
+                <div class="step-number" style="background: #8b5cf6;">8</div>
+                <div class="step-content">
+                    <h4>Consistency Analysis</h4>
+                    <p>Claude executes <code>/speckit.analyze</code> to check cross-artifact consistency: spec ↔ plan ↔ tasks. Catches coverage gaps, ambiguities, duplications, and constitution violations before coding starts.</p>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">9</div>
+                <div class="step-content">
+                    <h4>Implementation</h4>
+                    <p>Developer agent executes <code>/speckit.implement</code> to run all tasks in order. Creates merge request with all changes. Labels updated to <code>status::code-review</code>.</p>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">10</div>
+                <div class="step-content">
+                    <h4>Security & QA</h4>
+                    <p>Security agent reviews infrastructure security: secret management, networking configuration, authentication setup. QA agent runs tests and verifies acceptance criteria using <code>/speckit.checklist</code>.</p>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">11</div>
+                <div class="step-content">
+                    <h4>Human Merge</h4>
+                    <p>Human reviews MR, considers agent feedback, and merges. Issue automatically moves to <code>status::done</code> on Kanban.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pipeline Flow Diagram -->
+        <div class="section">
+            <h2>CI/CD Pipeline Flow</h2>
+
+            <div class="diagram-container">
+                <pre class="mermaid">
+sequenceDiagram
+    participant H as Human
+    participant GL as GitLab
+    participant CI as CI/CD Pipeline
+    participant CC as Claude Code
+    participant SK as Spec-Kit
+    participant KB as Kanban Board
+
+    H->>GL: Create Issue
+    GL->>CI: Pipeline trigger (issue event)
+    CI->>CC: Triage stage (complexity + clarity)
+
+    alt Issue is VAGUE
+        CC->>KB: Update status::needs-clarification
+        CC->>SK: /speckit.clarify
+        SK-->>CC: Clarifying questions
+        CC->>GL: Post questions as comment
+        Note over H,GL: Pipeline BLOCKS - awaiting human answers
+        H->>GL: Answer clarifying questions
+        GL->>CI: Pipeline trigger (comment event)
+        CC->>GL: Consolidate answers into issue
+    end
+
+    CC->>KB: Update status::spec-ready
+
+    CI->>CC: Specification stage
+    CC->>SK: /speckit.specify
+    SK-->>CC: Structured spec (WHAT + WHY)
+    CC->>GL: Commit spec.md to repo
+
+    CI->>CC: Quality gates stage
+    CC->>SK: /speckit.checklist
+    SK-->>CC: Domain checklists (security, UX, etc.)
+
+    alt Checklist FAILS
+        CC->>GL: Post failed items
+        CC->>KB: Keep status::spec-checklist
+        Note over H,GL: Loop back to clarify gaps
+    end
+
+    CC->>KB: Update status::spec-review
+
+    Note over H,KB: HUMAN GATE: Reviews spec...
+
+    H->>GL: Approve spec (label change)
+    GL->>CI: Pipeline trigger (label event)
+
+    CI->>CC: Planning stage
+    CC->>SK: /speckit.plan
+    SK-->>CC: plan.md + data-model + contracts
+    CC->>GL: Commit plan artifacts
+
+    CI->>CC: Task generation stage
+    CC->>SK: /speckit.tasks
+    SK-->>CC: tasks.md (granular, ordered)
+    CC->>GL: Commit tasks
+
+    CI->>CC: Consistency analysis stage
+    CC->>SK: /speckit.analyze
+    SK-->>CC: Cross-artifact validation
+
+    alt Analysis FAILS
+        CC->>GL: Post inconsistencies found
+        Note over CI,CC: Loop back to plan or tasks
+    end
+
+    CC->>KB: Update status::ready-to-implement
+
+    CI->>CC: Implementation stage
+    CC->>SK: /speckit.implement
+    SK-->>CC: Execute tasks in order
+    CC->>GL: Create MR with changes
+    CC->>KB: Update status::code-review
+
+    CI->>CC: Security review
+    CC->>GL: Add security findings
+
+    CI->>CC: Testing stage
+    CC->>GL: Add test results
+
+    Note over H,KB: HUMAN GATE: Reviews MR...
+
+    H->>GL: Merge MR
+    GL->>KB: Update status::done
+                </pre>
+            </div>
+        </div>
+
+        <!-- GitLab Duo vs OpenHands -->
+        <div class="section">
+            <h2>Tool Comparison: GitLab Duo vs OpenHands</h2>
+
+            <table class="comparison-table">
+                <tr>
+                    <th>Factor</th>
+                    <th>Current Setup (Claude Code)</th>
+                    <th>GitLab Duo ($29/user/mo)</th>
+                    <th>OpenHands (Free)</th>
+                </tr>
+                <tr>
+                    <td>Capability Gaps</td>
+                    <td>None critical</td>
+                    <td>None</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>Cost (5 users/mo)</td>
+                    <td>$0*</td>
+                    <td>$145-240</td>
+                    <td>$0*</td>
+                </tr>
+                <tr>
+                    <td>Setup Effort</td>
+                    <td>Already done</td>
+                    <td>Low (native)</td>
+                    <td>Medium-High</td>
+                </tr>
+                <tr>
+                    <td>Model Flexibility</td>
+                    <td>Claude only</td>
+                    <td>GitLab models</td>
+                    <td>Any LLM</td>
+                </tr>
+                <tr>
+                    <td>IDE Integration</td>
+                    <td>None</td>
+                    <td>Good</td>
+                    <td>CLI only</td>
+                </tr>
+                <tr>
+                    <td>Scale (100+ agents)</td>
+                    <td>Limited</td>
+                    <td>Limited</td>
+                    <td>Excellent</td>
+                </tr>
+            </table>
+
+            <p style="font-size: 0.9em; color: #94a3b8; margin-top: 10px;">* Infrastructure costs only</p>
+
+            <div class="decision-box">
+                <h3>Recommendation: DEFER BOTH</h3>
+                <p>Master the Human + Claude CLI + Spec-Kit workflow first. Adding tools without process mastery creates complexity.</p>
+            </div>
+
+            <h3>When to Reconsider</h3>
+            <div class="key-points">
+                <div class="key-point blue">
+                    <h4>GitLab Duo Triggers</h4>
+                    <p>Team grows beyond 10 developers, IDE-centric workflow becomes primary, or single-vendor relationship desired.</p>
+                </div>
+                <div class="key-point orange">
+                    <h4>OpenHands Triggers</h4>
+                    <p>Need 100+ concurrent agents, model diversity required (GPT, Gemini, local), or cost optimization critical at scale.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Timeline -->
+        <div class="section">
+            <h2>Implementation Roadmap</h2>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 1</div>
+                    <div class="timeline-content">
+                        <h4>Foundation</h4>
+                        <p>Install glab CLI, configure GL_TOKEN, create labels, install Spec-Kit, set up Kanban board</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 2</div>
+                    <div class="timeline-content">
+                        <h4>Pipeline Setup</h4>
+                        <p>Create .gitlab-ci.yml template, configure CI/CD variables, set up runner networking, test triage stage</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 3</div>
+                    <div class="timeline-content">
+                        <h4>Spec-Kit Integration</h4>
+                        <p>Create spec template repository, test /speckit.specify and /speckit.plan workflows</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 4</div>
+                    <div class="timeline-content">
+                        <h4>Full Pipeline</h4>
+                        <p>Enable implementation, security, and testing stages; run end-to-end pilot project</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-week">Week 5</div>
+                    <div class="timeline-content">
+                        <h4>Observability</h4>
+                        <p>Create Grafana dashboard, add Loki queries, set up Matrix notifications, document runbook</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Metrics -->
+        <div class="section">
+            <h2>Success Metrics</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="number">100%</div>
+                    <div class="label">Spec Creation Rate (features)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">&lt;1hr</div>
+                    <div class="label">Issue-to-MR (simple)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">&lt;4hr</div>
+                    <div class="label">Issue-to-MR (complex)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">&lt;20%</div>
+                    <div class="label">Human Intervention Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">100%</div>
+                    <div class="label">Security Config Review</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">&gt;85%</div>
+                    <div class="label">Pipeline Success Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Start -->
+        <div class="section">
+            <h2>Quick Start (Today)</h2>
+            <p style="margin-bottom: 20px;">Start getting value immediately, before the full pipeline is deployed:</p>
+
+            <div style="background: rgba(15, 52, 96, 0.7); padding: 20px; border-radius: 10px; font-family: monospace; font-size: 0.9em; overflow-x: auto;">
+<pre style="color: #10b981;"># 1. Verify gitlab-integration skill
+ls ~/.claude/skills/gitlab-integration/
+
+# 2. Install glab CLI
+sudo apt install glab || snap install glab
+
+# 3. Configure authentication
+glab auth login --hostname gitlab.ai-servicers.com
+
+# 4. Create basic labels
+glab label create "status::backlog" "status::in-progress" "status::done"
+
+# 5. Immediate workflow (manual)
+claude "Implement GitLab issue #123"
+# Claude reads issue via glab, implements, creates MR</pre>
+            </div>
+
+            <p style="margin-top: 15px; color: #94a3b8;">This gives <strong>80% of the value</strong> while the full CI/CD pipeline is being developed.</p>
+        </div>
+
+        <!-- Documentation Links -->
+        <div class="section">
+            <h2>Documentation</h2>
+            <div class="key-points">
+                <div class="key-point">
+                    <h4>Full Technical Document</h4>
+                    <p><code>~/projects/ainotes/createsolution/speckitgitlab.final.md</code></p>
+                </div>
+                <div class="key-point green">
+                    <h4>Requirements</h4>
+                    <p><code>~/projects/ainotes/createsolution/speckitgitlab.md</code></p>
+                </div>
+                <div class="key-point blue">
+                    <h4>Gemini Review</h4>
+                    <p><code>~/projects/ainotes/createsolution/speckitgitlab.gemini.md</code></p>
+                </div>
+                <div class="key-point orange">
+                    <h4>Codex Review</h4>
+                    <p><code>~/projects/ainotes/createsolution/speckitgitlab.codex.md</code></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>
+                Spec-Driven Development Pipeline |
+                <a href="https://github.com/github/spec-kit">Spec-Kit</a> |
+                <a href="https://code.claude.com/docs/en/gitlab-ci-cd">Claude GitLab CI/CD</a> |
+                AI Board Reviewed: 2026-01-20
+            </p>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true
+            }
+        });
+    </script>
+</body>
+</html>
