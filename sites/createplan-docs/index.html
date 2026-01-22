@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreatePlan: Multi-AI Project Planning Workflow</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%);
+            padding: 2rem;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 3rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #0d9488;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        h1 {
+            font-size: 2.8rem;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .intro {
+            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+            color: white;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+        }
+
+        .intro h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .intro p {
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        section {
+            margin: 3rem 0;
+        }
+
+        section h2 {
+            color: #1a202c;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid #0d9488;
+            padding-bottom: 0.5rem;
+        }
+
+        section h3 {
+            color: #2d3748;
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+        }
+
+        section p {
+            color: #4a5568;
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .diagram-container {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .diagram-container h3 {
+            color: #0d9488;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .step-card {
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+            border: 2px solid #14b8a6;
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .step-card .step-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #0d9488;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .step-card h4 {
+            color: #0f766e;
+            margin-top: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.2rem;
+        }
+
+        .step-card p {
+            color: #4a5568;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .step-card .output {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #99f6e4;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #0f766e;
+        }
+
+        .ai-nodes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 800px) {
+            .ai-nodes {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .ai-node {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .ai-node:hover {
+            transform: translateY(-5px);
+        }
+
+        .ai-node.claude {
+            border: 3px solid #a855f7;
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+        }
+
+        .ai-node.gemini {
+            border: 3px solid #22c55e;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+
+        .ai-node.codex {
+            border: 3px solid #3b82f6;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        }
+
+        .ai-node .icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-node h3 {
+            margin: 0.5rem 0;
+            font-size: 1.4rem;
+        }
+
+        .ai-node.claude h3 { color: #7c3aed; }
+        .ai-node.gemini h3 { color: #16a34a; }
+        .ai-node.codex h3 { color: #2563eb; }
+
+        .ai-node .focus {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-node.claude .focus { color: #a855f7; }
+        .ai-node.gemini .focus { color: #22c55e; }
+        .ai-node.codex .focus { color: #3b82f6; }
+
+        .ai-node p {
+            color: #4a5568;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .key-insight {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .key-insight h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            border: none;
+            color: white;
+        }
+
+        .key-insight p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: white;
+            margin: 0;
+        }
+
+        .comparison-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 700px) {
+            .comparison-box {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .compare-item {
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .compare-item.solution {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+        }
+
+        .compare-item.plan {
+            background: #ccfbf1;
+            border: 2px solid #14b8a6;
+        }
+
+        .compare-item h4 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .compare-item.solution h4 { color: #b45309; }
+        .compare-item.plan h4 { color: #0f766e; }
+
+        .compare-item ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .compare-item li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #4a5568;
+        }
+
+        .compare-item li::before {
+            content: ">";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .compare-item.solution li::before { color: #f59e0b; }
+        .compare-item.plan li::before { color: #14b8a6; }
+
+        .file-structure {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .file-structure .folder { color: #fbbf24; }
+        .file-structure .file { color: #22d3ee; }
+        .file-structure .comment { color: #64748b; }
+
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .benefit-card {
+            background: #f8fafc;
+            border-left: 4px solid #0d9488;
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .benefit-card h4 {
+            color: #0f766e;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .benefit-card p {
+            color: #64748b;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .usage-box {
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+            border: 2px solid #14b8a6;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .usage-box h3 {
+            color: #0f766e;
+            margin-top: 0;
+        }
+
+        .usage-box code {
+            background: #0f766e;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            display: inline-block;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+        }
+
+        .usage-box p {
+            color: #4a5568;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #718096;
+        }
+
+        .footer a {
+            color: #0d9488;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: #e2e8f0;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #0f766e;
+        }
+
+        .phase-arrow {
+            text-align: center;
+            font-size: 2rem;
+            color: #14b8a6;
+            margin: 1rem 0;
+        }
+
+        /* Agent cards styling */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .agent-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .agent-card.pm { border: 2px solid #8b5cf6; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); }
+        .agent-card.architect { border: 2px solid #06b6d4; background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); }
+        .agent-card.security { border: 2px solid #ef4444; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); }
+        .agent-card.developer { border: 2px solid #22c55e; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
+        .agent-card.qa { border: 2px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); }
+
+        .agent-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+        .agent-card h4 { margin: 0.25rem 0; font-size: 1.1rem; }
+        .agent-card.pm h4 { color: #7c3aed; }
+        .agent-card.architect h4 { color: #0891b2; }
+        .agent-card.security h4 { color: #dc2626; }
+        .agent-card.developer h4 { color: #16a34a; }
+        .agent-card.qa h4 { color: #d97706; }
+
+        .agent-card p { color: #64748b; font-size: 0.85rem; margin: 0.5rem 0 0 0; }
+
+        /* Parallel execution box */
+        .parallel-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .parallel-box h3 {
+            color: #1d4ed8;
+            margin-top: 0;
+        }
+
+        .parallel-indicator {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .task-format {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .task-format .keyword { color: #f472b6; }
+        .task-format .agent { color: #22d3ee; }
+        .task-format .group { color: #a5f3fc; }
+        .task-format .value { color: #fde047; }
+        .task-format .comment { color: #64748b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">&larr; Back to Portal</a>
+
+        <header>
+            <h1>CreatePlan Workflow</h1>
+            <p class="subtitle">Multi-AI Project Planning with Agent Assignments & Parallel Execution</p>
+        </header>
+
+        <main>
+            <!-- INTRODUCTION -->
+            <div class="intro">
+                <h2>From Solution to Executable Plan</h2>
+                <p><strong>CreatePlan</strong> takes a solution design (or any "plan ask") and transforms it into an actionable project plan through multi-AI collaboration with explicit agent assignments.</p>
+                <p>Three AI perspectives (Claude, Gemini, Codex) independently create implementation plans, which are synthesized and peer-reviewed. The final plan specifies which agent handles each task and which tasks can run in parallel.</p>
+                <p><strong>Result:</strong> A comprehensive project plan with clear agent assignments (PM, Architect, Security, Developer, QA) and parallel execution guidance for maximum efficiency.</p>
+            </div>
+
+            <!-- AGENT ASSIGNMENTS (NEW SECTION) -->
+            <section id="agents">
+                <h2>Agent Assignments</h2>
+                <p>Every task in the final plan specifies which agent should execute it. The available agents are:</p>
+
+                <div class="agent-grid">
+                    <div class="agent-card pm">
+                        <div class="icon">&#x1F3AF;</div>
+                        <h4>PM</h4>
+                        <p>Project orchestration, multi-agent coordination, milestone tracking</p>
+                    </div>
+
+                    <div class="agent-card architect">
+                        <div class="icon">&#x1F3D7;</div>
+                        <h4>Architect</h4>
+                        <p>System design, tech decisions, ADRs, integration patterns</p>
+                    </div>
+
+                    <div class="agent-card security">
+                        <div class="icon">&#x1F512;</div>
+                        <h4>Security</h4>
+                        <p>Network, auth, DNS, secrets, Keycloak, Traefik, SSL/TLS</p>
+                    </div>
+
+                    <div class="agent-card developer">
+                        <div class="icon">&#x1F4BB;</div>
+                        <h4>Developer</h4>
+                        <p>Implementation, Docker deployment, debugging, database ops</p>
+                    </div>
+
+                    <div class="agent-card qa">
+                        <div class="icon">&#x2705;</div>
+                        <h4>QA</h4>
+                        <p>Test creation, GitLab CI pipelines, quality gates, validation</p>
+                    </div>
+                </div>
+
+                <div class="task-format">
+<span class="comment">### Task Format in Final Plan:</span>
+
+<span class="keyword">### Task:</span> <span class="value">Design OAuth2 Integration</span>
+<span class="keyword">- Agent:</span> <span class="agent">Security</span>
+<span class="keyword">- Support:</span> <span class="agent">Architect</span>
+<span class="keyword">- Parallel Group:</span> <span class="group">Sequential</span> <span class="comment">(blocks implementation)</span>
+<span class="keyword">- Dependencies:</span> <span class="value">None</span>
+<span class="keyword">- Deliverable:</span> <span class="value">OAuth2 flow diagram, Keycloak client config</span>
+                </div>
+            </section>
+
+            <!-- SHARED CONTEXT: AGENTPARALLEL.MD -->
+            <section id="shared-context">
+                <h2>Shared Agent Context</h2>
+                <p>To ensure all AIs (Claude, Gemini, Codex) understand the agent capabilities and create consistent plans, a shared reference document is provided to each:</p>
+
+                <div class="parallel-box" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-color: #f59e0b;">
+                    <h3 style="color: #b45309;">Agent Parallelization Guide</h3>
+                    <p style="margin-bottom: 1rem;"><code style="background: #b45309; color: white; padding: 0.5rem 1rem; border-radius: 4px;">$HOME/projects/ainotes/agentparallel.md</code></p>
+                    <p>This reference file is automatically included when dispatching to Gemini and Codex, ensuring they understand:</p>
+                </div>
+
+                <div class="benefit-grid" style="margin-top: 1.5rem;">
+                    <div class="benefit-card" style="border-color: #f59e0b;">
+                        <h4 style="color: #b45309;">5 Available Agents</h4>
+                        <p>PM, Architect, Security, Developer, QA - with their specializations and when to use each.</p>
+                    </div>
+                    <div class="benefit-card" style="border-color: #f59e0b;">
+                        <h4 style="color: #b45309;">Task Assignment Format</h4>
+                        <p>Standard format with Agent, Support, Parallel Group, Dependencies, and Deliverable fields.</p>
+                    </div>
+                    <div class="benefit-card" style="border-color: #f59e0b;">
+                        <h4 style="color: #b45309;">Parallel Execution Rules</h4>
+                        <p>Group notation (A, B, C...), dependency rules, and when tasks can run simultaneously.</p>
+                    </div>
+                    <div class="benefit-card" style="border-color: #f59e0b;">
+                        <h4 style="color: #b45309;">Best Practices</h4>
+                        <p>How to maximize parallelism, avoid pitfalls, and select the right agent for each task type.</p>
+                    </div>
+                </div>
+
+                <div class="diagram-container" style="margin-top: 2rem;">
+                    <h3>How Context Flows to All AIs</h3>
+                    <div class="mermaid">
+flowchart LR
+    subgraph REF["Reference Document"]
+        A[agentparallel.md]
+    end
+
+    subgraph PLAN["Plan Generation"]
+        A --> C1[Claude]
+        A --> C2[Gemini]
+        A --> C3[Codex]
+    end
+
+    subgraph REVIEW["Peer Review"]
+        A --> R1[Gemini Review]
+        A --> R2[Codex Review]
+    end
+
+    C1 --> D[Draft Plan]
+    C2 --> D
+    C3 --> D
+    D --> R1
+    D --> R2
+    R1 --> F[Final Plan]
+    R2 --> F
+
+    style REF fill:#fef3c7,stroke:#f59e0b
+    style PLAN fill:#faf5ff,stroke:#a855f7
+    style REVIEW fill:#eff6ff,stroke:#3b82f6
+                    </div>
+                </div>
+
+                <div class="task-format" style="margin-top: 1.5rem;">
+<span class="comment"># Dispatch template sent to Gemini/Codex:</span>
+
+<span class="value">First, read and understand the Agent Parallelization Guide at:</span>
+<span class="agent">$HOME/projects/ainotes/agentparallel.md</span>
+
+<span class="value">This document describes:</span>
+<span class="keyword">-</span> 5 available agents: PM, Architect, Security, Developer, QA
+<span class="keyword">-</span> How to assign agents to each task
+<span class="keyword">-</span> How to identify tasks that can run in parallel
+<span class="keyword">-</span> Task assignment format and dependency rules
+
+<span class="value">Your plan MUST:</span>
+<span class="group">1.</span> Assign one of the 5 agents to each task
+<span class="group">2.</span> Identify which tasks can run in parallel (same group letter)
+<span class="group">3.</span> Specify dependencies between tasks
+<span class="group">4.</span> Use the standard task format
+                </div>
+            </section>
+
+            <!-- PARALLEL EXECUTION (NEW SECTION) -->
+            <section id="parallel">
+                <h2>Parallel Execution</h2>
+                <p>The final plan identifies which tasks can run simultaneously using parallel group notation:</p>
+
+                <div class="parallel-box">
+                    <h3>Parallel Group Notation</h3>
+                    <p>Tasks with the same group letter (A, B, C...) can execute simultaneously. Multiple developers can work on independent services at the same time.</p>
+                </div>
+
+                <div class="diagram-container">
+                    <h3>Example: Phased Execution with Parallel Groups</h3>
+                    <div class="mermaid">
+gantt
+    title Project Timeline with Parallel Tasks
+    dateFormat X
+    axisFormat %s
+
+    section Phase 1
+    Architecture Design (Architect)    :a1, 0, 2
+    Security Review (Security)         :a2, 0, 2
+
+    section Phase 2 - Parallel A
+    User Service (Dev-1)               :b1, 2, 3
+    Product Service (Dev-2)            :b2, 2, 3
+    Test Specs (QA)                    :b3, 2, 3
+
+    section Phase 3
+    Integration (Developer)            :c1, 5, 2
+
+    section Phase 4 - Parallel B
+    CI Pipeline (QA)                   :d1, 7, 2
+    Security Audit (Security)          :d2, 7, 2
+                    </div>
+                </div>
+
+                <div class="task-format">
+<span class="comment"># For parallel tasks, spawn multiple agents simultaneously:</span>
+<span class="keyword">Task</span>(<span class="agent">pm</span>, "Coordinate Phase 2 tasks...")
+<span class="keyword">Task</span>(<span class="agent">developer</span>, "Implement User Service...", <span class="group">run_in_background=true</span>)
+<span class="keyword">Task</span>(<span class="agent">developer</span>, "Implement Product Service...", <span class="group">run_in_background=true</span>)
+<span class="keyword">Task</span>(<span class="agent">qa</span>, "Create test specifications...", <span class="group">run_in_background=true</span>)
+                </div>
+
+                <h3>Parallel Execution Rules</h3>
+                <div class="benefit-grid">
+                    <div class="benefit-card">
+                        <h4>Independent Tasks</h4>
+                        <p>Tasks with no shared dependencies can run in parallel (same group letter).</p>
+                    </div>
+                    <div class="benefit-card">
+                        <h4>Same Agent Type</h4>
+                        <p>Multiple developers can work simultaneously on different services (Dev-1, Dev-2).</p>
+                    </div>
+                    <div class="benefit-card">
+                        <h4>Cross-Agent Parallel</h4>
+                        <p>Architect can plan Phase 2 while Developers implement Phase 1.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- WORKFLOW DIAGRAM -->
+            <section id="workflow">
+                <h2>The CreatePlan Workflow</h2>
+
+                <div class="diagram-container">
+                    <h3>End-to-End Process Flow</h3>
+                    <div class="mermaid">
+flowchart TB
+    subgraph INPUT["1. Input"]
+        A[Plan Ask] --> B[Clarify & Format]
+    end
+
+    subgraph PARALLEL["2. Parallel Plan Generation"]
+        B --> C1[Claude Plan]
+        B --> C2[Gemini Plan]
+        B --> C3[Codex Plan]
+    end
+
+    subgraph SYNTHESIS["3. Synthesis"]
+        C1 --> D[Claude Synthesizes<br/>All 3 Plans]
+        C2 --> D
+        C3 --> D
+        D --> E[Draft Plan<br/>+ Agent Assignments<br/>+ Parallel Groups]
+    end
+
+    subgraph REVIEW["4. Peer Review"]
+        E --> F1[Gemini Review]
+        E --> F2[Codex Review]
+        F1 --> G[Incorporate Feedback]
+        F2 --> G
+    end
+
+    subgraph OUTPUT["5. Output"]
+        G --> H[Final Plan<br/>w/ Agents & Parallel]
+        H --> I[Executive Presentation]
+    end
+
+    style INPUT fill:#f0fdfa,stroke:#14b8a6
+    style PARALLEL fill:#faf5ff,stroke:#a855f7
+    style SYNTHESIS fill:#fef3c7,stroke:#f59e0b
+    style REVIEW fill:#eff6ff,stroke:#3b82f6
+    style OUTPUT fill:#dcfce7,stroke:#22c55e
+                    </div>
+                </div>
+            </section>
+
+            <!-- THE THREE AI NODES -->
+            <section id="ai-nodes">
+                <h2>Three AI Perspectives</h2>
+                <p>Each AI brings different training backgrounds and reasoning patterns to the planning process:</p>
+
+                <div class="ai-nodes">
+                    <div class="ai-node claude">
+                        <div class="icon">&#x1F7E3;</div>
+                        <h3>Claude</h3>
+                        <p class="focus">Practical Execution & Integration</p>
+                        <p>Deep architectural analysis, nuanced technical decisions, and integration considerations.</p>
+                    </div>
+
+                    <div class="ai-node gemini">
+                        <div class="icon">&#x1F7E2;</div>
+                        <h3>Gemini</h3>
+                        <p class="focus">High-Level Architecture & User Workflows</p>
+                        <p>System integration, user flow design, and best practices research with web search.</p>
+                    </div>
+
+                    <div class="ai-node codex">
+                        <div class="icon">&#x1F535;</div>
+                        <h3>Codex</h3>
+                        <p class="focus">Technical Implementation & Feasibility</p>
+                        <p>Code structure, technical stack choices, implementation order, and potential blockers.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP BY STEP -->
+            <section id="steps">
+                <h2>Step-by-Step Process</h2>
+
+                <div class="workflow-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h4>Clarify & Format</h4>
+                        <p>Minimal clarification of the plan ask to ensure all AI reviewers interpret requirements consistently.</p>
+                        <div class="output">Output: {descriptor}.plan.ask.md</div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h4>Parallel Plan Generation <span class="parallel-indicator">PARALLEL</span></h4>
+                        <p>All three AIs independently create implementation plans from the same input simultaneously.</p>
+                        <div class="output">Output: .plan.claude.md, .plan.gemini.md, .plan.codex.md</div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h4>Plan Synthesis</h4>
+                        <p>Claude analyzes all three plans, assigns agents to tasks, identifies parallel opportunities, creates unified draft.</p>
+                        <div class="output">Output: {descriptor}.plan.draft.md</div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <h4>Peer Review <span class="parallel-indicator">PARALLEL</span></h4>
+                        <p>Gemini and Codex review the draft plan, providing feedback on completeness, feasibility, and agent assignments.</p>
+                        <div class="output">Output: .plan.gemini-review.md, .plan.codex-review.md</div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">5</div>
+                        <h4>Final Plan</h4>
+                        <p>Incorporate peer review feedback, finalize agent assignments and parallel groups.</p>
+                        <div class="output">Output: {descriptor}.plan.final.md</div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">6</div>
+                        <h4>Executive Presentation</h4>
+                        <p>Create a web-ready visual summary with timeline diagrams, agent workload, and parallel execution visualization.</p>
+                        <div class="output">Output: nginx/sites/{descriptor}-plan/</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FINAL PLAN STRUCTURE -->
+            <section id="structure">
+                <h2>Final Plan Structure</h2>
+                <p>The final plan includes these required sections:</p>
+
+                <div class="workflow-grid">
+                    <div class="step-card" style="background: #f0fdf4; border-color: #22c55e;">
+                        <h4>Executive Summary</h4>
+                        <p>2-3 paragraph overview of the project scope and approach.</p>
+                    </div>
+
+                    <div class="step-card" style="background: #f0fdf4; border-color: #22c55e;">
+                        <h4>Phase Breakdown</h4>
+                        <p>Tasks organized by execution order with clear milestones.</p>
+                    </div>
+
+                    <div class="step-card" style="background: #f0fdf4; border-color: #22c55e;">
+                        <h4>Task Details</h4>
+                        <p>Each task with agent assignment, parallel group, dependencies, and deliverable.</p>
+                    </div>
+
+                    <div class="step-card" style="background: #f0fdf4; border-color: #22c55e;">
+                        <h4>Dependency Graph</h4>
+                        <p>Visual Mermaid diagram showing task dependencies and parallel groups.</p>
+                    </div>
+
+                    <div class="step-card" style="background: #f0fdf4; border-color: #22c55e;">
+                        <h4>Agent Workload Summary</h4>
+                        <p>Tasks per agent, parallel opportunities, and workload distribution.</p>
+                    </div>
+
+                    <div class="step-card" style="background: #f0fdf4; border-color: #22c55e;">
+                        <h4>Risk Register</h4>
+                        <p>Potential blockers and mitigation strategies from multi-AI analysis.</p>
+                    </div>
+                </div>
+
+                <div class="diagram-container">
+                    <h3>Dependency Graph Example</h3>
+                    <div class="mermaid">
+graph TD
+    A[Architecture Design<br/>Architect] --> B[User Service<br/>Developer-1]
+    A --> C[Product Service<br/>Developer-2]
+    A --> D[Test Specs<br/>QA]
+    B --> E[Integration<br/>Developer]
+    C --> E
+    D --> F[CI Pipeline<br/>QA]
+    E --> F
+    F --> G[Security Audit<br/>Security]
+
+    subgraph "Parallel Group A"
+        B
+        C
+        D
+    end
+
+    subgraph "Parallel Group B"
+        F
+        G
+    end
+                    </div>
+                </div>
+            </section>
+
+            <!-- COMPARISON: SOLUTION vs PLAN -->
+            <section id="comparison">
+                <h2>CreateSolution vs CreatePlan</h2>
+                <p>These two skills work together in sequence:</p>
+
+                <div class="comparison-box">
+                    <div class="compare-item solution">
+                        <h4>CreateSolution</h4>
+                        <ul>
+                            <li>Answers: "What should we build?"</li>
+                            <li>Focuses on requirements and design</li>
+                            <li>Proposes architecture and approach</li>
+                            <li>Defines technology choices</li>
+                            <li>Creates solution design document</li>
+                        </ul>
+                    </div>
+
+                    <div class="compare-item plan">
+                        <h4>CreatePlan</h4>
+                        <ul>
+                            <li>Answers: "How do we build it?"</li>
+                            <li>Assigns agents to each task</li>
+                            <li>Identifies parallel execution opportunities</li>
+                            <li>Defines phases and dependencies</li>
+                            <li>Creates actionable project plan</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="phase-arrow">CreateSolution &#x2192; CreatePlan &#x2192; Agent Execution</div>
+            </section>
+
+            <!-- KEY INSIGHT -->
+            <div class="key-insight">
+                <h2>The Power of Multi-AI Planning with Agents</h2>
+                <p><strong>Different AI models see different risks, consider different edge cases, and prioritize different concerns.</strong></p>
+                <p style="margin-top: 1rem;">By synthesizing three independent plans, assigning specialized agents, and identifying parallel execution paths, CreatePlan produces executable project plans that maximize team efficiency.</p>
+            </div>
+
+            <!-- FILE STRUCTURE -->
+            <section id="files">
+                <h2>Output File Structure</h2>
+                <p>All artifacts are saved to a consistent directory structure:</p>
+
+                <div class="file-structure">
+<span class="folder">$HOME/projects/ainotes/createplan/</span>
+<span class="comment"># Directory for all createplan outputs</span>
+
+<span class="file">{descriptor}.plan.ask.md</span>        <span class="comment"># Clarified plan ask</span>
+<span class="file">{descriptor}.plan.claude.md</span>     <span class="comment"># Claude's implementation plan</span>
+<span class="file">{descriptor}.plan.gemini.md</span>     <span class="comment"># Gemini's implementation plan</span>
+<span class="file">{descriptor}.plan.codex.md</span>      <span class="comment"># Codex's implementation plan</span>
+<span class="file">{descriptor}.plan.draft.md</span>      <span class="comment"># Synthesized draft plan</span>
+<span class="file">{descriptor}.plan.gemini-review.md</span>  <span class="comment"># Gemini's review feedback</span>
+<span class="file">{descriptor}.plan.codex-review.md</span>   <span class="comment"># Codex's review feedback</span>
+<span class="file">{descriptor}.plan.final.md</span>      <span class="comment"># Final plan with agents & parallel groups</span>
+
+<span class="folder">$HOME/projects/nginx/sites/{descriptor}-plan/</span>
+<span class="comment"># Web presentation</span>
+<span class="file">index.html</span>                       <span class="comment"># Executive summary with visuals</span>
+                </div>
+            </section>
+
+            <!-- USAGE -->
+            <section id="usage">
+                <h2>How to Use</h2>
+
+                <div class="usage-box">
+                    <h3>Invoke the Skill</h3>
+                    <code>/createplan [your plan ask here]</code>
+                    <p>Example:</p>
+                    <p><code>/createplan Implement the options finder API as specified in the solution document</code></p>
+                    <p style="margin-top: 1rem;">The skill will automatically:</p>
+                    <ul style="margin-left: 2rem; margin-top: 0.5rem; color: #4a5568;">
+                        <li>Create a descriptor based on your input</li>
+                        <li>Generate plans from all three AI nodes (in parallel)</li>
+                        <li>Synthesize with agent assignments and parallel groups</li>
+                        <li>Peer-review the draft (Gemini + Codex in parallel)</li>
+                        <li>Deploy an executive presentation to nginx</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- BENEFITS -->
+            <section id="benefits">
+                <h2>Why This Approach Works</h2>
+
+                <div class="benefit-grid">
+                    <div class="benefit-card">
+                        <h4>Clear Ownership</h4>
+                        <p>Every task has an assigned agent, eliminating ambiguity about who does what.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <h4>Maximum Parallelism</h4>
+                        <p>Independent tasks are explicitly grouped for simultaneous execution.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <h4>Diverse Perspectives</h4>
+                        <p>Three AI models catch blind spots that any single model would miss.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <h4>Executable Output</h4>
+                        <p>Plans can be directly executed using Claude Code's Task() for spawning agents.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <h4>Risk Mitigation</h4>
+                        <p>Peer review catches feasibility issues before implementation begins.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <h4>Executive Visibility</h4>
+                        <p>Web presentation provides stakeholders with clear timeline and workload visibility.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p><strong>CreatePlan Skill</strong> | Multi-AI Project Planning with Agent Assignments</p>
+            <p style="margin-top: 0.5rem;">Part of the AI Review Board Architecture</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">
+                See also:
+                <a href="/review-board/">AI Peer Review Board</a> |
+                <a href="/ai-swarm-architecture/">AI Swarm Architecture</a> |
+                <a href="/agent-workflow/">Agent Workflow</a> |
+                <a href="/user-level-skills/">User-Level Skills</a> |
+                <a href="/">All Documentation</a>
+            </p>
+            <p style="margin-top: 1rem; color: #a0aec0; font-size: 0.85rem;">
+                Skill Location: <code>~/.claude/skills/createplan/SKILL.md</code> |
+                Updated: 2026-01-21
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#ccfbf1',
+                primaryBorderColor: '#14b8a6',
+                primaryTextColor: '#0f766e',
+                lineColor: '#64748b',
+                secondaryColor: '#f0fdfa',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+</body>
+</html>

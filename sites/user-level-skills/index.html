@@ -224,6 +224,41 @@
             font-family: monospace;
         }
 
+        .skill-name-link {
+            text-decoration: none;
+            color: #1a365d;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .skill-name-link:hover {
+            color: #4299e1;
+        }
+
+        .skill-name-link .link-icon {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .skill-name-link:hover .link-icon {
+            opacity: 1;
+        }
+
+        .docs-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
         .section-title {
             font-size: 1.5rem;
             color: #1a365d;
@@ -306,7 +341,7 @@
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-value">11</div>
+                <div class="stat-value">12</div>
                 <div class="stat-label">Total Skills</div>
             </div>
             <div class="stat-card">
@@ -314,7 +349,7 @@
                 <div class="stat-label">Proactive</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">9</div>
+                <div class="stat-value">10</div>
                 <div class="stat-label">On-Demand</div>
             </div>
             <div class="stat-card">
@@ -540,7 +575,11 @@
             <div class="skill-card">
                 <div class="skill-header">
                     <span class="skill-icon">💡</span>
-                    <a href="/createsolution-docs/" class="skill-name" style="text-decoration: none; color: #1a365d;">createsolution</a>
+                    <a href="/createsolution-docs/" class="skill-name-link">
+                        <span class="skill-name">createsolution</span>
+                        <span class="link-icon">↗</span>
+                    </a>
+                    <span class="docs-badge">Docs</span>
                 </div>
                 <span class="skill-type on-demand">On-Demand - Workflow</span>
                 <p class="skill-description">Execute the AI Board Review workflow: refine requirements, analyze, gather multi-AI perspectives (Gemini, Codex), synthesize into a final solution, and create an executive web presentation.</p>
@@ -554,7 +593,35 @@
                     </ul>
                 </div>
                 <div class="skill-resources">
-                    <span class="resource-tag">$HOME/projects/ainotes/</span>
+                    <span class="resource-tag">$HOME/projects/ainotes/createsolution/</span>
+                    <span class="resource-tag">nginx deployment</span>
+                </div>
+            </div>
+
+            <!-- Create Plan -->
+            <div class="skill-card">
+                <div class="skill-header">
+                    <span class="skill-icon">📅</span>
+                    <a href="/createplan-docs/" class="skill-name-link">
+                        <span class="skill-name">createplan</span>
+                        <span class="link-icon">↗</span>
+                    </a>
+                    <span class="docs-badge">Docs</span>
+                </div>
+                <span class="skill-type on-demand">On-Demand - Workflow</span>
+                <p class="skill-description">Multi-AI project planning workflow: all three AIs (Claude, Gemini, Codex) generate plans in parallel, synthesize into a draft, peer review, and create a final actionable project plan with executive presentation.</p>
+                <div class="skill-triggers">
+                    <h4>Workflow Steps:</h4>
+                    <ul>
+                        <li>Clarify and format plan ask</li>
+                        <li>Parallel plan generation (3 AIs)</li>
+                        <li>Synthesize into draft plan</li>
+                        <li>Peer review from Gemini & Codex</li>
+                        <li>Create final plan and presentation</li>
+                    </ul>
+                </div>
+                <div class="skill-resources">
+                    <span class="resource-tag">$HOME/projects/ainotes/createplan/</span>
                     <span class="resource-tag">nginx deployment</span>
                 </div>
             </div>
@@ -592,6 +659,8 @@
 │   ├── assets/templates/
 │   └── references/
 ├── claudemd-generator/
+│   └── SKILL.md
+├── createplan/
 │   └── SKILL.md
 ├── createsolution/
 │   └── SKILL.md
@@ -645,7 +714,7 @@
                     </tr>
                     <tr>
                         <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;"><strong>Count</strong></td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">11 skills</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">12 skills</td>
                         <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">8 skills</td>
                     </tr>
                     <tr>
@@ -655,7 +724,7 @@
                     </tr>
                     <tr>
                         <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;"><strong>Examples</strong></td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">createsolution, ai-communication, frontend-design-pro, naming-validator</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">createsolution, createplan, ai-communication, frontend-design-pro, naming-validator</td>
                         <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">keycloak-setup, postgres-integration, traefik-setup</td>
                     </tr>
                 </tbody>

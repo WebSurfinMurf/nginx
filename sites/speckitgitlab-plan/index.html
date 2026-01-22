@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spec-Driven Development Pipeline - Implementation Plan</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .header .meta {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-card {
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-card .label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .architecture-diagram {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.4;
+        }
+
+        .phase {
+            background: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .phase-header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .phase-header h4 {
+            font-size: 1.1rem;
+        }
+
+        .phase-header .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .phase-body {
+            padding: 1.5rem;
+        }
+
+        .task-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .task-table th {
+            background: var(--bg);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .task-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .task-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .agent-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .agent-pm { background: #dbeafe; color: #1e40af; }
+        .agent-architect { background: #fef3c7; color: #92400e; }
+        .agent-security { background: #fee2e2; color: #991b1b; }
+        .agent-developer { background: #d1fae5; color: #065f46; }
+        .agent-qa { background: #e0e7ff; color: #3730a3; }
+
+        .parallel-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--bg);
+            color: var(--text-light);
+        }
+
+        .parallel-badge.parallel {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .timeline {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .timeline-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-label {
+            width: 100px;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+
+        .timeline-track {
+            flex: 1;
+            height: 30px;
+            background: var(--bg);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-fill {
+            position: absolute;
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+        }
+
+        .workload-chart {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .workload-item {
+            flex: 1;
+            min-width: 150px;
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .workload-item .agent-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .workload-item .task-count {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .risk-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .risk-table th, .risk-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .risk-table th {
+            background: var(--bg);
+            font-weight: 600;
+        }
+
+        .risk-high { color: var(--danger); font-weight: 600; }
+        .risk-medium { color: var(--warning); font-weight: 600; }
+        .risk-low { color: var(--success); font-weight: 600; }
+
+        .success-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric-item {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .metric-item .label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .mermaid {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .container {
+                padding: 1rem;
+            }
+            .task-table {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Spec-Driven Development Pipeline</h1>
+        <p class="subtitle">Implementation Plan - AI Board Reviewed</p>
+        <p class="meta">Version 1.0 Final | 2026-01-21 | linuxserver.lan</p>
+    </header>
+
+    <div class="container">
+        <!-- Executive Summary Stats -->
+        <section class="section">
+            <h2>Executive Summary</h2>
+            <div class="grid">
+                <div class="card stat-card">
+                    <div class="number">36</div>
+                    <div class="label">Total Tasks</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="number">6</div>
+                    <div class="label">Phases</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="number">5</div>
+                    <div class="label">Agents</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="number">16</div>
+                    <div class="label">Parallel Tasks</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Objective</h3>
+                <p>Implement a <strong>Spec-Driven Development Pipeline</strong> that automates the software development lifecycle from issue creation through deployment, using 5 specialized AI agents coordinated by GitLab CI/CD and the Spec-Kit methodology.</p>
+                <br>
+                <p><strong>Key Components:</strong></p>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>Claude Code CLI with 5 specialized agents (PM, Architect, Security, Developer, QA)</li>
+                    <li>GitLab CI/CD pipeline with 11 stages</li>
+                    <li>Spec-Kit methodology for structured specifications</li>
+                    <li>Kanban board with scoped labels for visibility</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Architecture -->
+        <section class="section">
+            <h2>Five-Layer Architecture</h2>
+            <div class="architecture-diagram">
++-------------------------------------------------------------------------+
+|                       LAYER 4: VISIBILITY                               |
+|  GitLab Kanban Board with scoped labels (status::, type::, priority::)  |
++-------------------------------------------------------------------------+
+|                       LAYER 3: ORCHESTRATION                            |
+|  GitLab CI/CD Pipeline (11 stages, triggers, resource_groups)           |
++-------------------------------------------------------------------------+
+|                       LAYER 2: METHODOLOGY                              |
+|  Spec-Kit: clarify -> specify -> checklist -> plan -> tasks -> analyze  |
++-------------------------------------------------------------------------+
+|                       LAYER 1.5: INTEGRATION BRIDGE                     |
+|  glab CLI + GL_TOKEN for Claude <-> GitLab communication                |
++-------------------------------------------------------------------------+
+|                       LAYER 1: EXECUTION                                |
+|  Claude Code CLI with 5 agents: PM, Architect, Security, Developer, QA  |
++-------------------------------------------------------------------------+
+|                       LAYER 0: INFRASTRUCTURE                           |
+|  GitLab, MCP Proxy, PostgreSQL, Keycloak, Traefik, Loki/Grafana        |
++-------------------------------------------------------------------------+
+            </div>
+        </section>
+
+        <!-- Agent Coordination Flow -->
+        <section class="section">
+            <h2>Agent Coordination Flow</h2>
+            <div class="card">
+                <div class="mermaid">
+graph TD
+    User((User)) -->|Create Issue| GL[GitLab]
+    GL -->|Trigger| CI[CI Pipeline]
+    CI -->|Triage| PM[PM Agent]
+    CI -->|Clarification| PM
+    CI -->|Specification| Arch[Architect Agent]
+    CI -->|Planning| Arch
+    CI -->|Implementation| Dev[Developer Agent]
+    CI -->|Security| Sec[Security Agent]
+    CI -->|Testing| QA[QA Agent]
+    PM -->|Labels/Comments| GL
+    Arch -->|Specs/Plans| GL
+    Dev -->|Code/MR| GL
+    Sec -->|Review| GL
+    QA -->|Test Results| GL
+    GL -->|Deploy| Prod[Production]
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase Breakdown -->
+        <section class="section">
+            <h2>Implementation Phases</h2>
+
+            <!-- Phase 0 -->
+            <div class="phase">
+                <div class="phase-header">
+                    <h4>Phase 0: Discovery & Baseline</h4>
+                    <span class="badge">2 Tasks | Parallel Group A</span>
+                </div>
+                <div class="phase-body">
+                    <table class="task-table">
+                        <thead>
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Task Name</th>
+                                <th>Agent</th>
+                                <th>Parallel</th>
+                                <th>Deliverable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>T0.1</td>
+                                <td>Inventory existing services</td>
+                                <td><span class="agent-badge agent-pm">PM</span></td>
+                                <td><span class="parallel-badge parallel">A</span></td>
+                                <td>Service inventory checklist</td>
+                            </tr>
+                            <tr>
+                                <td>T0.2</td>
+                                <td>Validate runner networking</td>
+                                <td><span class="agent-badge agent-security">Security</span></td>
+                                <td><span class="parallel-badge parallel">A</span></td>
+                                <td>Network connectivity confirmation</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Phase 1 -->
+            <div class="phase">
+                <div class="phase-header">
+                    <h4>Phase 1: Foundation</h4>
+                    <span class="badge">6 Tasks | Groups B, C + Sequential</span>
+                </div>
+                <div class="phase-body">
+                    <table class="task-table">
+                        <thead>
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Task Name</th>
+                                <th>Agent</th>
+                                <th>Parallel</th>
+                                <th>Deliverable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>T1.1</td>
+                                <td>Install glab CLI</td>
+                                <td><span class="agent-badge agent-developer">Developer</span></td>
+                                <td><span class="parallel-badge parallel">B</span></td>
+                                <td>glab authenticated</td>
+                            </tr>
+                            <tr>
+                                <td>T1.2</td>
+                                <td>Configure GL_TOKEN</td>
+                                <td><span class="agent-badge agent-security">Security</span></td>
+                                <td><span class="parallel-badge parallel">B</span></td>
+                                <td>Token in secrets + CI vars</td>
+                            </tr>
+                            <tr>
+                                <td>T1.3</td>
+                                <td>Install Spec-Kit CLI</td>
+                                <td><span class="agent-badge agent-developer">Developer</span></td>
+                                <td><span class="parallel-badge parallel">B</span></td>
+                                <td>speckit commands available</td>
+                            </tr>
+                            <tr>
+                                <td>T1.4</td>
+                                <td>Create label taxonomy</td>
+                                <td><span class="agent-badge agent-pm">PM</span></td>
+                                <td><span class="parallel-badge parallel">C</span></td>
+                                <td>34 labels created</td>
+                            </tr>
+                            <tr>
+                                <td>T1.5</td>
+                                <td>Configure Kanban board</td>
+                                <td><span class="agent-badge agent-pm">PM</span></td>
+                                <td><span class="parallel-badge parallel">C</span></td>
+                                <td>Board with status lists</td>
+                            </tr>
+                            <tr>
+                                <td>T1.6</td>
+                                <td>Register GitLab Runner</td>
+                                <td><span class="agent-badge agent-security">Security</span></td>
+                                <td><span class="parallel-badge">Sequential</span></td>
+                                <td>Runner with mcp-net access</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="phase">
+                <div class="phase-header">
+                    <h4>Phase 2: Pipeline Setup</h4>
+                    <span class="badge">6 Tasks | Group D + Sequential</span>
+                </div>
+                <div class="phase-body">
+                    <table class="task-table">
+                        <thead>
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Task Name</th>
+                                <th>Agent</th>
+                                <th>Parallel</th>
+                                <th>Deliverable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>T2.1</td>
+                                <td>Create .gitlab-ci.yml skeleton</td>
+                                <td><span class="agent-badge agent-architect">Architect</span></td>
+                                <td><span class="parallel-badge">Sequential</span></td>
+                                <td>11-stage pipeline template</td>
+                            </tr>
+                            <tr>
+                                <td>T2.2</td>
+                                <td>Configure CI/CD variables</td>
+                                <td><span class="agent-badge agent-security">Security</span></td>
+                                <td><span class="parallel-badge parallel">D</span></td>
+                                <td>ANTHROPIC_API_KEY, GL_TOKEN, GL_HOST</td>
+                            </tr>
+                            <tr>
+                                <td>T2.3</td>
+                                <td>Configure runner networking</td>
+                                <td><span class="agent-badge agent-developer">Developer</span></td>
+                                <td><span class="parallel-badge parallel">D</span></td>
+                                <td>Runner Docker config</td>
+                            </tr>
+                            <tr>
+                                <td>T2.4</td>
+                                <td>Create pipeline trigger token</td>
+                                <td><span class="agent-badge agent-security">Security</span></td>
+                                <td><span class="parallel-badge parallel">D</span></td>
+                                <td>Trigger token for API</td>
+                            </tr>
+                            <tr>
+                                <td>T2.5</td>
+                                <td>Build base Docker image</td>
+                                <td><span class="agent-badge agent-developer">Developer</span></td>
+                                <td><span class="parallel-badge parallel">D</span></td>
+                                <td>Pre-built image with deps</td>
+                            </tr>
+                            <tr>
+                                <td>T2.6</td>
+                                <td>Test triage stage</td>
+                                <td><span class="agent-badge agent-qa">QA</span></td>
+                                <td><span class="parallel-badge">Sequential</span></td>
+                                <td>Passing triage test</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Phase 3 -->
+            <div class="phase">
+                <div class="phase-header">
+                    <h4>Phase 3: Spec-Kit Integration + Early Observability</h4>
+                    <span class="badge">10 Tasks | Groups E, F + Sequential</span>
+                </div>
+                <div class="phase-body">
+                    <table class="task-table">
+                        <thead>
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Task Name</th>
+                                <th>Agent</th>
+                                <th>Parallel</th>
+                                <th>Deliverable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>T3.1</td>
+                                <td>Create spec template structure</td>
+                                <td><span class="agent-badge agent-architect">Architect</span></td>
+                                <td><span class="parallel-badge parallel">E</span></td>
+                                <td>Template repo structure</td>
+                            </tr>
+                            <tr>
+                                <td>T3.2</td>
+                                <td>Implement clarification stage</td>
+                                <td><span class="agent-badge agent-developer">Developer</span></td>
+                                <td><span class="parallel-badge parallel">E</span></td>
+                                <td>/speckit.clarify in CI</td>
+                            </tr>
+                            <tr>
+                                <td>T3.3</td>
+                                <td>Implement specification stage</td>
+                                <td><span class="agent-badge agent-developer">Developer</span></td>
+                                <td><span class="parallel-badge parallel">E</span></td>
+                                <td>/speckit.specify in CI</td>
+                            </tr>
+                            <tr>
+                                <td>T3.4</td>
+                                <td>Implement spec-checklist stage</td>
+                                <td><span class="agent-badge agent-qa">QA</span></td>
+                                <td><span class="parallel-badge parallel">E</span></td>
+                                <td>/speckit.checklist in CI</td>
+                            </tr>
+                            <tr>
+                                <td>T3.5</td>
+                                <td>Implement planning stage</td>
+                                <td><span class="agent-badge agent-architect">Architect</span></td>
+                                <td><span class="parallel-badge parallel">F</span></td>
+                                <td>/speckit.plan in CI</td>
+                            </tr>
+                            <tr>
+                                <td>T3.6</td>
+                                <td>Implement task-generation stage</td>
+                                <td><span class="agent-badge agent-developer">Developer</span></td>
+                                <td><span class="parallel-badge parallel">F</span></td>
+                                <td>/speckit.tasks in CI</td>
+                            </tr>
+                            <tr>
+                                <td>T3.7</td>
+                                <td>Implement task-analysis stage</td>
+                                <td><span class="agent-badge agent-qa">QA</span></td>
+                                <td><span class="parallel-badge parallel">F</span></td>
+                                <td>/speckit.analyze in CI</td>
+                            </tr>
+                            <tr>
+                                <td>T3.8</td>
+                                <td>Validate all Spec-Kit commands</td>
+                                <td><span class="agent-badge agent-qa">QA</span></td>
+                                <td><span class="parallel-badge">Sequential</span></td>
+                                <td>Validation report</td>
+                            </tr>
+                            <tr>
+                                <td>T3.9</td>
+                                <td>Configure Loki log collection</td>
+                                <td><span class="agent-badge agent-developer">Developer</span></td>
+                                <td><span class="parallel-badge parallel">E</span></td>
+                                <td>Log scraping for runner</td>
+                            </tr>
+                            <tr>
+                                <td>T3.10</td>
+                                <td>Create Grafana dashboard</td>
+                                <td><span class="agent-badge agent-developer">Developer</span></td>
+                                <td><span class="parallel-badge parallel">E</span></td>
+                                <td>Pipeline metrics dashboard</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Phase 4 -->
+            <div class="phase">
+                <div class="phase-header">
+                    <h4>Phase 4: Full Pipeline</h4>
+                    <span class="badge">6 Tasks | Group G + Sequential</span>
+                </div>
+                <div class="phase-body">
+                    <table class="task-table">
+                        <thead>
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Task Name</th>
+                                <th>Agent</th>
+                                <th>Parallel</th>
+                                <th>Deliverable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>T4.1</td>
+                                <td>Implement implementation stage</td>
+                                <td><span class="agent-badge agent-developer">Developer</span></td>
+                                <td><span class="parallel-badge parallel">G</span></td>
+                                <td>/speckit.implement in CI</td>
+                            </tr>
+                            <tr>
+                                <td>T4.2</td>
+                                <td>Implement security stage</td>
+                                <td><span class="agent-badge agent-security">Security</span></td>
+                                <td><span class="parallel-badge parallel">G</span></td>
+                                <td>Security review in CI</td>
+                            </tr>
+                            <tr>
+                                <td>T4.3</td>
+                                <td>Implement testing stage</td>
+                                <td><span class="agent-badge agent-qa">QA</span></td>
+                                <td><span class="parallel-badge parallel">G</span></td>
+                                <td>Test validation in CI</td>
+                            </tr>
+                            <tr>
+                                <td>T4.4</td>
+                                <td>Implement deployment stage</td>
+                                <td><span class="agent-badge agent-developer">Developer</span></td>
+                                <td><span class="parallel-badge">Sequential</span></td>
+                                <td>Deploy script in CI</td>
+                            </tr>
+                            <tr>
+                                <td>T4.5</td>
+                                <td>Define rollback workflow</td>
+                                <td><span class="agent-badge agent-security">Security</span></td>
+                                <td><span class="parallel-badge parallel">G</span></td>
+                                <td>Rollback procedure documented</td>
+                            </tr>
+                            <tr>
+                                <td>T4.6</td>
+                                <td>End-to-end pilot</td>
+                                <td><span class="agent-badge agent-pm">PM</span></td>
+                                <td><span class="parallel-badge">Sequential</span></td>
+                                <td>Complete feature via pipeline</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Phase 5 -->
+            <div class="phase">
+                <div class="phase-header">
+                    <h4>Phase 5: Documentation & Onboarding</h4>
+                    <span class="badge">5 Tasks | Group H + Sequential</span>
+                </div>
+                <div class="phase-body">
+                    <table class="task-table">
+                        <thead>
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Task Name</th>
+                                <th>Agent</th>
+                                <th>Parallel</th>
+                                <th>Deliverable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>T5.1</td>
+                                <td>Configure notifications</td>
+                                <td><span class="agent-badge agent-pm">PM</span></td>
+                                <td><span class="parallel-badge parallel">H</span></td>
+                                <td>Slack/email alerts</td>
+                            </tr>
+                            <tr>
+                                <td>T5.2</td>
+                                <td>Document runbook draft</td>
+                                <td><span class="agent-badge agent-pm">PM</span></td>
+                                <td><span class="parallel-badge parallel">H</span></td>
+                                <td>Operations runbook draft</td>
+                            </tr>
+                            <tr>
+                                <td>T5.3</td>
+                                <td>Start runbook early</td>
+                                <td><span class="agent-badge agent-pm">PM</span></td>
+                                <td><span class="parallel-badge">Ongoing</span></td>
+                                <td>Architecture documentation</td>
+                            </tr>
+                            <tr>
+                                <td>T5.4</td>
+                                <td>Finalize runbook</td>
+                                <td><span class="agent-badge agent-pm">PM</span></td>
+                                <td><span class="parallel-badge">Sequential</span></td>
+                                <td>Complete runbook</td>
+                            </tr>
+                            <tr>
+                                <td>T5.5</td>
+                                <td>Create developer guide</td>
+                                <td><span class="agent-badge agent-pm">PM</span></td>
+                                <td><span class="parallel-badge parallel">H</span></td>
+                                <td>Onboarding documentation</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Timeline -->
+        <section class="section">
+            <h2>Timeline Visualization</h2>
+            <div class="card">
+                <div class="timeline-bar">
+                    <div class="timeline-label">Phase 0</div>
+                    <div class="timeline-track">
+                        <div class="timeline-fill" style="left: 0%; width: 8%; background: #22c55e;">A</div>
+                    </div>
+                </div>
+                <div class="timeline-bar">
+                    <div class="timeline-label">Phase 1</div>
+                    <div class="timeline-track">
+                        <div class="timeline-fill" style="left: 8%; width: 20%; background: #3b82f6;">B,C</div>
+                    </div>
+                </div>
+                <div class="timeline-bar">
+                    <div class="timeline-label">Phase 2</div>
+                    <div class="timeline-track">
+                        <div class="timeline-fill" style="left: 28%; width: 18%; background: #8b5cf6;">D</div>
+                    </div>
+                </div>
+                <div class="timeline-bar">
+                    <div class="timeline-label">Phase 3</div>
+                    <div class="timeline-track">
+                        <div class="timeline-fill" style="left: 46%; width: 25%; background: #f59e0b;">E,F</div>
+                    </div>
+                </div>
+                <div class="timeline-bar">
+                    <div class="timeline-label">Phase 4</div>
+                    <div class="timeline-track">
+                        <div class="timeline-fill" style="left: 71%; width: 18%; background: #ef4444;">G</div>
+                    </div>
+                </div>
+                <div class="timeline-bar">
+                    <div class="timeline-label">Phase 5</div>
+                    <div class="timeline-track">
+                        <div class="timeline-fill" style="left: 89%; width: 11%; background: #64748b;">H</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent Workload -->
+        <section class="section">
+            <h2>Agent Workload Distribution</h2>
+            <div class="card">
+                <div class="workload-chart">
+                    <div class="workload-item">
+                        <div class="agent-name"><span class="agent-badge agent-pm">PM</span></div>
+                        <div class="task-count">8</div>
+                        <div class="label">tasks</div>
+                    </div>
+                    <div class="workload-item">
+                        <div class="agent-name"><span class="agent-badge agent-architect">Architect</span></div>
+                        <div class="task-count">5</div>
+                        <div class="label">tasks</div>
+                    </div>
+                    <div class="workload-item">
+                        <div class="agent-name"><span class="agent-badge agent-security">Security</span></div>
+                        <div class="task-count">8</div>
+                        <div class="label">tasks</div>
+                    </div>
+                    <div class="workload-item">
+                        <div class="agent-name"><span class="agent-badge agent-developer">Developer</span></div>
+                        <div class="task-count">11</div>
+                        <div class="label">tasks</div>
+                    </div>
+                    <div class="workload-item">
+                        <div class="agent-name"><span class="agent-badge agent-qa">QA</span></div>
+                        <div class="task-count">6</div>
+                        <div class="label">tasks</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Risk Register -->
+        <section class="section">
+            <h2>Risk Register</h2>
+            <div class="card">
+                <table class="risk-table">
+                    <thead>
+                        <tr>
+                            <th>Risk</th>
+                            <th>Probability</th>
+                            <th>Impact</th>
+                            <th>Mitigation</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>MCP Proxy unreachable</td>
+                            <td class="risk-medium">Medium</td>
+                            <td class="risk-high">High</td>
+                            <td>network_mode + extra_hosts, T0.2 validation</td>
+                            <td><span class="agent-badge agent-security">Security</span></td>
+                        </tr>
+                        <tr>
+                            <td>Spec-Kit install fails</td>
+                            <td class="risk-low">Low</td>
+                            <td class="risk-medium">Medium</td>
+                            <td>Pre-built Docker image (T2.5)</td>
+                            <td><span class="agent-badge agent-developer">Developer</span></td>
+                        </tr>
+                        <tr>
+                            <td>Claude API rate limits</td>
+                            <td class="risk-low">Low</td>
+                            <td class="risk-medium">Medium</td>
+                            <td>Exponential backoff retry</td>
+                            <td><span class="agent-badge agent-developer">Developer</span></td>
+                        </tr>
+                        <tr>
+                            <td>Underspecified requirements</td>
+                            <td class="risk-high">High</td>
+                            <td class="risk-medium">Medium</td>
+                            <td>Mandatory clarification loop</td>
+                            <td><span class="agent-badge agent-pm">PM</span></td>
+                        </tr>
+                        <tr>
+                            <td>Pipeline timeouts</td>
+                            <td class="risk-medium">Medium</td>
+                            <td class="risk-low">Low</td>
+                            <td>Per-stage timeouts, split prompts</td>
+                            <td><span class="agent-badge agent-architect">Architect</span></td>
+                        </tr>
+                        <tr>
+                            <td>Runner token exposure</td>
+                            <td class="risk-low">Low</td>
+                            <td class="risk-high">Critical</td>
+                            <td>Masked variables, audit logs</td>
+                            <td><span class="agent-badge agent-security">Security</span></td>
+                        </tr>
+                        <tr>
+                            <td>Deployment failure</td>
+                            <td class="risk-medium">Medium</td>
+                            <td class="risk-high">High</td>
+                            <td>Rollback workflow (T4.5)</td>
+                            <td><span class="agent-badge agent-security">Security</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Success Metrics -->
+        <section class="section">
+            <h2>Success Criteria</h2>
+            <div class="card">
+                <div class="success-metrics">
+                    <div class="metric-item">
+                        <div class="value">100%</div>
+                        <div class="label">Spec Creation Rate</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value">&lt;1h</div>
+                        <div class="label">Simple Issue-to-MR</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value">&lt;4h</div>
+                        <div class="label">Complex Issue-to-MR</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value">&lt;20%</div>
+                        <div class="label">Human Intervention</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value">&gt;85%</div>
+                        <div class="label">Pipeline Success Rate</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value">&gt;90%</div>
+                        <div class="label">Spec Pass Rate (1st try)</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value">100%</div>
+                        <div class="label">Security Issues Caught</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="value">&lt;30m</div>
+                        <div class="label">Developer Onboarding</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dependency Graph -->
+        <section class="section">
+            <h2>Dependency Graph</h2>
+            <div class="card">
+                <div class="mermaid">
+graph TD
+    subgraph "Phase 0"
+        T0_1[T0.1 Inventory]
+        T0_2[T0.2 Network]
+    end
+    subgraph "Phase 1"
+        T0_1 --> T1_1[T1.1 glab]
+        T0_1 --> T1_2[T1.2 Token]
+        T0_1 --> T1_3[T1.3 Spec-Kit]
+        T1_1 --> T1_4[T1.4 Labels]
+        T1_4 --> T1_5[T1.5 Kanban]
+        T1_1 --> T1_6[T1.6 Runner]
+        T1_2 --> T1_6
+        T0_2 --> T1_6
+    end
+    subgraph "Phase 2"
+        T1_6 --> T2_1[T2.1 CI YAML]
+        T2_1 --> T2_2[T2.2 CI Vars]
+        T2_1 --> T2_5[T2.5 Docker]
+        T2_2 --> T2_6[T2.6 Test]
+        T2_5 --> T2_6
+    end
+    subgraph "Phase 3"
+        T2_6 --> T3_8[T3.8 Validate]
+        T2_6 --> T3_10[T3.10 Grafana]
+    end
+    subgraph "Phase 4"
+        T3_8 --> T4_4[T4.4 Deploy]
+        T4_4 --> T4_6[T4.6 Pilot]
+        T5_4 --> T4_6
+    end
+    subgraph "Phase 5"
+        T4_4 --> T5_4[T5.4 Runbook]
+        T4_4 --> T5_5[T5.5 Guide]
+    end
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>Spec-Driven Development Pipeline - Implementation Plan</p>
+        <p>AI Board Reviewed: Claude (Opus 4.5), Gemini (gemini-3-pro-preview), Codex (OpenAI)</p>
+        <p>Generated: 2026-01-21 | linuxserver.lan</p>
+    </footer>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+</body>
+</html>
